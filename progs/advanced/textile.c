@@ -351,7 +351,7 @@ key(unsigned char key, int x, int y)
 void
 menu(int value)
 {
-  key(value, 0, 0);
+  key((unsigned char) value, 0, 0);
 }
 
 int doubleBuffered = GL_FALSE;

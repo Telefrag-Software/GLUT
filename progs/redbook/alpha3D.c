@@ -110,7 +110,7 @@ void display(void)
       glDisable (GL_BLEND);
    glPopMatrix ();
 
-   glutSwapBuffers();
+   glFlush();
 }
 
 void reshape(int w, int h)

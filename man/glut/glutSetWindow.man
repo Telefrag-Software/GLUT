@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSetWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSetWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSetWindow - sets the current window; glutGetWindow - returns
 the identifier of the current window. 
@@ -23,4 +23,4 @@ done using glutUseLayer.
 .SH SEE ALSO
 glutCreateWindow, glutSetMenu
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

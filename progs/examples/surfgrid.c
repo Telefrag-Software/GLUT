@@ -1,7 +1,7 @@
 /**
  * surfgrid.c - simple test of polygon offset
  *
- * GLUT distribution version  $Revision: 1.7 $
+ * GLUT distribution version  $Revision: 1.8 $
  *
  * usage:
  *	surfgrid [-f]

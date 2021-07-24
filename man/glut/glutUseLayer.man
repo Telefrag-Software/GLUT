@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutUseLayer 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutUseLayer 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutUseLayer - changes the layer in use for the current window. 
 .SH SYNTAX
@@ -25,4 +25,4 @@ glutLayerGet(GLUT_LAYER_IN_USE).
 .SH SEE ALSO
 glutEstablishOverlay, glutSetWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

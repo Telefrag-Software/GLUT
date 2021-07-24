@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutMenuStatusFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutMenuStatusFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutMenuStatusFunc - sets the global menu status callback. 
 .SH SYNTAX
@@ -47,4 +47,4 @@ additional x and y coordinates.
 .SH SEE ALSO
 glutCreateMenu, glutCreateWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

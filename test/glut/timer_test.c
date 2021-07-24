@@ -16,13 +16,15 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <GL/glut.h>
 
-#ifdef WIN32
+#ifdef _WIN32
+#include <windows.h>
 #define sleep(x) Sleep(1000 * x)
 #else
 #include <unistd.h>
 #endif
+
+#include <GL/glut.h>
 
 void
 display(void)

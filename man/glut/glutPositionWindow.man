@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutPositionWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutPositionWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutPositionWindow - requests a change to the position of the current window. 
 .SH SYNTAX
@@ -36,4 +36,4 @@ previously enabled.
 .SH SEE ALSO
 glutInitWindowPosition, glutReshapeWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

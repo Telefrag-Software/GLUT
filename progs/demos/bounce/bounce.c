@@ -12,7 +12,7 @@
  **************************************************************************/
 
 /*
- *  foo $Revision: 1.16 $
+ *  foo $Revision: 1.4 $
  */
 #include <assert.h>
 #include <math.h>
@@ -136,7 +136,7 @@ typedef struct fastobj {
     int material;
     int display;
     int ablend;
-    int *data;
+    GLint *data;
 } fastobj;
 
 /*
@@ -304,7 +304,7 @@ drawbox(void)
 void
 drawfastobj(fastobj *obj)
 {
-    register int *p, *end;
+    register GLint *p, *end;
     register int npolys;
 
     p = obj->data;
@@ -312,7 +312,6 @@ drawfastobj(fastobj *obj)
 
     if(obj->colors) {
 	npolys = obj->npoints/4;
-	p = obj->data;
 	while(npolys--) {
 	    PolyOrLine();
 	    glColor3iv(p);
@@ -423,7 +422,11 @@ drawimage(void)
 
     glColor3f(1.0, 1.0, 1.0);
     if (performance) {
-	text(10, 73, 20, "%.0f fps", 1.0 / ((end - last) / 1000.0));
+        if (end - last == 0) {
+	    text(10, 73, 20, "unknown fps");
+	} else {
+	    text(10, 73, 20, "%.0f fps", 1.0 / ((end - last) / 1000.0));
+	}
 	last = start;
     }
     text(10, 43, 14, "Attenuation [%.2f]", fatt);
@@ -660,19 +663,19 @@ menu(int value)
 {
     switch(value) {
     case 1:
-	if (lighton[0] = !lighton[0])
+	if ((lighton[0] = !lighton[0]))
 	    glEnable(GL_LIGHT0);
 	else
 	    glDisable(GL_LIGHT0);
 	break;
     case 2:
-	if (lighton[1] = !lighton[1])
+	if ((lighton[1] = !lighton[1]))
 	    glEnable(GL_LIGHT1);
 	else
 	    glDisable(GL_LIGHT1);
 	break;
     case 3:
-	if (lighton[2] = !lighton[2])
+	if ((lighton[2] = !lighton[2]))
 	    glEnable(GL_LIGHT2);
 	else
 	    glDisable(GL_LIGHT2);
@@ -721,7 +724,7 @@ readfastobj(char *name)
     int i;
     int nlongs;
     int magic;
-    int *ip;
+    GLint *ip;
     char filename[512];
 
     inf = fopen(name,"r");
@@ -750,12 +753,15 @@ readfastobj(char *name)
      * has to map in the next virtual page and re-start the DMA transfer).
      */
     nlongs = 8 * obj->npoints;
-    obj->data = (int *) malloc(nlongs*sizeof(int) + 4096);
-    obj->data = (int *) (((int)(obj->data)) + 0xfff);
-    obj->data = (int *) (((int)(obj->data)) & 0xfffff000);
+    obj->data = (GLint *) malloc(nlongs*sizeof(int) + 4096);
+    obj->data = (GLint *) (((int)(obj->data)) + 0xfff);
+    obj->data = (GLint *) (((int)(obj->data)) & 0xfffff000);
 
+    /* XXX Careful, sizeof(GLint) could change from implementation
+       to implementation making this file format implementation
+       dependent. -mjk */
     for (i = 0, ip = obj->data;  i < nlongs/4;  i++, ip += 4)
-	fread(ip, 3 * sizeof(int), 1, inf);
+	fread(ip, 3 * sizeof(GLint), 1, inf);
     fclose(inf);
     return obj;
 }

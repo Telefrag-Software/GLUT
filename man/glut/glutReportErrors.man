@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutReportErrors 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutReportErrors 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutReportErrors - for debugging purposes; prints out OpenGL run-time errors.
 .SH SYNTAX
@@ -26,4 +26,4 @@ option to detect OpenGL errors in any GLUT program.
 .SH SEE ALSO
 glutInit, glutCreateWindow, glutInitDisplayMode, gluErrorString, glGetError
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

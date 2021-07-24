@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutReshapeWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutReshapeWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutReshapeWindow - requests a change to the size of the current window. 
 .SH SYNTAX
@@ -37,4 +37,4 @@ previously enabled.
 .SH SEE ALSO
 glutPositionWindow, glutReshapeFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

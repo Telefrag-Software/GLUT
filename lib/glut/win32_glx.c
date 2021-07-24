@@ -23,8 +23,13 @@ glXCreateContext(Display * display, XVisualInfo * visinfo,
 
   context = wglCreateContext(XHDC);
 
-  if (share)
+#if 0
+  /* XXX GLUT doesn't support it now, so don't worry about display list
+     and texture object sharing. */
+  if (share) {
     wglShareLists(share, context);
+  }
+#endif
 
   /* Since direct rendering is implicit, the direct flag is
      ignored. */
@@ -147,7 +152,7 @@ glXChooseVisual(Display * display, int screen, int *attribList)
   pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
   pfd.iPixelType = PFD_TYPE_COLORINDEX;
   pfd.cColorBits = 32;
-  pfd.cDepthBits = 1;
+  pfd.cDepthBits = 0;
 
   while (*p) {
     switch (*p) {

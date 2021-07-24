@@ -91,6 +91,7 @@ visible(int vis)
     glutIdleFunc(NULL);
 }
 
+int
 main(int argc, char *argv[])
 {
   static GLfloat lightpos[] =

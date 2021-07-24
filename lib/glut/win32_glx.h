@@ -38,12 +38,6 @@ typedef HGLRC GLXContext;
 #define glXDestroyContext(display, context) \
   wglDeleteContext(context)
 
-#define glXSwapBuffers(display, window) \
-  SwapBuffers(GetDC(window))
-
-#define glXMakeCurrent(display, window, context) \
-  wglMakeCurrent(GetDC(window), context)
-
 /* Function prototypes. */
 
 extern GLXContext glXCreateContext(

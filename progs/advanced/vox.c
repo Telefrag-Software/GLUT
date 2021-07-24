@@ -45,7 +45,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #else
 #define R_OK 04  /* Win32 doesn't define this */
@@ -113,6 +113,7 @@ readVoxelData(void)
 #endif
   /* open vox.bin data file */
   if ((file = fopen("vox.bin", "r")) == NULL) {
+#ifndef _WIN32
     if (!access("vox.bin.gz", R_OK)) {
       if ((file = popen("gzcat vox.bin.gz", "r")) == NULL) {
         fprintf(stderr, "cannot popen input file vox.bin.gz (missing gzcat?)\n");
@@ -128,6 +129,10 @@ readVoxelData(void)
       exit(1);
     }
     using_pipe = 1;
+#else
+    fprintf(stderr, "cannot find vox.bin\n");
+    exit(1);
+#endif
   } else {
     using_pipe = 0;
   }

@@ -294,6 +294,8 @@ mouse(int button, int state, int x, int y)
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
 
+#undef max
+#undef min
 #define max(a,b)  ((a) > (b) ? (a) : (b))
 #define min(a,b)  ((a) < (b) ? (a) : (b))
 

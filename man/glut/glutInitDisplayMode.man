@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutInitDisplayMode 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutInitDisplayMode 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutInitDisplayMode - sets the initial display mode. 
 .SH SYNTAX
@@ -84,4 +84,4 @@ GLUT_LUMINANCE is not supported on most OpenGL platforms.
 .SH SEE ALSO
 glutInit, glutCreateWindow, glutInitDisplayString
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

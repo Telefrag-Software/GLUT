@@ -170,7 +170,8 @@ reshape(int wid, int ht)
   }
 
   glutUseLayer(GLUT_NORMAL);
-  glViewport(-wid * .1, -ht * .1, wid * 1.2, ht * 1.2);
+  glViewport((GLint) (-wid * .1), (GLint) (-ht * .1),
+    (GLuint) (wid * 1.2), (GLuint) (ht * 1.2));
 
   winWidth = wid;
   winHeight = ht;
@@ -346,6 +347,7 @@ redraw(void)
 const int TEXDIM = 256;
 
 /* Parse arguments, and set up interface between OpenGL and window system */
+int
 main(int argc, char *argv[])
 {
   GLfloat *tex;

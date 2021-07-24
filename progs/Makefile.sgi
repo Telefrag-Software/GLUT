@@ -19,7 +19,7 @@ sinclude $(TOP)/Fortran.mk
 sinclude $(TOP)/Inventor.mk
 
 # XXX Keep next line as a single physical line for mkfiles/progs_Makefile
-SUBDIRS = examples redbook demos contrib advanced mesademos sgi-stereo texfont perf_harness mui gle $(FORTRAN) $(INVENTOR)
+SUBDIRS = examples redbook demos contrib advanced mesademos sgi-stereo texfont perf_harness mui gle gameglut bucciarelli advanced97 spheremap $(FORTRAN) $(INVENTOR)
 
 default $(COMMONTARGS): $(_FORCE)
 	$(SUBDIRS_MAKERULE)

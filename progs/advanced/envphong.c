@@ -635,7 +635,7 @@ key(unsigned char key, int x, int y)
 void
 domenu(int value)
 {
-  key(value, 0, 0);
+  key((unsigned char) value, 0, 0);
 }
 
 int

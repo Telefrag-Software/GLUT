@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutCreateSubWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutCreateSubWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutCreateSubWindow - creates a subwindow. 
 .SH SYNTAX
@@ -44,4 +44,4 @@ The range of allocated identifiers starts at one.
 .SH SEE ALSO
 glutCreateWindow, glutDestroyWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

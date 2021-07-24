@@ -146,14 +146,14 @@ invertmat(float from[4][4], float to[4][4])
     r3[7] = r3[7] - m3 * r2[7];
 
     if (r3[3] == 0.0) goto singular;
-    s = 1.0/r3[3];		/* now back substitute row 3	*/
+    s = 1.0f/r3[3];		/* now back substitute row 3	*/
     r3[4] = r3[4] * s;
     r3[5] = r3[5] * s;
     r3[6] = r3[6] * s;
     r3[7] = r3[7] * s;
 
     m2 = r2[3];			/* now back substitute row 2	*/
-    s = 1.0/r2[2];
+    s = 1.0f/r2[2];
     r2[4] = s * (r2[4] - r3[4] * m2);
     r2[5] = s * (r2[5] - r3[5] * m2);
     r2[6] = s * (r2[6] - r3[6] * m2);
@@ -170,7 +170,7 @@ invertmat(float from[4][4], float to[4][4])
     r0[7] = (r0[7] - r3[7] * m0);
 
     m1 = r1[2];			/* now back substitute row 1	*/
-    s = 1.0/r1[1];
+    s = 1.0f/r1[1];
     r1[4] = s * (r1[4] - r2[4] * m1);
     r1[5] = s * (r1[5] - r2[5] * m1);
     r1[6] = s * (r1[6] - r2[6] * m1);
@@ -182,7 +182,7 @@ invertmat(float from[4][4], float to[4][4])
     r0[7] = (r0[7] - r2[7] * m0);
 
     m0 = r0[1];			/* now back substitute row 0	*/
-    s = 1.0/r0[0];
+    s = 1.0f/r0[0];
     r0[4] = s * (r0[4] - r1[4] * m0);
     r0[5] = s * (r0[5] - r1[5] * m0);
     r0[6] = s * (r0[6] - r1[6] * m0);

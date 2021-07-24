@@ -1,5 +1,5 @@
 
-/* Copyright (c) Mark J. Kilgard, 1997.  */
+/* Copyright (c) Mark J. Kilgard, 1997, 1998.  */
 
 /* This program is freely distributable without licensing fees and is
    provided without guarantee or warrantee expressed or implied.  This
@@ -12,6 +12,7 @@
    objects spin.  See the rts.c and  rtshadow.h source code for more details. */
 
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include <stdlib.h>
 #include <GL/glut.h>
@@ -37,7 +38,8 @@ enum {
   M_TORUS, M_CUBE, M_DOUBLE_TORUS, M_NORMAL_VIEW, M_LIGHT1_VIEW, M_LIGHT2_VIEW,
   M_START_MOTION, M_ROTATING,
   M_TWO_BIT_STENCIL, M_ALL_STENCIL,
-  M_RENDER_SILHOUETTE
+  M_RENDER_SILHOUETTE,
+  M_ENABLE_STENCIL_HACK, M_DISABLE_STENCIL_HACK
 };
 
 #define OBJECT_1  0x8000
@@ -120,7 +122,7 @@ renderScene(GLenum castingLight, void *sceneData, RTSscene * scene)
 {
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(70.0, 1.0, 0.01, 30.0);
+  gluPerspective(70.0, 1.0, 0.5, 30.0);
 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -378,6 +380,14 @@ menuHandler(int value)
     renderSilhouette2 = !renderSilhouette2;
     glutPostRedisplay();
     break;
+  case M_ENABLE_STENCIL_HACK:
+    rtsStencilRenderingInvariantHack(scene, GL_TRUE);
+    glutPostRedisplay();
+    break;
+  case M_DISABLE_STENCIL_HACK:
+    rtsStencilRenderingInvariantHack(scene, GL_FALSE);
+    glutPostRedisplay();
+    break;
   }
 }
 
@@ -408,6 +418,9 @@ initMenu(void)
   glutAddMenuEntry("1 Toggle silhouette", OBJECT_1 | M_RENDER_SILHOUETTE);
   glutAddMenuEntry("2 Toggle silhouette", OBJECT_2 | M_RENDER_SILHOUETTE);
 
+  glutAddMenuEntry("Enable stencil hack", M_ENABLE_STENCIL_HACK);
+  glutAddMenuEntry("Disable stencil hack", M_DISABLE_STENCIL_HACK);
+
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
@@ -435,6 +448,24 @@ motion(int x, int y)
     begin = x;
     glutPostRedisplay();
   }
+}
+
+/* XXX RIVA 128 board vendors may change their GL_VENDOR
+   and GL_RENDERER strings. */
+int
+detectRiva128hardware(void)
+{
+  const char *vendor, *renderer;
+
+  vendor = glGetString(GL_VENDOR);
+  renderer = glGetString(GL_RENDERER);
+  if (strcmp("NVIDIA Corporation", vendor)) {
+    return 0;
+  }
+  if (strncmp("RIVA 128", renderer, 8)) {
+    return 0;
+  }
+  return 1;
 }
 
 int
@@ -471,6 +502,15 @@ main(int argc, char **argv)
   rtsAddLightToScene(scene, light2);
   rtsAddObjectToLight(light2, object);
   rtsAddObjectToLight(light2, object2);
+
+  if (detectRiva128hardware()) {
+    /* RIVA 128 and RIVA 128 ZX lack hardware stencil
+       support and the hardware rasterization path
+       (non-stenciled) and the software rasterization
+       path (with stenciling enabled) do not meet the
+       invariants. */
+    rtsStencilRenderingInvariantHack(scene, GL_TRUE);
+  }
 
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);

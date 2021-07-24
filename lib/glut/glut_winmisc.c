@@ -10,13 +10,12 @@
 #include <string.h>
 #include <assert.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>  /* for XA_STRING atom */
 #endif
 
-#include <GL/glut.h>
 #include "glutint.h"
 
 /* CENTRY */
@@ -26,6 +25,7 @@ glutSetWindowTitle(const char *title)
   XTextProperty textprop;
 
   assert(!__glutCurrentWindow->parent);
+  IGNORE_IN_GAME_MODE();
   textprop.value = (unsigned char *) title;
   textprop.encoding = XA_STRING;
   textprop.format = 8;
@@ -41,6 +41,7 @@ glutSetIconTitle(const char *title)
   XTextProperty textprop;
 
   assert(!__glutCurrentWindow->parent);
+  IGNORE_IN_GAME_MODE();
   textprop.value = (unsigned char *) title;
   textprop.encoding = XA_STRING;
   textprop.format = 8;
@@ -53,6 +54,7 @@ glutSetIconTitle(const char *title)
 void APIENTRY 
 glutPositionWindow(int x, int y)
 {
+  IGNORE_IN_GAME_MODE();
   __glutCurrentWindow->desiredX = x;
   __glutCurrentWindow->desiredY = y;
   __glutCurrentWindow->desiredConfMask |= CWX | CWY;
@@ -62,6 +64,7 @@ glutPositionWindow(int x, int y)
 void APIENTRY 
 glutReshapeWindow(int w, int h)
 {
+  IGNORE_IN_GAME_MODE();
   if (w <= 0 || h <= 0)
     __glutWarning("glutReshapeWindow: non-positive width or height not allowed");
 
@@ -74,6 +77,7 @@ glutReshapeWindow(int w, int h)
 void APIENTRY 
 glutPopWindow(void)
 {
+  IGNORE_IN_GAME_MODE();
   __glutCurrentWindow->desiredStack = Above;
   __glutCurrentWindow->desiredConfMask |= CWStackMode;
   __glutPutOnWorkList(__glutCurrentWindow, GLUT_CONFIGURE_WORK);
@@ -82,6 +86,7 @@ glutPopWindow(void)
 void APIENTRY 
 glutPushWindow(void)
 {
+  IGNORE_IN_GAME_MODE();
   __glutCurrentWindow->desiredStack = Below;
   __glutCurrentWindow->desiredConfMask |= CWStackMode;
   __glutPutOnWorkList(__glutCurrentWindow, GLUT_CONFIGURE_WORK);
@@ -90,6 +95,7 @@ glutPushWindow(void)
 void APIENTRY 
 glutIconifyWindow(void)
 {
+  IGNORE_IN_GAME_MODE();
   assert(!__glutCurrentWindow->parent);
   __glutCurrentWindow->desiredMapState = IconicState;
   __glutPutOnWorkList(__glutCurrentWindow, GLUT_MAP_WORK);
@@ -98,6 +104,7 @@ glutIconifyWindow(void)
 void APIENTRY 
 glutShowWindow(void)
 {
+  IGNORE_IN_GAME_MODE();
   __glutCurrentWindow->desiredMapState = NormalState;
   __glutPutOnWorkList(__glutCurrentWindow, GLUT_MAP_WORK);
 }
@@ -105,6 +112,7 @@ glutShowWindow(void)
 void APIENTRY 
 glutHideWindow(void)
 {
+  IGNORE_IN_GAME_MODE();
   __glutCurrentWindow->desiredMapState = WithdrawnState;
   __glutPutOnWorkList(__glutCurrentWindow, GLUT_MAP_WORK);
 }

@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutPostRedisplay 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutPostRedisplay 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutPostRedisplay, glutPostWindowRedisplay - marks the current or specified window as needing to be
 redisplayed. 
@@ -34,4 +34,4 @@ the desired window and then calling glutPostRedisplay.
 .SH SEE ALSO
 glutPostOverlayRedisplay, glutDisplayFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -7,9 +7,9 @@
 
 #include <stdlib.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <GL/glx.h>
-#endif /* !WIN32 */
+#endif
 
 #ifdef __sgi
 #include <dlfcn.h>
@@ -24,7 +24,7 @@
 #define GLX_SGIX_video_resize 1
 #endif
 
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
 static int canVideoResize = -1;
 static int videoResizeChannel;
 #else
@@ -38,7 +38,7 @@ static int dx = -1, dy = -1, dw = -1, dh = -1;
    resizing from an indirect OpenGL context (either local or
    over a network). */
 
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
 
 static volatile int errorCaught;
 
@@ -55,7 +55,7 @@ catchXSGIvcErrors(Display * dpy, XErrorEvent * event)
 int APIENTRY 
 glutVideoResizeGet(GLenum param)
 {
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
   if (canVideoResize < 0) {
     canVideoResize = __glutIsSupportedByGLX("GLX_SGIX_video_resize");
     if (canVideoResize) {
@@ -134,7 +134,7 @@ glutVideoResizeGet(GLenum param)
   case GLUT_VIDEO_RESIZE_Y:
   case GLUT_VIDEO_RESIZE_WIDTH:
   case GLUT_VIDEO_RESIZE_HEIGHT:
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
     if (videoResizeInUse) {
       int x, y, width, height;
 
@@ -162,7 +162,7 @@ glutVideoResizeGet(GLenum param)
 void APIENTRY 
 glutSetupVideoResizing(void)
 {
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
   if (glutVideoResizeGet(GLUT_VIDEO_RESIZE_POSSIBLE)) {
     glXBindChannelToWindowSGIX(__glutDisplay, __glutScreen,
       videoResizeChannel, __glutCurrentWindow->win);
@@ -175,7 +175,7 @@ glutSetupVideoResizing(void)
 void APIENTRY 
 glutStopVideoResizing(void)
 {
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
   if (glutVideoResizeGet(GLUT_VIDEO_RESIZE_POSSIBLE)) {
     if (videoResizeInUse) {
       glXBindChannelToWindowSGIX(__glutDisplay, __glutScreen,
@@ -190,7 +190,7 @@ glutStopVideoResizing(void)
 void APIENTRY 
 glutVideoResize(int x, int y, int width, int height)
 {
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
   if (videoResizeInUse) {
 #ifdef GLX_SYNC_SWAP_SGIX
     /* glXChannelRectSyncSGIX introduced in a patch to IRIX
@@ -209,7 +209,7 @@ glutVideoResize(int x, int y, int width, int height)
 void APIENTRY 
 glutVideoPan(int x, int y, int width, int height)
 {
-#ifdef GLX_SGIX_video_resize
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_video_resize)
   if (videoResizeInUse) {
 #ifdef GLX_SYNC_FRAME_SGIX
     /* glXChannelRectSyncSGIX introduced in a patch to IRIX

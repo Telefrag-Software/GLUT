@@ -6,7 +6,6 @@
    implied. This program is -not- in the public domain. */
 
 #include <stdlib.h>
-#include <GL/glut.h>
 #include "glutint.h"
 
 #define CLAMP(i) ((i) > 1.0 ? 1.0 : ((i) < 0.0 ? 0.0 : (i)))
@@ -38,7 +37,7 @@ glutSetColor(int ndx, GLfloat red, GLfloat green, GLfloat blue)
     __glutWarning("glutSetColor: current window is RGBA");
     return;
   }
-#if defined(WIN32)
+#if defined(_WIN32)
   if (ndx >= 256 ||     /* always assume 256 colors on Win32 */
 #else
   if (ndx >= vis->visual->map_entries ||
@@ -72,7 +71,7 @@ glutSetColor(int ndx, GLfloat red, GLfloat green, GLfloat blue)
         color.blue = (GLfloat) 0xffff *
           cmap->cells[i].component[GLUT_BLUE];
         color.flags = DoRed | DoGreen | DoBlue;
-#if defined(WIN32)
+#if defined(_WIN32)
         if (IsWindowVisible(__glutCurrentWindow->win)) {
           XHDC = __glutCurrentWindow->hdc;
         } else {
@@ -95,7 +94,7 @@ glutSetColor(int ndx, GLfloat red, GLfloat green, GLfloat blue)
     XSetWindowColormap(__glutDisplay,
       __glutCurrentWindow->renderWin, cmap->cmap);
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
     {
       GLUTwindow *toplevel;
 
@@ -117,7 +116,7 @@ glutSetColor(int ndx, GLfloat red, GLfloat green, GLfloat blue)
   cmap->cells[ndx].component[GLUT_BLUE] = blue;
   color.blue = (GLfloat) 0xffff *blue;
   color.flags = DoRed | DoGreen | DoBlue;
-#if defined(WIN32)
+#if defined(_WIN32)
   if (IsWindowVisible(__glutCurrentWindow->win)) {
     XHDC = __glutCurrentWindow->hdc;
   } else {
@@ -150,7 +149,7 @@ glutGetColor(int ndx, int comp)
     __glutWarning("glutGetColor: current window is RGBA");
     return -1.0;
   }
-#if defined(WIN32)
+#if defined(_WIN32)
 #define OUT_OF_RANGE_NDX(ndx) (ndx >= 256 || ndx < 0)
 #else
 #define OUT_OF_RANGE_NDX(ndx) (ndx >= vis->visual->map_entries || ndx < 0)
@@ -197,7 +196,7 @@ glutCopyColormap(int winnum)
     /* Source and destination are the same; now copy needed. */
     return;
   }
-#if !defined(WIN32)
+#if !defined(_WIN32)
   /* Play safe: compare visual IDs, not Visual*'s. */
   if (newcmap->visual->visualid == oldcmap->visual->visualid) {
 #endif
@@ -213,7 +212,7 @@ glutCopyColormap(int winnum)
     }
     XSetWindowColormap(__glutDisplay, __glutCurrentWindow->renderWin,
       newcmap->cmap);
-#if !defined(WIN32)
+#if !defined(_WIN32)
     __glutPutOnWorkList(__glutToplevelOf(window), GLUT_COLORMAP_WORK);
   } else {
     GLUTcolormap *copycmap;

@@ -210,6 +210,7 @@ void muiFreeObject(muiObject *obj)
 	    free(obj->object);
 	    break;
 	case MUI_LABEL:
+	case MUI_BOLDLABEL:
 	    break;
     }
     free(obj);
@@ -502,7 +503,7 @@ void muiHandleEvent(int event, int value, int x, int y)
     if (lastactive != ActiveUIList) {
 	muiInitInteraction(lastactive = ActiveUIList);
     }
-    if (event == MUI_KEYSTROKE) {
+    if ((event == MUI_KEYSTROKE)) {
 	if (obj = muiGetActiveTB()) {
 	    retval = (obj->handler)(obj, event, value, x, y);
 	    if (retval && obj->callback)

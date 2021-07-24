@@ -1,6 +1,6 @@
 #!smake
 #
-# Copyright (c) Mark J. Kilgard, 1995.
+# Copyright (c) Mark J. Kilgard, 1995, 1998.
 #
 
 IDB_TAG = GLUT_DEV_MAN
@@ -11,23 +11,28 @@ MANPAGES = glutAddMenuEntry.man glutAddSubMenu.man glutAttachMenu.man \
   glutChangeToMenuEntry.man glutChangeToSubMenu.man glutCopyColormap.man \
   glutCreateMenu.man glutCreateSubWindow.man glutCreateWindow.man \
   glutDestroyMenu.man glutDestroyWindow.man glutDeviceGet.man \
-  glutDialsFunc.man glutDisplayFunc.man glutEntryFunc.man \
+  glutDialsFunc.man glutDisplayFunc.man \
+  glutEnterGameMode.man glutEntryFunc.man \
   glutEstablishOverlay.man glutExtensionSupported.man glutFullScreen.man \
+  glutForceJoystickFunc.man glutGameModeGet.man glutGameModeString.man \
   glutGet.man glutGetColor.man glutGetModifiers.man glutIdleFunc.man \
+  glutIgnoreKeyRepeat.man \
   glutInit.man glutInitDisplayMode.man glutInitWindowPosition.man \
-  glutKeyboardFunc.man glutLayerGet.man glutMainLoop.man \
+  glutJoystickFunc.man glutKeyboardFunc.man glutKeyboardUpFunc.man \
+  glutLayerGet.man glutMainLoop.man \
   glutMenuStatusFunc.man glutMotionFunc.man glutMouseFunc.man \
   glutOverlayDisplayFunc.man glutPopWindow.man glutPositionWindow.man \
   glutPostOverlayRedisplay.man glutPostRedisplay.man \
   glutRemoveMenuItem.man glutRemoveOverlay.man glutReshapeFunc.man \
   glutReshapeWindow.man glutSetColor.man glutSetCursor.man \
+  glutSetKeyRepeat.man \
   glutSetMenu.man glutSetWindow.man glutSetWindowTitle.man \
   glutShowOverlay.man glutShowWindow.man glutSolidCone.man \
   glutSolidCube.man glutSolidDodecahedron.man glutSolidIcosahedron.man \
   glutSolidOctahedron.man glutSolidSphere.man glutSolidTeapot.man \
   glutSolidTetrahedron.man glutSolidTorus.man \
   glutSpaceballButtonFunc.man glutSpaceballMotionFunc.man \
-  glutSpaceballRotateFunc.man glutSpecialFunc.man \
+  glutSpaceballRotateFunc.man glutSpecialFunc.man glutSpecialUpFunc.man \
   glutStrokeCharacter.man glutStrokeWidth.man glutSwapBuffers.man \
   glutTabletButtonFunc.man glutTabletMotionFunc.man glutTimerFunc.man \
   glutUseLayer.man glutVisibilityFunc.man glut.man \
@@ -65,10 +70,11 @@ install: $(FORMATTED)
 	$(INSTALL) -idb "$(IDB_TAG)" -lns glut.z -F $(IDB_PATH) intro.z
 	$(INSTALL) -idb "$(IDB_TAG)" -lns glutBitmapWidth.z -F $(IDB_PATH) glutBitmapLength.z
 	$(INSTALL) -idb "$(IDB_TAG)" -lns glutStrokeWidth.z -F $(IDB_PATH) glutStrokeLength.z
+	$(INSTALL) -idb "$(IDB_TAG)" -lns glutEnterGameMode.z -F $(IDB_PATH) glutLeaveGameMode.z
 	
 .man.z:
 	nroff -man < $< > $*.nr
-	pack $*.nr
+	pack -f $*.nr
 	mv $*.nr.z $@
 
 .man.ps:

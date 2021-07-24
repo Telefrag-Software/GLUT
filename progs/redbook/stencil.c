@@ -1,5 +1,5 @@
 
-/* Copyright (c) Mark J. Kilgard, 1994. */
+/* Copyright (c) Mark J. Kilgard, 1994, 1998. */
 
 /*
  * (c) Copyright 1993, Silicon Graphics, Inc.
@@ -75,12 +75,13 @@ void myinit (void)
 
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHTING);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_DEPTH_TEST);
 
     glClearStencil(0x0);
     glEnable(GL_STENCIL_TEST);
 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0.0, 0.0, -5.0);
 }
 
 /*  Draw a sphere in a diamond-shaped section in the
@@ -88,7 +89,41 @@ void myinit (void)
  */
 void display(void)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_STENCIL_BUFFER_BIT);
+
+/* create a diamond shaped stencil area */
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glOrtho(-3.0, 3.0, -3.0, 3.0, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    /* Disable color buffer update. */
+    glColorMask(0, 0, 0, 0);
+    glDisable(GL_DEPTH_TEST);
+    glStencilFunc (GL_ALWAYS, 0x1, 0x1);
+    glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
+
+    glBegin(GL_QUADS);
+	glVertex3f (-1.0, 0.0, 0.0);
+	glVertex3f (0.0, 1.0, 0.0);
+	glVertex3f (1.0, 0.0, 0.0);
+	glVertex3f (0.0, -1.0, 0.0);
+    glEnd();
+
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    
+    /* Enable color buffer update. */
+    glColorMask(1, 1, 1, 1);
+    glEnable(GL_DEPTH_TEST);
+    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
 /* draw blue sphere where the stencil is 1 */
     glStencilFunc (GL_EQUAL, 0x1, 0x1);
@@ -97,7 +132,6 @@ void display(void)
 
 /* draw the tori where the stencil is not 1 */
     glStencilFunc (GL_NOTEQUAL, 0x1, 0x1);
-    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glPushMatrix();
 	glRotatef (45.0, 0.0, 0.0, 1.0);
 	glRotatef (45.0, 0.0, 1.0, 0.0);
@@ -119,29 +153,10 @@ void myReshape(int w, int h)
 {
     glViewport(0, 0, w, h);
 
-    glClear(GL_STENCIL_BUFFER_BIT);
-/* create a diamond shaped stencil area */
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-3.0, 3.0, -3.0, 3.0, -1.0, 1.0);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glStencilFunc (GL_ALWAYS, 0x1, 0x1);
-    glStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
-    glBegin(GL_QUADS);
-	glVertex3f (-1.0, 0.0, 0.0);
-	glVertex3f (0.0, 1.0, 0.0);
-	glVertex3f (1.0, 0.0, 0.0);
-	glVertex3f (0.0, -1.0, 0.0);
-    glEnd();
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45.0, (GLfloat) w/(GLfloat) h, 3.0, 7.0);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(0.0, 0.0, -5.0);
 }
 
 /*  Main Loop

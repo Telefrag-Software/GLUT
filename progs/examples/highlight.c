@@ -63,7 +63,7 @@ GLuint selectBuf[BUFSIZE];
 int W = 500, H = 500;
 GLfloat x, y;
 int locating = 0;
-int theObject = 0;
+GLuint theObject = 0;
 int menu_inuse = 0;
 int mouse_state = 0;
 
@@ -198,8 +198,9 @@ myortho(void)
 void
 processHits(GLint hits, GLuint buffer[])
 {
-  GLuint depth = ~0;
-  unsigned int i, getThisName;
+  GLuint depth = (GLuint) ~0;
+  unsigned int getThisName;
+  GLint i;
   GLuint names, *ptr;
   GLuint newObject;
 

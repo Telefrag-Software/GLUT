@@ -12,7 +12,7 @@
 #include <GL/glut.h>
 
 static int transP;
-static int main_win, sub_win;
+static int main_win;
 static float x = 0, y = 0;
 
 static void
@@ -105,7 +105,7 @@ move_on(void)
   if (display_count == 4) {
     printf("display_count == 4\n");
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-    sub_win = glutCreateSubWindow(main_win, 10, 10, 150, 150);
+    glutCreateSubWindow(main_win, 10, 10, 150, 150);
     glClearColor(0.5, 0.5, 0.5, 0.0);
     glutDisplayFunc(render_sub);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_INDEX);

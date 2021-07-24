@@ -17,6 +17,18 @@
 extern "C" {
 #endif
 
+/**
+ GLE API revision history:
+ 
+ GLE_API_VERSION is updated to reflect GLE API changes (interface
+ changes, semantic changes, deletions, or additions).
+ 
+ GLE_API_VERSION=228  GLUT 3.7 release of GLE.
+**/
+#ifndef GLE_API_VERSION  /* allow this to be overriden */
+#define GLE_API_VERSION                228
+#endif
+
 /* some types */
 #define gleDouble double
 typedef gleDouble gleAffine[2][3];
@@ -74,25 +86,10 @@ typedef gleDouble gleAffine[2][3];
 
 #endif /* GL_32 */
 
-#ifdef _NO_PROTO		/* NO ANSI C PROTOTYPING */
-
-extern int gleGetJoinStyle ();
-extern void gleSetJoinStyle ();
-extern void glePolyCone ();
-extern void glePolyCylinder ();
-extern void gleExtrusion ();
-extern void gleSuperExtrusion ();
-extern void gleTwistExtrusion ();
-extern void gleSpiral ();
-extern void gleLathe ();
-extern void gleHelicoid ();
-extern void gleToroid ();
-extern void gleScrew ();
-
-#else /* _NO_PROTO */		/* ANSI C PROTOTYPING */
-
 extern int gleGetJoinStyle (void);
 extern void gleSetJoinStyle (int style);	/* bitwise OR of flags */
+extern int gleGetNumSlices(void);
+extern void gleSetNumSlices(int slices);
 
 /* draw polyclinder, specified as a polyline */
 extern void glePolyCylinder (int npoints,	/* num points in polyline */
@@ -195,8 +192,6 @@ extern void gleScrew (int ncp,          /* number of contour points */
              gleDouble twist);          /* number of rotations */
 
 extern void gleTextureMode (int mode);
-
-#endif /* _NO_PROTO */
 
 #ifdef __cplusplus
 }

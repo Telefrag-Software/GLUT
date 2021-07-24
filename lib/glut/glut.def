@@ -20,10 +20,14 @@ EXPORTS
 	glutDeviceGet
 	glutDialsFunc
 	glutDisplayFunc
+	glutEnterGameMode
 	glutEntryFunc
 	glutEstablishOverlay
 	glutExtensionSupported
+	glutForceJoystickFunc
 	glutFullScreen
+	glutGameModeGet
+	glutGameModeString
 	glutGet
 	glutGetColor
 	glutGetMenu
@@ -33,13 +37,17 @@ EXPORTS
 	glutHideWindow
 	glutIconifyWindow
 	glutIdleFunc
+	glutIgnoreKeyRepeat
 	glutInit
 	glutInitDisplayMode
 	glutInitDisplayString
 	glutInitWindowPosition
 	glutInitWindowSize
+	glutJoystickFunc
 	glutKeyboardFunc
+	glutKeyboardUpFunc
 	glutLayerGet
+	glutLeaveGameMode
 	glutMainLoop
 	glutMenuStateFunc
 	glutMenuStatusFunc
@@ -62,6 +70,7 @@ EXPORTS
 	glutSetColor
 	glutSetCursor
 	glutSetIconTitle
+	glutSetKeyRepeat
 	glutSetMenu
 	glutSetWindow
 	glutSetWindowTitle
@@ -81,6 +90,7 @@ EXPORTS
 	glutSpaceballMotionFunc
 	glutSpaceballRotateFunc
 	glutSpecialFunc
+	glutSpecialUpFunc
 	glutStopVideoResizing
 	glutStrokeCharacter
 	glutStrokeLength

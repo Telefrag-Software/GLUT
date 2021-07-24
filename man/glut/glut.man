@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glut 3GLUT "3.6" "GLUT" "GLUT"
+.TH glut 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glut - an introduction to the OpenGL Utility Toolkit
 .SH SYNOPSIS
@@ -244,4 +244,4 @@ OpenGL and X: An OpenGL Toolkit article (PostScript)
 .br
 http://reality.sgi.com/mjk/glut3/glut.column1.ps.gz
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

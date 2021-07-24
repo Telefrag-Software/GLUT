@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutPopWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutPopWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutPopWindow, glutPushWindow - change the stacking order of the current window relative to its siblings. 
 .SH SYNTAX
@@ -21,4 +21,4 @@ to the window system's policy for restacking windows.
 .SH SEE ALSO
 glutShowWindow, glutIconifyWindow, glutHideWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

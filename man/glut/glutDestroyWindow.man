@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutDestroyWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutDestroyWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutDestroyWindow - destroys the specified window. 
 .SH SYNTAX
@@ -22,4 +22,4 @@ window becomes invalid ( glutGetWindow will return zero).
 .SH SEE ALSO
 glutCreateWindow, glutCreateSubWindow, glutDestroyMenu
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -111,7 +111,19 @@ void gleExtrusion (int ncp,               /* number of contour points */
 /* ============================================================ */
 
 /* should really make this an adaptive algorithm ... */
-#define _POLYCYL_TESS	20
+static int __gleSlices = 20;
+
+int
+gleGetNumSlices(void)
+{
+  return __gleSlices;
+}
+
+void
+gleSetNumSlices(int slices)
+{
+  __gleSlices = slices;
+}
 
 void gen_polycone (int npoints,
                gleDouble point_array[][3],
@@ -120,8 +132,8 @@ void gen_polycone (int npoints,
                gleDouble xform_array[][2][3])
 {
    int saved_style;
-   gleDouble circle [_POLYCYL_TESS][2];
-   gleDouble norm [_POLYCYL_TESS][2];
+   glePoint *circle = (glePoint*) malloc(sizeof(glePoint)*2*__gleSlices);
+   glePoint *norm = &circle[__gleSlices];
    double c, s;
    int i;
    double v21[3];
@@ -134,8 +146,8 @@ void gen_polycone (int npoints,
     * both the polycone and the polycylinder routines */
    if (xform_array != NULL) radius = 1.0;
 
-   s = sin (2.0*M_PI/ ((double) _POLYCYL_TESS));
-   c = cos (2.0*M_PI/ ((double) _POLYCYL_TESS));
+   s = sin (2.0*M_PI/ ((double) __gleSlices));
+   c = cos (2.0*M_PI/ ((double) __gleSlices));
 
    norm [0][0] = 1.0;
    norm [0][1] = 0.0;
@@ -143,7 +155,7 @@ void gen_polycone (int npoints,
    circle [0][1] = 0.0;
 
    /* draw a norm using recursion relations */
-   for (i=1; i<_POLYCYL_TESS; i++) {
+   for (i=1; i<__gleSlices; i++) {
       norm [i][0] = norm[i-1][0] * c - norm[i-1][1] * s;
       norm [i][1] = norm[i-1][0] * s + norm[i-1][1] * c;
       circle [i][0] = radius * norm[i][0];
@@ -171,17 +183,19 @@ void gen_polycone (int npoints,
    /* if lighting is not turned on, don't send normals.  
     * MMODE is a good indicator of whether lighting is active */
    if (!__IS_LIGHTING_ON) {
-       gleSuperExtrusion (_POLYCYL_TESS, circle, NULL, up,
+       gleSuperExtrusion (__gleSlices, circle, NULL, up,
                      npoints, point_array, color_array,
                      xform_array);
    } else {
-       gleSuperExtrusion (_POLYCYL_TESS, circle, norm, up,
+       gleSuperExtrusion (__gleSlices, circle, norm, up,
                      npoints, point_array, color_array,
                      xform_array);
    }
    
    /* restore the join style */
    extrusion_join_style = saved_style;
+
+   free(circle);
 }
 
 /* ============================================================ */
@@ -316,7 +330,7 @@ void gleSpiral (int ncp,               /* number of contour points */
    int i;
 
    /* allocate sufficient memory to store path */
-   npoints = (int) ((((double) _POLYCYL_TESS) /360.0) * fabs(sweepTheta)) + 4;
+   npoints = (int) ((((double) __gleSlices) /360.0) * fabs(sweepTheta)) + 4;
 
    if (startXform == NULL) {
       mem_anchor = malloc (3*npoints * sizeof (gleDouble));
@@ -606,15 +620,15 @@ void super_helix (gleDouble rToroid,
 {
 
    int saved_style;
-   gleDouble circle [_POLYCYL_TESS][2];
-   gleDouble norm [_POLYCYL_TESS][2];
+   glePoint *circle = (glePoint*) malloc(sizeof(glePoint)*2*__gleSlices);
+   glePoint *norm = &circle[__gleSlices];
    double c, s;
    int i;
    gleDouble up[3];
 
    /* initialize sine and cosine for circle recusrion equations */
-   s = sin (2.0*M_PI/ ((double) _POLYCYL_TESS));
-   c = cos (2.0*M_PI/ ((double) _POLYCYL_TESS));
+   s = sin (2.0*M_PI/ ((double) __gleSlices));
+   c = cos (2.0*M_PI/ ((double) __gleSlices));
 
    norm [0][0] = 1.0;
    norm [0][1] = 0.0;
@@ -622,7 +636,7 @@ void super_helix (gleDouble rToroid,
    circle [0][1] = 0.0;
 
    /* draw a norm using recursion relations */
-   for (i=1; i<_POLYCYL_TESS; i++) {
+   for (i=1; i<__gleSlices; i++) {
       norm [i][0] = norm[i-1][0] * c - norm[i-1][1] * s;
       norm [i][1] = norm[i-1][0] * s + norm[i-1][1] * c;
       circle [i][0] = rToroid * norm[i][0];
@@ -641,7 +655,7 @@ void super_helix (gleDouble rToroid,
    /* if lighting is not turned on, don't send normals.  
     * MMODE is a good indicator of whether lighting is active */
    if (!__IS_LIGHTING_ON) {
-      (*helix_callback) (_POLYCYL_TESS, circle, NULL, up,
+      (*helix_callback) (__gleSlices, circle, NULL, up,
              startRadius,
              drdTheta,
              startZ,
@@ -651,7 +665,7 @@ void super_helix (gleDouble rToroid,
              startTheta,
              sweepTheta);
    } else {
-      (*helix_callback) (_POLYCYL_TESS, circle, norm, up,
+      (*helix_callback) (__gleSlices, circle, norm, up,
              startRadius,
              drdTheta,
              startZ,
@@ -665,6 +679,7 @@ void super_helix (gleDouble rToroid,
    /* restore the join style */
    extrusion_join_style = saved_style;
 
+   free(circle);
 }
 
 /* ============================================================ */

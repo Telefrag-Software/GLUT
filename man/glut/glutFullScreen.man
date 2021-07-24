@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutFullScreen 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutFullScreen 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutFullScreen - requests that the current window be made full screen. 
 .SH SYNTAX
@@ -35,4 +35,4 @@ _MOTIF_WM_HINTS.
 .SH SEE ALSO
 glutReshapeWindow, glutPositionWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

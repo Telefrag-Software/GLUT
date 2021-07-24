@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSetWindowTitle 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSetWindowTitle 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSetWindowTitle, glutSetIconTitle - change the window or icon title respectively of the current top-level window. 
 .SH SYNTAX
@@ -27,4 +27,4 @@ is window system dependent.
 .SH SEE ALSO
 glutCreateWindow, glutIconifyWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

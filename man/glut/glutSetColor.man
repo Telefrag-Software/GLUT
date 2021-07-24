@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSetColor 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSetColor 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSetColor - sets the color of a colormap entry in the layer of use
 for the current window. 
@@ -32,4 +32,4 @@ overlay's transparent index.
 .SH SEE ALSO
 glutGetColor, glutCopyColormap, glutInitDisplayMode
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -1,12 +1,8 @@
 #! smake
 #
-# Copyright (c) Mark J. Kilgard, 1995.
+# Copyright (c) Mark J. Kilgard, 1995, 1998.
 #
 include $(ROOT)/usr/include/make/commondefs
-
-# NOTE:  In my GLUT development tree, many of the C source files for
-# GLUT are generated.  For this reason, "make full_clobber" will remove
-# these generated C files, while "make clobber" will not.
 
 TOP = ../..
 
@@ -54,7 +50,7 @@ default: $(TARGETS)
 
 sinclude ObjectType.mk
 
-$(SRCS) : $(HDRS)
+$(OBJS) : $(HDRS)
 
 libgle.a : $(OBJS)
 	$(RM) $@

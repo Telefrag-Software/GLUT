@@ -132,6 +132,7 @@ visible(int vis)
     glutIdleFunc(NULL);
 }
 
+int
 main(int argc, char *argv[])
 {
   glutInit(&argc, argv);

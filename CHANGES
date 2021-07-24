@@ -4,6 +4,203 @@ GLUT Change Log
 
 NOTE:  This document is potentially incomplete.
 
+GLUT 3.6 -> 3.7
+----------------
+
+  o  Port of IRIS GL newave "wave physics" demo by Erik Larsen
+     (cayman@sprintmail.com).  Look in progs/demos/newave
+
+  o  Fixed a performance bug in progs/advanced/rts.c that eliminates
+     one full shadow volume rendering pass.  If you have the silhouette
+     shadow volume geometry, you can use GL_INVERT and draw the shadow
+     volume with a single pass with both front & back faces enabled
+     instead of two distinct passes for front and back as would be
+     needed if GL_INCR/GL_DECR were used.  Also fixed the near and
+     far clipping planes for better depth precision with 16-bit
+     depth bufffers.
+
+  o  Improve the efficiency of Win32's wglMakeCurrent calls.  It
+     turns out that Microsoft does not "short circuit" a redundant
+     wglMakeCurrent (ie, if you make current to the same context
+     and same DC you are already bound to, it is not a no-up).
+     Now, GLUT uses wglGetCurrentContext and wglGetCurrentDC to
+     determine when not to redundantly call wglMakeCurrent.
+
+     This also reduced the calling of GetDC within Win32 GLUT.
+
+     Note that the GLX version still assumes that a redundant
+     glXMakeCurrent is short circuited.
+
+  o  Added lib/glsmap library for dynamic real-time sphere mapping.
+     See the demos in progs/spheremap/glsmap
+
+     Builds for N32, O32, and N64 for IRIX.
+
+     rtsmap has an environment reflected in a sphere, teapot, or
+     icosahedron (8 passes).  Very cool.  fakeraytrace goes one
+     step further and has two reflective objects, then does an
+     extra recursive pass so that one of the spheres is actually
+     reflecting the reflection in the other sphere.  Wow.
+
+  o  Man pages updated.
+
+     Version number in man pages changed to 3.7.
+
+     My email address changed to mjk@nvidia.com
+
+     New man pages:
+       glutEnterGameMode
+       glutForceJoystickFunc
+       glutGameModeGet
+       glutGameModeString
+       glutIgnoreKeyRepeat
+       glutJoystickFunc
+       glutKeyboardUpFunc
+       glutSetKeyRepeat
+       glutSpecialUpFunc
+
+     Updated man pages:
+       glutDeviceGet
+       glutGet
+       glutSolidTeapot
+
+  o  Updated the ./linux/* files for GLUT 3.7.
+
+  o  The GLUT library should compile with a C++ compiler now.  I make
+     no promises that the entirety of GLUT can compile with a C++
+     compiler though.  Brian Paul wanted this for Mesa which does
+     expect to build with a C++ compiler.  Christoph M. Hoffmann
+     <cmh@cs.purdue.edu> brought up this issue.
+
+  o  Added proto dynamic sphere mapping programs in
+     progs/spheremap/hacks to help you understand the steps in
+     making a dynamic sphere map.
+
+  o  Added program demonstrating window space texture coordinate
+     generation at progs/advanced/texwinalign.c; demonstrates how
+     texture matrix can be be used to generated texture coordinates
+     in window space.
+
+  o  The -iconic command line option works for Win32 GLUT programs
+     now.  The new test28 actually tests the -iconic command line option.
+
+  o  Added the glutGameModeString, glutEnterGameMode, glutLeaveGameMode,
+     and glutGameModeGet calls for "full screen" game mode display
+     change switching.  Only the Win32 implementation really does
+     display mode changes.  See lib/glut/glut_gamemode.c
+
+  o  Several demos added a -fullscreen option to use the new GLUT
+     game mode functionality.  I generally also fixed these to
+     match the window aspect ratio.  Examples:  underwater, txfdemo
+
+  o  Sort of fixed how WM_ACTIVATE messages get processed in the
+     Win32 GLUT implementation.
+
+  o  Moved the Win32 WinProc function out of win32_util.c into
+     its own win32_winproc.c file.
+
+  o  Building the GLUT library debug for Win32 works now (changes
+     to the Makefile.win setup).
+
+  o  Added a poor man's stereo example by Walter Vannini
+     (walterv@jps.net, waltervannini@hotmail.com).  The idea
+     is to draw the left eye in red and right eye in blue
+     and use cheap red/blue filter stereo glasses to see
+     the stereo separation.  See progs/advanced/redblue_stereo.c
+
+  o  Improve GLUT static library implementation.  Now if you don't
+     use the GLUT menu API, you don't get this code included in your
+     binary.  Reduces GLUT program text size by 25% for such non-menu
+     GLUT programs.
+
+  o  Add gleGetNumSlices and gleSetNumSlices entry points to control
+     the tessellation level (previously, always a constant 20).
+
+  o  Improved dependencies in SGI Makefiles in lib/*/Makefile.sgi
+
+  o  Added progs/gle/martini.c example.  Spinning martini glass.
+
+  o  Should work on VMS 7.0.  Changes suggested by Jouk Jansen
+     (joukj@crys.chem.uva.nl).  Mainly changes to GLUT library itself
+     to deal with VMS 7.0's POSIX-compliant support for gettimeofday.
+
+  o  Added GLUT version of "skyfly" terrain fly over demo.  See
+     progs/demos/skyfly
+
+  o  Update of GLUT frequently asked questions.  See FAQ.glut
+
+  o  Added workaround to real-time shadow demos so they work on old
+     (pre-IRIX 6.5) Octane and Impact systems.  The work around makes
+     sure the feedback buffer is always at least 2048 entries big to
+     force use of software feedback.  See progs/advanced/rts.c and
+     progs/advanced/shadowfun.c
+
+  o  Add work-around in hello2rts for Riva 128 and 128 ZX to make
+     hello2rts start by default with the stencil invariant hack
+     enabled.  This makes sure that hello2rts use the software
+     rasterizer for all rendering so the shadows look right.  Other
+     platforms may need this support.  There is a menu option to
+     flip it on if need be.
+
+  o  Added a "win32pfd" (Win32 Pixel Format Descriptor) capability
+     name for the Win32 version of GLUT's glutInitDisplayString
+     parser.  This lets you select a specific pixel format descriptor,
+     much as "xvisual" allows one to do with X11.  This is intended
+     to facilitate benchmark construction with GLUT where particular
+     PFDs can be selected for benchmarking or testing.  Also documented
+     on glutInitDisplayString man page.  Win32 GLUT only.
+
+  o  Add glutGet(GLUT_WINDOW_FORMAT_ID) to return the window system
+     dependent window format ID (Visual ID for X11; Pixel Format
+     Descriptor Number for Win32).  This should help people be able
+     to report bugs and now precisely what format ID they are
+     testing and/or benchmarking.  Note that these values can change
+     between X servers, hardware, and OpenGL implementations.
+
+  o  Fix glutGet(GLUT_WINDOW_COLORMAP_SIZE) bug in X11 GLUT
+     implementation.  The routine now correctly returns the colormap
+     size of the current layer (previously it returned the size
+     of the normal layer which was a totally bogus value for an
+     RGBA normal layer).
+
+  o  Fixed SEE ALSO section of glutDeviceGet man page.
+
+  o  glutInitDisplayString now knows how to use the SGIX_fbconfig
+     extension to access 16-bit StaticGray luminance visuals.
+     These high-resolution luminance (1 component) visuals are
+     excellent for medical imaging applications that need the
+     16 bits per pixel resolution.
+
+     To get a luminance window, do:
+
+	glutInitDisplayString("luminance");
+
+     Note that few systems actually support 16-bit luminance visuals.
+     InfiniteReality does.  I'm not aware of any other systems that
+     do.
+
+  o  Added missing GLUT entry points to the GLUT Ada binding
+     and interface files.
+
+  o  Added progs/demos/sysview, an IRIX operating system 3D
+     monitor.  Only compiles on SGI machines, though it could
+     easily be adapted to other operating systems.  Courtesy
+     of Javier Velasco <fjvelasco@sfe.indra.es>.
+
+  o  Win32 GLUT didn't generate keyboard callback for Delete key
+     (ascii 127) before; now it does.
+ 
+  o  Fix warning in glut_input.c when compiling on Alpha due
+     to XInput extension API snafu.  Pointed out by Tom Holroyd
+     <tomh@taz.ccs.fau.edu> compiling on a Linux Alpha machine.
+
+  o  Fixed bug reported by Rune Hasvold <runeh@ifi.uio.no> in
+     win32_glx.c where Win32 GLUT was always requesting a 1
+     bit depth buffer at least.  Now, GLUT requests zero bits
+     of DEPTH unless you request a depth buffer.  Apparently
+     this bug was fixed in the Mesa version of GLUT a while
+     back, but didn't get to my GLUT source until now.
+
 GLUT 3.5 -> 3.6
 ----------------
 

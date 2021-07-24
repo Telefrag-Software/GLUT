@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutInitWindowPosition 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutInitWindowPosition 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutInitWindowPositionWindowPosition, glutInitWindowSize - set the
 initial window position and size respectively.
@@ -71,4 +71,4 @@ your call to glutInit.  For example:
 .SH SEE ALSO
 glutInit, glutCreateWindow, glutCreateSubWindow, glutReshapeFunc, glutGet
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

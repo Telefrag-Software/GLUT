@@ -8,7 +8,6 @@ TOP = ../..
 X=XXX
 sinclude $(TOP)/lib/mui/Makefile.sgi
 sinclude ObjectType.mk
-CANNOTATE=
 
 LDIRT += $(SRCS)
 

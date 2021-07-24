@@ -7,49 +7,139 @@ Asked Questions list can be found at:
 Here are few questions I expect to be frequently asked about GLUT 3.5.
 First, here are tag-line summaries of the question subject matter.
 
-Q1:   Problems building GLUT.
-Q2:   More GUI features.
-Q3:   New with GLUT 3.0.
-Q4:   GLUT for Windows 95 and NT.
-Q5:   GLUT for OS/2.
-Q6:   GLUT for Power Mcintosh.
-Q7:   GLUT 3.0 incompatibilities.
-Q8:   GLUT and Motif.
-Q9:   aux convension to GLUT.
-Q10:  SGI N32 and 64-bit support.
-Q11:  FORTRAN and GLUT.
-Q12:  Sophisticated input devices.
-Q13:  GLUT and Open Inventor.
-Q14:  GLUT, Sun, and Overlays.
-Q15:  The GLUT stroke font.
-Q16:  My book about GLUT.
-Q17:  GLUT and Microsoft portability.
-Q18:  GLUT and networking.
-Q19:  Asking GLUT questions.
-Q20:  Free OpenGL.
-Q21:  GLUT overlay example code.
-Q22:  BadMatch errors running GLUT programs. 
-Q23:  New in GLUT 3.1.
-Q24:  Shared libraries for Linux 
-Q25:  New in GLUT 3.2.
-Q26:  GLUT API man pages.
-Q27:  Fast window repair for Mesa.
-Q28:  Advanced GLUT example .rgb image file.
-Q29:  IRIX 6.3 and 6.4 fast atoms support issues for older IRIX releases. 
-Q30:  GLUT for the Power Macintosh.
-Q31:  New in GLUT 3.4.
-Q32:  Cosmo3D beta and GLUT problem.
-Q33:  New in GLUT 3.5.
-Q34:  Using the precompiled GLUT DLLs with Borland compilers.
-Q35:  Using GLUT with C++.
-Q36:  Avoiding the Console window for Win32 GLUT programs.
-Q37:  New in GLUT 3.6.
-Q38:  O2 build problmes with glXChannelRectSyncSGIX.
+Q1:   Problems building GLUT.  I've tried to use the "mkmkfiles.imake"
+      script to generate Makefiles so I can build GLUT, but it doesn't
+      seem to work.  What should I try?
+
+Q2:   More GUI features.  GLUT needs improved menus, dialog boxes,
+      scrollbars, text entry fields, etc. to be useful to me.  What
+      should I do?
+
+Q3:   New with GLUT 3.0.  What new things are in GLUT 3.0?
+
+Q4:   GLUT for Windows 95 and NT.  Is there a version of GLUT for
+      Windows NT or Windows 95?
+
+Q5:   GLUT for OS/2.  Is there a version of GLUT for OS/2?
+
+Q6:   GLUT for Power Macintosh.  Is there a version of GLUT for the
+      Power Macintosh?
+
+Q7:   GLUT 3.0 incompatibilities.  I'm hesitant about upgrading to GLUT
+      3.0 since I've got things working will with GLUT 2.3.  Is the
+      transition painful?
+
+Q8:   GLUT and Motif.  So how do I use GLUT and Motif together?
+
+Q9:   aux convension to GLUT.  I have a bunch of simple OpenGL programs
+      using the aux toolkit descibed in the OpenGL Programming Guide
+      (the "red" book).  Is there an easy way to convert them to GLUT?
+
+Q10:  SGI N32 and 64-bit support.  I have IRIX 6.2 (or 6.1) and I'd
+      like to write GLUT programs run in true 64-bit and/or benefit
+      from the recent, faster MIPS processors.  How do I build GLUT to
+      support these newer application binary interfaces (ABIs)?
+
+Q11:  FORTRAN and GLUT.  I'd like to write FORTRAN programs using GLUT
+      and OpenGL.  How do I use GLUT with FORTRAN?
+
+Q12:  Sophisticated input devices.  I'd like to use the sophisticated
+      input devices that GLUT supports.  What should I know about this?
+
+Q13:  GLUT and Open Inventor.  Can I use GLUT and Open Inventor?
+
+Q14:  GLUT, Sun, and Overlays.  I have Sun workstation, and it is
+      supposed to support overlays.  So why does GLUT not use them?
+
+Q15:  The GLUT stroke font.  The stroke font used for GLUT looks
+      familar.  Where did it come from?
+
+Q16:  My book about GLUT.  I read in the NOTICE file that you are
+      writing a book on programming OpenGL for the X Window System.
+      Where can I get it?
+
+Q17:  GLUT and Microsoft portability.  You mention an unnamed bu "very
+      large window system software vendor" as the reason portable GLUT
+      programs should not directly include <GL/gl.h> and <GL/glu.h>
+      directly.  What's the vendor and what are the details?
+
+Q18:  GLUT and networking.  I want my GLUT program to read and send
+      information over a socket to some other program.  How do I do
+      this in in GLUT?
+
+Q19:  Asking GLUT questions.  Where's the best place to ask questions
+      about GLUT or OpenGL?  Can I just email them to you?
+
+Q20:  Free OpenGL.  My workstation doesn't have OpenGL.  Where can I get a
+      free copy to use with GLUT?
+
+Q21:  GLUT overlay example code.  I hear GLUT 3.0 has overlay support.
+      Where is an example?
+
+Q22:  BadMatch errors running GLUT programs.  I get BadMatch X protocol
+      errors when I run GLUT programs. What gives?
+
+Q23:  New in GLUT 3.1.  What is new in GLUT 3.1?
+
+Q24:  Shared libraries for Linux.  How do I make Linux shared libraries
+      for GLUT?
+
+Q25:  New in GLUT 3.2.  What is new in GLUT 3.2?
+
+Q26:  GLUT API man pages.  I've heard GLUT 3.2 has man pages.  How do I
+      use them?
+
+Q27:  Fast window repair for Mesa.  What is the MESA_SWAP_HACK in GLUT
+      3.2?  How does it help Mesa users avoid excessive window redraws?
+
+Q28:  Advanced GLUT example .rgb image file.  I try to run the examples in
+      progs/advanced but they don't work for lack of image files.
+      Where can I get those files?
+
+Q29:  IRIX 6.3 and 6.4 fast atoms support issues for older IRIX
+      releases.  Why doesn't GLUT programs compiled on IRIX 6.4 or 6.3
+      work earlier releases?
+
+Q30:  GLUT for the Power Macintosh.  Can I get a version of GLUT for the
+      Power Macintosh?
+
+Q31:  New in GLUT 3.4.  What is new in GLUT 3.4?
+
+Q32:  Cosmo3D beta and GLUT problem.  I installed SGI's Cosmo3D beta and
+      GLUT, and I'm having problems compiling GLUT programs.  What gives?
+
+Q33:  New in GLUT 3.5.  What is new in GLUT 3.5?
+
+Q34:  Using the precompiled GLUT DLLs with Borland compilers.  How do I use
+      the precompiled Win32 GLUT DLLs with Borland compilers?
+
+Q35:  Using GLUT with C++.  Are there any C++ wrappers for GLUT?
+
+Q36:  Avoiding the Console window for Win32 GLUT programs.  How do you avoid
+      the Console window appearing when you compiler a Win32 GLUT
+      application with Microsoft compilers?
+
+Q37:  New in GLUT 3.6.  What is new in GLUT 3.6?
+
+Q38:  O2 build problmes with glXChannelRectSyncSGIX.  On my IRIX 6.3 SGI O2
+      workstation, why do I get errors about "glXChannelRectSyncSGIX"
+      being unresolved building certain GLUT examples?
+
+Q39:  Using GLUT with Microsoft OpenGL 1.1 and compiling GLUT with
+      Borland compilers causes GLUT applications to generates floating
+      point exceptions.  What can be done?
+
+Q40:  Using GLUT with SGI OpenGL for Windows and compiling with
+      Borland compilers results in linking problems.  What can be
+      done?
+
+Q41:  What is GameGLUT?
 
 --
 
 Q1:  I've tried to use the "mkmkfiles.imake" script to generate
-     Makefiles so I can build GLUT, but it doesn't seem to work.
+     Makefiles so I can build GLUT, but it doesn't seem to work.  What
+     should I try?
 
 A1:  While Imakefiles are supposted to be system independent (hence
      the "I"), the commands to translate Imakefiles into Makefiles
@@ -70,7 +160,7 @@ A1:  While Imakefiles are supposted to be system independent (hence
 --
 
 Q2:  GLUT needs improved menus, dialog boxes, scrollbars, text
-     entry fields, etc. to be useful to me?
+     entry fields, etc. to be useful to me.  What should I do?
 
 A2:  GLUT does not pretend to be a full-featured graphical user
      interface toolkit.
@@ -78,6 +168,10 @@ A2:  GLUT does not pretend to be a full-featured graphical user
      You _could_ write these sorts of GUI objects using GLUT and OpenGL
      if you needed to.  The other alternative is to use Motif or
      whatever full featured toolkit you have.
+
+     A little toolkit called micro-UI uses OpenGL for rendering and is
+     based on GLUT.  The toolkit was developed by Tom Davis.  See the
+     README.mui file the accompanies GLUT 3.5 and up.
 
 --
 
@@ -88,11 +182,12 @@ A3:  See README.glut3 or read The OpenGL Utility (GLUT) Programming
 
 --
 
-Q4:  Is there a version of GLUT for Windows NT or Windows 95.
+Q4:  Is there a version of GLUT for Windows NT or Windows 95?
 
-A4:  As of GLUT 3.5, GLUT now builds for both Win32 and X11 window systems.
-     Much thanks to Nate Robins.  See the README.win file contained in GLUT 3.5
-     for details.
+A4:  As of GLUT 3.5, GLUT now builds for both Win32 and X11 window
+     systems.  Much thanks to Nate Robins.  See the README.win file
+     contained in GLUT 3.5 for details.  GLUT 3.6 improved the Win32
+     GLUT support considerably.
 
 --
 
@@ -101,14 +196,23 @@ Q5:  Is there a version of GLUT for OS/2?
 A5:  Yes.  I believe a version based on GLUT 2.x is distributed on an
      OS/2 OpenGL developer's CD-ROM.
 
+     You may have reasonable luck porting the Win32 version of the
+     GLUT 3.6 distribution to OS/2.  If you manage to do this, please
+     contact me.
+
 --
 
-Q6:  Is there a version of GLUT for the Power Mcintosh?
+Q6:  Is there a version of GLUT for the Power Macintosh?
 
-A6:  Was told by Template Graphics that an incomplete version of
+A6:  Conix Graphics supplies GLUT 3.5 with their Macintosh OpenGL
+     implementation.  See http://www.conix3d.com.
+
+     Was told by Template Graphics that an incomplete version of
      GLUT had been developed for their OpenGL product for the Power
-     Mcintosh.  I am not sure if it was ever completed or made
+     Macintosh.  I am not sure if it was ever completed or made
      available.
+
+
 
 --
 
@@ -159,6 +263,9 @@ A9:  In the progs/redbook directory, there is a script named
      Here's a usage example:
 
      sed -f aux2glut.sed < aux_prog. > glut_prog.c
+
+     Note that the second edition of the OpenGL Programming Guide uses
+     GLUT and not the aux toolkit.
 
 --
 
@@ -220,7 +327,8 @@ Q14: I have Sun workstation, and it is supposed to support overlays.
 
 A14: GLUT uses the SERVER_OVERLAY_VISUALS convention that advertises
      overlay visuals.  Most major workstation vendors support this
-     convention (DEC, HP, IBM, SGI), but Sun does not.
+     convention (DEC, HP, IBM, SGI), but Sun only support the
+     SERVER_OVERLAY_VISUALS in their latest Creator 3D hardware.
 
 --
 
@@ -248,6 +356,8 @@ A16: My book titled "Programming OpenGL for the X Window System" was
      API.  Another chapter uses GLUT-based examples to explain various
      OpenGL rendering features.  An appedix describes the GLUT API
      in detail.  If you use GLUT, this book will be very helpful.
+
+     A Japanese translation is also available now (ISBN4-7952-9703-7).
 
 --
 
@@ -302,6 +412,9 @@ A20: OpenGL is licensed by Silicon Graphics and is not available as
      branded as "OpenGL", an implementation must be licensed _and_ pass
      the Architectural Review Board's conformance suite, so Mesa is not
      an official "OpenGL" implementation.)  Mesa does work with GLUT.
+
+     Mesa 2.5 and beyond include GLUT with the Mesa source code
+     distribution.
 
 --
 
@@ -475,8 +588,8 @@ A29:  First, SGI never guarantees that an executable built on a later
 
 Q30:  Can I get a version of GLUT for the Power Macintosh?
 
-A30:  Probably pretty soon. Conix Graphics is working on a port of GLUT
-      3.2 as of late January 1997. Try checking the Conix Graphics web site
+A30:  Conix Graphics has released a port of GLUT
+      3.2 I believe.  Try checking the Conix Graphics web site
       http://www.conix3d.com for current info.
 
 --
@@ -497,7 +610,7 @@ A31:  GLUT 3.4 is an incremental release. An Ada binding for SGI
 --
 
 Q32:  I installed SGI's Cosmo3D beta and GLUT, and I'm having problems
-      compiling GLUT programs.
+      compiling GLUT programs.  What gives?
 
 A32:  Unfortunately, SGI's Cosmo3D beta images install a DSO for GLUT
       (libglut.so) that does not fully implement the GLUT API and lacks
@@ -630,6 +743,59 @@ A38:  The original IRIX 6.3 release for the O2 workstation accidently
       the latest O2 OpenGL patch from SGI customer support.
 
       Once the patch is installed, your build errors will be resolved.
+
+--
+
+Q39:  Using GLUT with Microsoft OpenGL 1.1 and compiling GLUT with
+      Borland compilers causes GLUT applications to generates floating
+      point exceptions.  What can be done?
+
+A39:  Under certain conditions (e.g. while rendering solid surfaces
+      with lighting enabled) MS libraries cause some illegal operations
+      like floating point overflow or division by zero. The default
+      behaviour of Microsoft compilers is to mask (ignore) floating
+      point exceptions, while Borland compilers do not.  A function of
+      Borland run-time library allows to mask exceptions.  Modify
+      glut_init.c by adding the following lines to the function
+      __glutOpenWin32Connection.
+
+#ifdef __BORLANDC__
+#include <float.h>
+  _control87(MCW_EM,MCW_EM);
+#endif
+
+      With this modification, compiling the GLUT library with your
+      Borland compilers and using GLUT with Microsoft OpenGL should
+      work fine.
+
+      GLUT 3.7 will have this change already included in the GLUT
+      library source code distribution.
+
+      This advice comes from Pier Giorgio Esposito (mc2172@mclink.it).
+
+--
+
+Q40:  Using GLUT with SGI OpenGL for Windows and compiling with
+      Borland compilers results in linking problems.  What can be
+      done?
+
+A40:  Some care must be taken when linking GLUT.DLL or programs
+      that use it with Borland compilers.  The import library
+      IMPORT32.LIB already contains the functions exported by
+      the Microsoft OpenGL libraries, thus SGI OpenGL import
+      libraries must be listed _before_ import32 in the Borland
+      tlink command line.
+
+      This advice comes from Pier Giorgio Esposito (mc2172@mclink.it).
+
+--
+
+Q41:  What is GameGLUT?
+
+A41:  GameGLUT is a set of API extension to GLUT to be released in
+      GLUT 3.7.  These extensions provide keyboard release callbacks,
+      disabling of keyboard auto repeat, joystick callbacks, and full
+      screen resolution setting.
 
 --
 

@@ -81,6 +81,7 @@ GLfloat lightOneColor[] = {0.99, 0.99, 0.99, 1.0};
 GLfloat lightTwoPosition[] = {-40.0, 40, 100.0, 0.0};
 GLfloat lightTwoColor[] = {0.99, 0.99, 0.99, 1.0}; 
 
+int
 main (int argc, char * argv[]) {
 
    /* initialize glut */

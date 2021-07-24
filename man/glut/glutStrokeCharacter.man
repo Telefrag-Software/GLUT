@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutStrokeCharacter 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutStrokeCharacter 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutStrokeCharacter - renders a stroke character using OpenGL. 
 .SH SYNTAX
@@ -63,4 +63,4 @@ If you want to draw stroke font text using wide, antialiased lines, use:
 .SH SEE ALSO
 glutBitmapCharacter, glutStrokeWidth
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

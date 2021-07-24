@@ -304,9 +304,6 @@ void Reshape(int width, int height)
 }
 
 int
-#ifdef WIN32
-__cdecl
-#endif
 main(int argc, char *argv[])
 {
     char *t;

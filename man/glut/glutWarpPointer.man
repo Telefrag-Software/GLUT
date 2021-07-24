@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1997.
 .\"
-.TH glutWarpPointer 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutWarpPointer 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutWarpPointer warps the pointer's location.
 .SH SYNTAX
@@ -36,4 +36,4 @@ XWarpPointer man page.)
 .SH SEE ALSO
 glutMouseFunc, glutMotionFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -1,5 +1,5 @@
 
-/* Copyright (c) Mark J. Kilgard, 1994, 1997. */
+/* Copyright (c) Mark J. Kilgard, 1994, 1997, 1998. */
 
 /* This program is freely distributable without licensing fees
    and is provided without guarantee or warrantee expressed or
@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #if defined(__vms)
 #include <X11/XInput.h>
@@ -18,7 +18,10 @@
 #include <X11/extensions/XInput.h>
 #endif
 #include <X11/Xutil.h>
-#endif /* !WIN32 */
+#else
+#include <windows.h>
+#include <mmsystem.h>  /* Win32 Multimedia API header. */
+#endif /* !_WIN32 */
 
 #include "glutint.h"
 
@@ -31,7 +34,11 @@ XDevice *__glutTablet = NULL;
 XDevice *__glutDials = NULL;
 XDevice *__glutSpaceball = NULL;
 
-#if !defined(WIN32)
+int __glutHasJoystick = 0;
+int __glutNumJoystickButtons = 0;
+int __glutNumJoystickAxes = 0;
+
+#if !defined(_WIN32)
 typedef struct _Range {
   int min;
   int range;
@@ -57,7 +64,8 @@ static int
 normalizeTabletPos(int axis, int rawValue)
 {
   assert(rawValue >= __glutTabletRange[axis].min);
-  assert(rawValue <= __glutTabletRange[axis].min + __glutTabletRange[axis].range);
+  assert(rawValue <= __glutTabletRange[axis].min
+    + __glutTabletRange[axis].range);
   /* Normalize rawValue to between 0 and 4000. */
   return ((rawValue - __glutTabletRange[axis].min) * 4000) /
     __glutTabletRange[axis].range;
@@ -105,7 +113,11 @@ queryTabletPos(GLUTwindow * window)
   state = XQueryDeviceState(__glutDisplay, __glutTablet);
   any = state->data;
   for (i = 0; i < state->num_classes; i++) {
+#if defined(__cplusplus) || defined(c_plusplus)
+    switch (any->c_class) {
+#else
     switch (any->class) {
+#endif
     case ValuatorClass:
       v = (XValuatorState *) any;
       if (v->num_valuators < 2)
@@ -143,12 +155,12 @@ tabletPosChange(GLUTwindow * window, int first, int count, int *data)
   if (genEvent)
     window->tabletMotion(window->tabletPos[0], window->tabletPos[1]);
 }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
 int
 __glutProcessDeviceEvents(XEvent * event)
 {
-#if !defined(WIN32)
+#if !defined(_WIN32)
   GLUTwindow *window;
 
   /* XXX Ugly code fan out. */
@@ -194,7 +206,8 @@ __glutProcessDeviceEvents(XEvent * event)
       }
       return 1;
     }
-  } else if (__glutDeviceButtonPress && event->type == __glutDeviceButtonPress) {
+  } else if (__glutDeviceButtonPress
+    && event->type == __glutDeviceButtonPress) {
     XDeviceButtonEvent *devbtn = (XDeviceButtonEvent *) event;
 
     window = __glutGetWindow(devbtn->window);
@@ -219,7 +232,8 @@ __glutProcessDeviceEvents(XEvent * event)
       }
       return 1;
     }
-  } else if (__glutDeviceButtonRelease && event->type == __glutDeviceButtonRelease) {
+  } else if (__glutDeviceButtonRelease
+    && event->type == __glutDeviceButtonRelease) {
     XDeviceButtonEvent *devbtn = (XDeviceButtonEvent *) event;
 
     window = __glutGetWindow(devbtn->window);
@@ -245,7 +259,24 @@ __glutProcessDeviceEvents(XEvent * event)
       return 1;
     }
   }
-#endif /* !WIN32 */
+#else
+  {
+    JOYINFOEX info;
+    int njoyId = 0;
+    int nConnected = 0;
+    MMRESULT result;
+
+    /* Loop through all possible joystick IDs until we get the error
+       JOYERR_PARMS. Count the number of times we get JOYERR_NOERROR
+       indicating an installed joystick driver with a joystick currently
+       attached to the port. */
+    while ((result = joyGetPosEx(njoyId++,&info)) != JOYERR_PARMS) {
+      if (result == JOYERR_NOERROR) {
+        ++nConnected;  /* The count of connected joysticks. */
+      }
+    }
+  }
+#endif /* !_WIN32 */
   return 0;
 }
 
@@ -268,7 +299,7 @@ probeDevices(void)
 {
   static Bool been_here = False;
   static int support;
-#if !defined(WIN32)
+#if !defined(_WIN32)
   XExtensionVersion *version;
   XDeviceInfoPtr device_info, device;
   XAnyClassPtr any;
@@ -277,16 +308,19 @@ probeDevices(void)
   XAxisInfoPtr a;
   int num_dev, btns, dials;
   int i, j, k;
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
   if (been_here) {
     return support;
   }
   been_here = True;
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
   version = XGetExtensionVersion(__glutDisplay, "XInputExtension");
-  if (version == NULL || ((int) version) == NoSuchExtension) {
+  /* Ugh.  XInput extension API forces annoying cast of a pointer
+     to a long so it can be compared with the NoSuchExtension
+     value (#defined to 1). */
+  if (version == NULL || ((long) version) == NoSuchExtension) {
     support = 0;
     return support;
   }
@@ -305,7 +339,11 @@ probeDevices(void)
         v = NULL;
         b = NULL;
         for (j = 0; j < device->num_classes; j++) {
+#if defined(__cplusplus) || defined(c_plusplus)
+          switch (any->c_class) {
+#else
           switch (any->class) {
+#endif
           case ButtonClass:
             b = (XButtonInfoPtr) any;
             btns = b->num_buttons;
@@ -335,7 +373,11 @@ probeDevices(void)
         v = NULL;
         b = NULL;
         for (j = 0; j < device->num_classes; j++) {
+#if defined(__cplusplus) || defined(c_plusplus)
+          switch (any->c_class) {
+#else
           switch (any->class) {
+#endif
           case ButtonClass:
             b = (XButtonInfoPtr) any;
             btns = b->num_buttons;
@@ -367,7 +409,11 @@ probeDevices(void)
         v = NULL;
         b = NULL;
         for (j = 0; j < device->num_classes; j++) {
+#if defined(__cplusplus) || defined(c_plusplus)
+          switch (any->c_class) {
+#else
           switch (any->class) {
+#endif
           case ButtonClass:
             b = (XButtonInfoPtr) any;
             btns = b->num_buttons;
@@ -395,7 +441,11 @@ probeDevices(void)
         }
       } else if (!strcmp(device->name, "mouse")) {
         for (j = 0; j < device->num_classes; j++) {
+#if defined(__cplusplus) || defined(c_plusplus)
+          if (any->c_class == ButtonClass) {
+#else
           if (any->class == ButtonClass) {
+#endif
             b = (XButtonInfoPtr) any;
             __glutNumMouseButtons = b->num_buttons;
           }
@@ -406,9 +456,9 @@ probeDevices(void)
     }
     XFreeDeviceList(device_info);
   }
-#else /* WIN32 */
+#else /* _WIN32 */
   __glutNumMouseButtons = GetSystemMetrics(SM_CMOUSEBUTTONS);
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
   /* X Input extension might be supported, but only if there is
      a tablet, dials, or spaceball do we claim devices are
      supported. */
@@ -419,7 +469,7 @@ probeDevices(void)
 void
 __glutUpdateInputDeviceMask(GLUTwindow * window)
 {
-#if !defined(WIN32)
+#if !defined(_WIN32)
   /* 5 (dial and buttons) + 5 (tablet locator and buttons) + 5
      (Spaceball buttons and axis) = 15 */
   XEventClass eventList[15];
@@ -518,7 +568,7 @@ __glutUpdateInputDeviceMask(GLUTwindow * window)
     /* X Input extension not supported; no chance for exotic
        input devices. */
   }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 }
 
 /* CENTRY */
@@ -547,6 +597,31 @@ glutDeviceGet(GLenum param)
     return __glutNumDials;
   case GLUT_NUM_TABLET_BUTTONS:
     return __glutNumTabletButtons;
+  case GLUT_DEVICE_IGNORE_KEY_REPEAT:
+    return __glutCurrentWindow->ignoreKeyRepeat;
+#ifndef _WIN32
+  case GLUT_DEVICE_KEY_REPEAT:
+    {
+      XKeyboardState state;
+
+      XGetKeyboardControl(__glutDisplay, &state);
+      return state.global_auto_repeat;
+    }
+  case GLUT_JOYSTICK_POLL_RATE:
+    return 0;
+#else
+  case GLUT_DEVICE_KEY_REPEAT:
+    /* Win32 cannot globally disable key repeat. */
+    return GLUT_KEY_REPEAT_ON;
+  case GLUT_JOYSTICK_POLL_RATE:
+    return __glutCurrentWindow->joyPollInterval;
+#endif
+  case GLUT_HAS_JOYSTICK:
+    return __glutHasJoystick;
+  case GLUT_JOYSTICK_BUTTONS:
+    return __glutNumJoystickButtons;
+  case GLUT_JOYSTICK_AXES:
+    return __glutNumJoystickAxes;
   default:
     __glutWarning("invalid glutDeviceGet parameter: %d", param);
     return -1;

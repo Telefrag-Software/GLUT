@@ -4,7 +4,7 @@ Toolkit (GLUT) distribution.  See the NOTICE for legal terms.
 
 VERSION:
 
-Release 3.6, December 10, 1997.
+Release 3.7, May 7, 1998.
 
 SUPPORTED PLATFORMS:
 
@@ -31,13 +31,15 @@ This distribution should compile for:
 
 MICROSOFT WINDOWS 95 and NT BUILD INSTRUCTIONS:   <-- IMPOARTANT!
 
-Read the README.win accompanying file.  The short instructions if
-you have Microsoft's C compiler is to run the "glutmake" batch file.
+Read the "README.win" accompanying file.  The short instructions if you
+have Microsoft's Visual C++ compiler is to run the "glutmake" batch
+file.  You may need to edit "glutwin32.mak" to indicate your compiler
+location.
 
 MAKEFILE GENERATION TO BUILD GLUT:                <-- IMPORTANT!
 
-Use mkmkfiles.sgi to put Makefiles using the SGI Makefile conventions
-in place.  Use mkmkfiles.imake to put Makefiles generated from
+Use "mkmkfiles.sgi" to put Makefiles using the SGI Makefile conventions
+in place.  Use "mkmkfiles.imake" to put Makefiles generated from
 Imakefiles in place.  Run one of these two commands in this directory,
 then do a "make".
 
@@ -139,7 +141,8 @@ book very informative.  See:
 
 BUG REPORTING:
 
-Send bug reports by electronic mail to mjk@sgi.com
+Send bug reports by electronic mail to mjk@nvidia.com (I now work
+for NVIDIA Corporation, not Silicon Graphics).
 
 Questions of a general interest about GLUT will be answered on the
 comp.graphics.api.opengl newsgroup.

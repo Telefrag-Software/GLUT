@@ -1,4 +1,4 @@
-XCOMM Copyright (c) Mark J. Kilgard, 1994, 1997.
+XCOMM Copyright (c) Mark J. Kilgard, 1994, 1997, 1998.
 XCOMM Glut.cf - GLUT distribution Imakefile configuration info
 
 #ifndef MathLibrary /* introduced with X11R6 */
@@ -28,6 +28,8 @@ MUI_DEPLIBS = $(DEPMUI) $(DEPGLUT) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
 MUI_LIBS = $(MUI) $(GLUT) $(GLU) $(OPENGL) $(XMULIB) $(XILIB) $(XLIB) MathLibrary
 GLE_DEPLIBS = $(DEPGLE) $(DEPGLUT) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
 GLE_LIBS = $(GLE) $(GLUT) $(GLU) $(OPENGL) $(XMULIB) $(XILIB) $(XLIB) MathLibrary
+GLSMAP_DEPLIBS = $(DEPGLSMAP) $(DEPGLUT) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
+GLSMAP_LIBS = $(GLSMAP) $(GLUT) $(GLU) $(OPENGL) $(XMULIB) $(XILIB) $(XLIB) MathLibrary
 
 #else /* Everybody but Sun... */
 #ifdef AlphaArchitecture
@@ -64,6 +66,8 @@ MUI_LIBS =       $(MUI) $(GLUTLIB)    $(GLULIB)    $(GLLIB)    $(XMULIB) $(XILIB
 MUI_DEPLIBS = $(DEPMUI) $(DEPGLUTLIB) $(DEPGLULIB) $(DEPGLLIB) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
 GLE_LIBS =       $(GLE) $(GLUTLIB)    $(GLULIB)    $(GLLIB)    $(XMULIB) $(XILIB) $(XLIB) MathLibrary
 GLE_DEPLIBS = $(DEPGLE) $(DEPGLUTLIB) $(DEPGLULIB) $(DEPGLLIB) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
+GLSMAP_LIBS =       $(GLSMAP) $(GLUTLIB)    $(GLULIB)    $(GLLIB)    $(XMULIB) $(XILIB) $(XLIB) MathLibrary
+GLSMAP_DEPLIBS = $(DEPGLSMAP) $(DEPGLUTLIB) $(DEPGLULIB) $(DEPGLLIB) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
 
 #else /* Everybody but Sun or DEC Alpha... */
 
@@ -93,6 +97,8 @@ MUI_DEPLIBS = $(DEPMUI) $(DEPGLUT) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
 MUI_LIBS = $(MUI) $(GLUT) $(GLU) $(OPENGL) $(XMULIB) $(XILIB) $(XLIB) MathLibrary
 GLE_DEPLIBS = $(DEPGLE) $(DEPGLUT) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
 GLE_LIBS = $(GLE) $(GLUT) $(GLU) $(OPENGL) $(XMULIB) $(XILIB) $(XLIB) MathLibrary
+GLSMAP_DEPLIBS = $(DEPGLSMAP) $(DEPGLUT) $(DEPXMULIB) $(DEPXILIB) $(DEPXLIB)
+GLSMAP_LIBS = $(GLSMAP) $(GLUT) $(GLU) $(OPENGL) $(XMULIB) $(XILIB) $(XLIB) MathLibrary
 
 #endif
 #endif
@@ -105,6 +111,8 @@ DEPMUI = $(TOP)/lib/mui/libmui.a
 MUI = $(TOP)/lib/mui/libmui.a
 DEPGLE = $(TOP)/lib/gle/libgle.a
 GLE = $(TOP)/lib/gle/libgle.a
+DEPGLSMAP = $(TOP)/lib/glsmap/libglsmap.a
+GLSMAP = $(TOP)/lib/glsmap/libglsmap.a
 
 CXXEXTRA_INCLUDES = -I/usr/include/CC $(EXTRA_INCLUDES)
 GLUT_INVENTOR_DEPLIBS = $(GLUT_DEPLIBS)
@@ -133,6 +141,8 @@ GLUT_INVENTOR_LIBS = $(INVENTOR) $(GLUT_LIBS)
 #define NormalMuiProgramTarget(name,objs) NormalProgramTarget(name,objs,$(MUI_DEPLIBS),$(MUI_LIBS),NullParameter)
 #define SimpleGleProgramTarget(name) NormalProgramTarget(name,name.o,$(GLE_DEPLIBS),$(GLE_LIBS),NullParameter)
 #define NormalGleProgramTarget(name,objs) NormalProgramTarget(name,objs,$(GLE_DEPLIBS),$(GLE_LIBS),NullParameter)
+#define SimpleGlsmapProgramTarget(name) NormalProgramTarget(name,name.o,$(GLSMAP_DEPLIBS),$(GLSMAP_LIBS),NullParameter)
+#define NormalGlsmapProgramTarget(name,objs) NormalProgramTarget(name,objs,$(GLSMAP_DEPLIBS),$(GLSMAP_LIBS),NullParameter)
 #define SimpleGlutInventorProgramTarget(name) NormalCplusplusProgramTarget(name,name.o,$(GLUT_INVENTOR_DEPLIBS),$(GLUT_INVENTOR_LIBS),NullParameter)
 #define NormalGlutInventorProgramTarget(name,objs) NormalCplusplusProgramTarget(name,objs,$(GLUT_INVENTOR_DEPLIBS),$(GLUT_INVENTOR_LIBS),NullParameter)
 

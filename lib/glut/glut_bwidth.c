@@ -5,7 +5,6 @@
    and is provided without guarantee or warrantee expressed or
    implied. This program is -not- in the public domain. */
 
-#include <GL/glut.h>
 #include "glutint.h"
 #include "glutbitmap.h"
 
@@ -16,7 +15,7 @@ glutBitmapWidth(GLUTbitmapFont font, int c)
   BitmapFontPtr fontinfo;
   const BitmapCharRec *ch;
 
-#ifdef WIN32
+#ifdef _WIN32
   fontinfo = (BitmapFontPtr) __glutFont(font);
 #else
   fontinfo = (BitmapFontPtr) font;
@@ -38,7 +37,7 @@ glutBitmapLength(GLUTbitmapFont font, const unsigned char *string)
   BitmapFontPtr fontinfo;
   const BitmapCharRec *ch;
 
-#ifdef WIN32
+#ifdef _WIN32
   fontinfo = (BitmapFontPtr) __glutFont(font);
 #else
   fontinfo = (BitmapFontPtr) font;

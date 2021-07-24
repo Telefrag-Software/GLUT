@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutAddMenuEntry 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutAddMenuEntry 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutAddMenuEntry - adds a menu entry to the bottom of the current menu. 
 .SH SYNTAX
@@ -23,4 +23,4 @@ will be called passing value as the callback's parameter.
 .SH SEE ALSO
 glutAddSubMenu, glutCreateMenu, glutChangeToMenuEntry, glutRemoveMenuItem
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

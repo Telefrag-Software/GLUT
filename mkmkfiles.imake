@@ -40,8 +40,19 @@ else # Try non-standard places vendor locations
       set path = ( /usr/openwin/bin $path )
       /usr/openwin/bin/xmkmf
     else
-      # Hope xmkmf is on your path!
-      xmkmf     
+      # Look for FreeBSD's non-standard placement of imake and xmkmf
+      if ( -d /usr/X11R6/lib/X11/config ) then
+        if ( -x /usr/X11R6/bin/imake ) then
+          # We found FreeBSD's location for imake and xmkmf
+          /usr/X11R6/bin/imake -DUseInstalled -I/usr/X11R6/lib/X11/config -DTOPDIR=.
+        else
+          # Hope imake is on your path!
+          imake -DUseInstalled -I/usr/X11R6/lib/X11/config -DTOPDIR=.
+        endif
+      else
+        # Hope xmkmf is on your path!
+        xmkmf     
+      endif
     endif
   endif
 endif

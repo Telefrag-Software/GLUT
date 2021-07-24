@@ -7,10 +7,12 @@ SRCS = smooth.c
 
 !include "$(TOP)/glutwin32.mak"
 
-trackball.c:
+trackball.c: ..\..\examples\trackball.c
+	-del /f trackball.c
 	copy ..\..\examples\trackball.c trackball.c
 
-trackball.h:
+trackball.h: ..\..\examples\trackball.h
+	-del /f trackball.h
 	copy ..\..\examples\trackball.h trackball.h
 
 # dependencies

@@ -4,7 +4,7 @@
 
 
 # defines
-SUBDIRS	= glut.dir mui.dir gle.dir
+SUBDIRS	= glut.dir mui.dir gle.dir glsmap.dir
 CLEAN	= $(SUBDIRS:.dir=.clean)
 CLOBBER	= $(SUBDIRS:.dir=.clobber)
 

@@ -1,5 +1,5 @@
 
-/* Copyright (c) Mark J. Kilgard, 1997.  */
+/* Copyright (c) Mark J. Kilgard, 1997, 1998.  */
 
 /* This program is freely distributable without licensing fees 
    and is provided without guarantee or warrantee expressed or 
@@ -11,10 +11,18 @@
    is present (supported on SGI's InfiniteReality hardware), the
    particle size is attenuated based on eye distance. */
 
+/* Now pointburst.c is extended to support the multi-vendor
+   EXT_point_parameters extension that has the same interface as the
+   SGIS extension (modulo the SGIS suffix/prefix).  NVidia's Release 2
+   OpenGL ICD driver supports the EXT_point_parameters extension. */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>       /* for cos(), sin(), and sqrt() */
+#ifdef _WIN32
+#include <windows.h>    /* for wglGetProcAddress */
+#endif
 #include <GL/glut.h>
 
 /* Some <math.h> files do not define M_PI... */
@@ -26,6 +34,37 @@
 #undef GL_SGIS_point_parameters
 #endif
 
+#if defined(GL_SGIS_point_parameters) && !defined(GL_EXT_point_parameters)
+/* Use the EXT point parameters interface for the SGIS implementation. */
+#define GL_POINT_SIZE_MIN_EXT GL_POINT_SIZE_MIN_SGIS
+#define GL_POINT_SIZE_MAX_EXT GL_POINT_SIZE_MAX_SGIS
+#define GL_POINT_FADE_THRESHOLD_SIZE_EXT GL_POINT_FADE_THRESHOLD_SIZE_SGIS
+#define GL_DISTANCE_ATTENUATION_EXT GL_DISTANCE_ATTENUATION_SGIS
+#define glPointParameterfEXT glPointParameterfSGIS
+#define glPointParameterfvEXT glPointParameterfvSGIS
+#define GL_EXT_point_parameters 1
+#endif
+
+#if !defined(GL_EXT_point_parameters)
+#define GL_POINT_SIZE_MIN_EXT               0x8126
+#define GL_POINT_SIZE_MAX_EXT               0x8127
+#define GL_POINT_FADE_THRESHOLD_SIZE_EXT    0x8128
+#define GL_DISTANCE_ATTENUATION_EXT         0x8129
+#ifdef _WIN32
+/* Curse Microsoft for the insanity of wglGetProcAddress. */
+typedef void (APIENTRY * PFNGLPOINTPARAMETERFEXTPROC) (GLenum pname, GLfloat param);
+typedef void (APIENTRY * PFNGLPOINTPARAMETERFVEXTPROC) (GLenum pname, const GLfloat *params);
+#define GL_EXT_point_parameters 1
+#endif
+#endif
+
+#ifdef _WIN32
+PFNGLPOINTPARAMETERFEXTPROC glPointParameterfEXT;
+PFNGLPOINTPARAMETERFVEXTPROC glPointParameterfvEXT;
+#endif
+
+int hasPointParameters;
+
 static GLfloat angle = -150;   /* in degrees */
 static int spin = 0;
 static int moving, begin;
@@ -34,10 +73,13 @@ static float time;
 static int repeat = 1;
 int useMipmaps = 1;
 int linearFiltering = 1;
+int useTexture = 1;
 
+#if GL_EXT_point_parameters
 static GLfloat constant[3] = { 1/5.0, 0.0, 0.0 };
 static GLfloat linear[3] = { 0.0, 1/5.0, 0.0 };
 static GLfloat quadratic[3] = { 0.25, 0.0, 1/60.0 };
+#endif
 
 #define MAX_POINTS 2000
 
@@ -189,7 +231,9 @@ redraw(void)
     recalcModelView();
 
   /* Draw the floor. */
-  glEnable(GL_TEXTURE_2D);
+  if (useTexture) {
+    glEnable(GL_TEXTURE_2D);
+  }
   glColor3f(0.5, 1.0, 0.5);
   glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0);
@@ -205,7 +249,9 @@ redraw(void)
   /* Allow particles to blend with each other. */
   glDepthMask(GL_FALSE);
 
-  glDisable(GL_TEXTURE_2D);
+  if (useTexture) {
+    glDisable(GL_TEXTURE_2D);
+  }
   glBegin(GL_POINTS);
     for (i=0; i<numPoints; i++) {
       /* Draw alive particles. */
@@ -253,15 +299,21 @@ menu(int option)
   case 0:
     makePointList();
     break;
-#if GL_SGIS_point_parameters
+#if GL_EXT_point_parameters
   case 1:
-    glPointParameterfvSGIS(GL_DISTANCE_ATTENUATION_SGIS, constant);
+    if (hasPointParameters) {
+      glPointParameterfvEXT(GL_DISTANCE_ATTENUATION_EXT, constant);
+    }
     break;
   case 2:
-    glPointParameterfvSGIS(GL_DISTANCE_ATTENUATION_SGIS, linear);
+    if (hasPointParameters) {
+      glPointParameterfvEXT(GL_DISTANCE_ATTENUATION_EXT, linear);
+    }
     break;
   case 3:
-    glPointParameterfvSGIS(GL_DISTANCE_ATTENUATION_SGIS, quadratic);
+    if (hasPointParameters) {
+      glPointParameterfvEXT(GL_DISTANCE_ATTENUATION_EXT, quadratic);
+    }
     break;
 #endif
   case 4:
@@ -270,12 +322,16 @@ menu(int option)
   case 5:
     glDisable(GL_BLEND);
     break;
-#if GL_SGIS_point_parameters
+#if GL_EXT_point_parameters
   case 6:
-    glPointParameterfSGIS(GL_POINT_FADE_THRESHOLD_SIZE_SGIS, 1.0);
+    if (hasPointParameters) {
+      glPointParameterfEXT(GL_POINT_FADE_THRESHOLD_SIZE_EXT, 1.0);
+    }
     break;
   case 7:
-    glPointParameterfSGIS(GL_POINT_FADE_THRESHOLD_SIZE_SGIS, 10.0);
+    if (hasPointParameters) {
+      glPointParameterfEXT(GL_POINT_FADE_THRESHOLD_SIZE_EXT, 10.0);
+    }
     break;
 #endif
   case 8:
@@ -292,6 +348,9 @@ menu(int option)
     break;
   case 12:
     glPointSize(8.0);
+    break;
+  case 18:
+    glPointSize(16.0);
     break;
   case 13:
     spin = 1 - spin;
@@ -312,6 +371,9 @@ menu(int option)
     break;
   case 17:
     numPoints = 2000;
+    break;
+  case 19:
+    useTexture = !useTexture;
     break;
   case 666:
     exit(0);
@@ -426,6 +488,21 @@ main(int argc, char **argv)
   }
 
   glutCreateWindow("point burst");
+
+  hasPointParameters = glutExtensionSupported("GL_SGIS_point_parameters") ||
+    glutExtensionSupported("GL_EXT_point_parameters");
+#ifdef _WIN32
+  if (hasPointParameters) {
+    glPointParameterfEXT = (PFNGLPOINTPARAMETERFEXTPROC)
+      wglGetProcAddress("glPointParameterfEXT");
+    glPointParameterfvEXT = (PFNGLPOINTPARAMETERFVEXTPROC)
+      wglGetProcAddress("glPointParameterfvEXT");
+    printf("has point parameters extension!\n");
+  } else {
+    printf("does NOT have point parameters extension!\n");
+  }
+#endif
+
   glutDisplayFunc(redraw);
   glutMouseFunc(mouse);
   glutMotionFunc(mouseMotion);
@@ -445,11 +522,13 @@ main(int argc, char **argv)
   glutAddMenuEntry("Point size 2", 10);
   glutAddMenuEntry("Point size 4", 11);
   glutAddMenuEntry("Point size 8", 12);
+  glutAddMenuEntry("Point size 16", 18);
   glutAddMenuEntry("Toggle spin", 13);
-  glutAddMenuEntry("200 points ", 14);
-  glutAddMenuEntry("500 points ", 15);
-  glutAddMenuEntry("1000 points ", 16);
-  glutAddMenuEntry("2000 points ", 17);
+  glutAddMenuEntry("200 points", 14);
+  glutAddMenuEntry("500 points", 15);
+  glutAddMenuEntry("1000 points", 16);
+  glutAddMenuEntry("2000 points", 17);
+  glutAddMenuEntry("Toggle texture", 19);
   glutAddMenuEntry("Quit", 666);
   glutAttachMenu(GLUT_RIGHT_BUTTON);
 
@@ -458,8 +537,10 @@ main(int argc, char **argv)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glPointSize(8.0);
-#if GL_SGIS_point_parameters
-  glPointParameterfvSGIS(GL_DISTANCE_ATTENUATION_SGIS, quadratic);
+#if GL_EXT_point_parameters
+  if (hasPointParameters) {
+    glPointParameterfvEXT(GL_DISTANCE_ATTENUATION_EXT, quadratic);
+  }
 #endif
 
   glMatrixMode(GL_PROJECTION);

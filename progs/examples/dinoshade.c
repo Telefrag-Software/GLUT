@@ -842,7 +842,7 @@ main(int argc, char **argv)
 #ifdef GL_VERSION_1_1
   if (supportsOneDotOne() && !forceExtension) {
     polygonOffsetVersion = ONE_DOT_ONE;
-    glPolygonOffset(-2.0, -1.0);
+    glPolygonOffset(-2.0, -9.0);
   } else
 #endif
   {
@@ -850,7 +850,7 @@ main(int argc, char **argv)
   /* check for the polygon offset extension */
   if (glutExtensionSupported("GL_EXT_polygon_offset")) {
     polygonOffsetVersion = EXTENSION;
-    glPolygonOffsetEXT(-0.1, -0.002);
+    glPolygonOffsetEXT(-2.0, -0.002);
   } else 
 #endif
     {

@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutGetColor 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutGetColor 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutGetColor - retrieves a red, green, or blue component for a given
 color index colormap entry for the layer in use's logical colormap for the
@@ -30,4 +30,4 @@ is transparent or outside the valid range of color indices.
 .SH SEE ALSO
 glutGet, glutSetColor, glutCopyColormap
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

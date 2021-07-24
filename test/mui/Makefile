@@ -6,6 +6,7 @@ TOP  = ../..
 SRCS = mui_test.c multi_test.c
 
 EXTRALIBS = $(MUI)
+DEPLIBS = $(MUI)
 
 !include "$(TOP)/glutwin32.mak"
 

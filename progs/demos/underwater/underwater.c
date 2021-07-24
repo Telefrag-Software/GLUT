@@ -70,6 +70,7 @@ static int object = MODEL_SPHERE;
 static int reportSpeed = 0;
 static int dinoDisplayList;
 static GLfloat causticScale = 1.0;
+static int fullscreen = 0;
 
 static GLfloat lightPosition[4];
 /* XXX Diffuse light color component > 1.0 to brighten caustics. */
@@ -315,6 +316,18 @@ display(void)
   }
 }
 
+void reshape(int w, int h)
+{
+   glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   gluPerspective(40.0, /* field of view in degree */
+     (GLfloat) w/(GLfloat) h, /* aspect ratio */
+     20.0, /* Z near */
+     100.0); /* Z far */
+   glMatrixMode(GL_MODELVIEW);
+}
+
 void
 idle(void)
 {
@@ -476,6 +489,8 @@ main(int argc, char **argv)
       /* Don't use linear mipmap linear texture filtering; instead
 	 use linear filtering. */
       useMipmaps = 0;
+    } else if (!strcmp("-fullscreen", argv[i])) {
+      fullscreen = 1;
     } else {
       fprintf(stderr, "usage: caustics [-lesstex]\n");
       fprintf(stderr, "       -lesstex uses half the caustic textures.\n");
@@ -485,7 +500,12 @@ main(int argc, char **argv)
   }
 
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
-  glutCreateWindow("underwater");
+  if (fullscreen) {
+    glutGameModeString("800x600:16@60");
+    glutEnterGameMode();
+  } else {
+    glutCreateWindow("underwater");
+  }
 
   /* Check that renderer has the GL_EXT_texture_object
      extension or supports OpenGL 1.1 */
@@ -569,11 +589,6 @@ main(int argc, char **argv)
   if (!HaveTexObj)
     glEndList();
 
-  /* Setup the projection and view. */
-  glMatrixMode(GL_PROJECTION);
-  gluPerspective( /* field of view in degree */ 40.0,
-  /* aspect ratio */ 1.0,
-    /* Z near */ 20.0, /* Z far */ 100.0);
   glMatrixMode(GL_MODELVIEW);
   gluLookAt(0.0, 8.0, 60.0,  /* eye is at (0,8,60) */
     0.0, 8.0, 0.0,      /* center is at (0,8,0) */
@@ -588,23 +603,26 @@ main(int argc, char **argv)
 
   /* Register assorted GLUT callback routines. */
   glutDisplayFunc(display);
+  glutReshapeFunc(reshape);
   glutVisibilityFunc(visible);
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
   glutKeyboardFunc(keyboard);
 
   /* Create a pop-up menu. */
-  glutCreateMenu(menuSelect);
-  glutAddMenuEntry("Positional light", M_POSITIONAL);
-  glutAddMenuEntry("Directional light", M_DIRECTIONAL);
-  glutAddMenuEntry("Greenish light", M_GREENISH_LIGHT);
-  glutAddMenuEntry("White light", M_WHITE_LIGHT);
-  glutAddMenuEntry("With caustics", M_WITH_CAUSTICS);
-  glutAddMenuEntry("No caustics", M_NO_CAUSTICS);
-  glutAddMenuEntry("Switch model", M_SWITCH_MODEL);
-  glutAddMenuEntry("Increase ripple size", M_INCREASE_RIPPLE_SIZE);
-  glutAddMenuEntry("Decrease ripple size", M_DECREASE_RIPPLE_SIZE);
-  glutAttachMenu(GLUT_RIGHT_BUTTON);
+  if (!fullscreen) {
+    glutCreateMenu(menuSelect);
+    glutAddMenuEntry("Positional light", M_POSITIONAL);
+    glutAddMenuEntry("Directional light", M_DIRECTIONAL);
+    glutAddMenuEntry("Greenish light", M_GREENISH_LIGHT);
+    glutAddMenuEntry("White light", M_WHITE_LIGHT);
+    glutAddMenuEntry("With caustics", M_WITH_CAUSTICS);
+    glutAddMenuEntry("No caustics", M_NO_CAUSTICS);
+    glutAddMenuEntry("Switch model", M_SWITCH_MODEL);
+    glutAddMenuEntry("Increase ripple size", M_INCREASE_RIPPLE_SIZE);
+    glutAddMenuEntry("Decrease ripple size", M_DECREASE_RIPPLE_SIZE);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+  }
 
   /* For rendering the MODEL_DINO object. */
   dinoDisplayList = makeDinosaur();

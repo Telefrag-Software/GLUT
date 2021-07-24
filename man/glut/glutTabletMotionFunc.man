@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutTabletMotionFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutTabletMotionFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutTabletMotionFunc - sets the special keyboard callback for the current window. 
 .SH SYNTAX
@@ -31,4 +31,4 @@ callback is initially registered.
 .SH SEE ALSO
 glutTabletButtonFunc, glutDeviceGet, glutMotionFunc, glutSpaceballMotionFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

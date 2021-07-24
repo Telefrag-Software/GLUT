@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutCreateMenu 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutCreateMenu 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutCreateMenu - creates a new pop-up menu. 
 .SH SYNTAX
@@ -58,4 +58,4 @@ if overlay visuals are available.
 .SH SEE ALSO
 glutCreateWindow, glutDestroyMenu, glutSetMenu, glutAttachMenu
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

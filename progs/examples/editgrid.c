@@ -19,7 +19,7 @@
 
 int antialiasing = 0;
 int gridSize = 20;
-GLuint selectedPoint = ~0;
+GLuint selectedPoint = (GLuint) ~0;
 int winWidth, winHeight;
 GLuint selectBuffer[64];
 GLdouble modelMatrix[16], projMatrix[16];

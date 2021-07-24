@@ -205,9 +205,16 @@ void	muiSetTLTop(muiObject *obj, float p)
 }
 
 
+void    settlstrings(TextList *tl, char **s)
+{
+    tl->strs = s;
 
-
-
+    tl->count = 0;
+    while(*s) {
+        tl->count++;
+        s++;
+    }
+}
 
 #ifdef NOTDEF
 

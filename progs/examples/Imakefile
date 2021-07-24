@@ -11,7 +11,7 @@ TARGETS = sphere scene movelight glutplane \
 	  abgr stars stenciltst surfgrid texenv triselect fogtst dials2 \
 	  molehill zoomdino splatlogo oversphere fontdemo evaltest sb2db \
 	  screendoor simple cube reflectdino rendereps dinoshade halomagic \
-	  trippy mjksift circlefit editgrid
+	  trippy mjksift circlefit editgrid dinodraw resolution
 
 SRCS = bitfont.c blender.c dials.c dinoball.c dinospin.c glpuzzle.c \
     glutdino.c glutplane.c highlight.c lightlab.c mjkwarp.c movelight.c \
@@ -20,7 +20,8 @@ SRCS = bitfont.c blender.c dials.c dinoball.c dinospin.c glpuzzle.c \
     abgr.c stars.c stenciltst.c surfgrid.c texenv.c triselect.c fogtst.c dials2.c \
     molehill.c splatlogo.c oversphere.c fontdemo.c evaltest.c sb2db.c \
     screendoor.c simple.c cube.c reflectdino.c rendereps.c dinoshade.c \
-    halomagic.c trippy.c mjksift.c circlefit.c editgrid.c
+    halomagic.c trippy.c mjksift.c circlefit.c editgrid.c dinodraw.c \
+    resolution.c
 
 AllTarget($(TARGETS))
 
@@ -52,6 +53,7 @@ SimpleGlutProgramTarget(origami)
 SimpleGlutProgramTarget(oversphere)
 SimpleGlutProgramTarget(reflectdino)
 SimpleGlutProgramTarget(rendereps)
+SimpleGlutProgramTarget(resolution)
 SimpleGlutProgramTarget(sb2db)
 SimpleGlutProgramTarget(scene)
 SimpleGlutProgramTarget(screendoor)
@@ -72,6 +74,7 @@ SimpleGlutProgramTarget(trippy)
 SimpleGlutProgramTarget(triselect)
 SimpleGlutProgramTarget(zoomdino)
 
+NormalGlutProgramTarget(dinodraw,dinodraw.o trackball.o)
 NormalGlutProgramTarget(dinospin,dinospin.o trackball.o)
 NormalGlutProgramTarget(glpuzzle,glpuzzle.o trackball.o)
 NormalGlutProgramTarget(splatlogo,splatlogo.o logo.o)

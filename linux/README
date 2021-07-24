@@ -1,9 +1,9 @@
 	  Files For Making a Mesa/GLUT System For Linux ELF
 
-			    Version 0.0.5
+			    Version 0.0.6
 
 			   Peter F. Martone
-		       updated by Mark Kilgard (for GLUT 3.6)
+		       updated by Mark Kilgard (for GLUT 3.7)
 
 //************************************************************
 
@@ -38,7 +38,7 @@ The steps to make this work are:
 
 	  make
 	
-	This should build the shared library 'libglut.so.3.6'.
+	This should build the shared library 'libglut.so.3.7'.
 
 	IF YOU HAVE PROBLEMS WITH HEADER FILE DEPENDENCIES, try
 	doing:
@@ -54,8 +54,8 @@ The steps to make this work are:
 
      5) Make two symbolic links:
 
-	  ln -s libglut.so.3.6 libglut.so.3
-	  ln -s libglut.so.3.6 libglut.so
+	  ln -s libglut.so.3.7 libglut.so.3
+	  ln -s libglut.so.3.7 libglut.so
 
      6) Now, back up to $GLUT_HOME/. and:
 

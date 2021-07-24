@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSolidCube 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSolidCube 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSolidCube, glutWireCube - render a solid or wireframe cube respectively. 
 .SH SYNTAX
@@ -22,4 +22,4 @@ glutSolidSphere, glutSolidCone, glutSolidTorus, glutSolidDodecahedron,
 glutSolidOctahedron, glutSolidTetrahedron, glutSolidIcosahedron,
 glutSolidTeapot
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

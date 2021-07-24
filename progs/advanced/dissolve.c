@@ -13,7 +13,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define random rand
 #endif
 
@@ -378,6 +378,7 @@ visible(int vis)
 const int TEXDIM = 256;
 GLfloat *tex = 0;
 
+int
 main(int argc, char *argv[])
 {
   static GLfloat sphere_mat[] =

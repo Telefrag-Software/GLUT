@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutKeyboardFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutKeyboardFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutKeyboardFunc - sets the keyboard callback for the current window. 
 .SH SYNTAX
@@ -32,6 +32,7 @@ callback occurred.
 Use glutSpecialFunc for a means to detect non-ASCII key
 strokes.
 .SH SEE ALSO
+glutKeyboardUpFunc,
 glutSpecialFunc, glutCreateWindow, glutMouseFunc, glutSpaceballButtonFunc, glutButtonBoxFunc, glutTabletButtonFunc, glutGetModifiers
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

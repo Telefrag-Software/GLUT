@@ -2,9 +2,10 @@
 #
 # Copyright (c) Mark J. Kilgard, 1997.
 #
-include $(ROOT)/usr/include/make/commondefs
 
 TOP = ../..
+include $(TOP)/glutdefs
+include $(ROOT)/usr/include/make/commondefs
 
 TARGETS = libmui.a
 
@@ -15,6 +16,7 @@ RM = -rm -rf
 LCOPTS = -I$(TOP)/include -fullwarn 
 LWOFF = ,813,852,827,826
 LDIRT = *~ *.bak
+LLDLIBS = -lGLU -lGL -lXmu -lXext -lX11 -lm
 
 SRCS = gizmo.c glutmui.c displaylist.c uicolor.c miscui.c mui.c vslider.c \
 	 textlist.c button.c pulldown.c hslider.c
@@ -28,5 +30,8 @@ sinclude ObjectType.mk
 libmui.a: $(OBJS)
 	$(RM) $@
 	$(AR) crl $@ $(OBJS)
+
+browser: browser.o browseparse.o libmui.a ../glut/libglut.a
+	$(CC) -o $@ browser.o browseparse.o libmui.a ../glut/libglut.a $(LDFLAGS)
 
 include $(COMMONRULES)

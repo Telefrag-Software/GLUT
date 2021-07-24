@@ -254,7 +254,7 @@ special(int key, int x, int y)
 void
 menu(int value)
 {
-  key(value, 0, 0);
+  key((unsigned char) value, 0, 0);
 }
 
 int

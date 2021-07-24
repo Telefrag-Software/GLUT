@@ -661,9 +661,9 @@ scene(void)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   if (view == M_LIGHT_SOURCE_VIEW) {
-    gluPerspective(45.0, 1.0, 0.1, 600.0);
+    gluPerspective(45.0, 1.0, 0.5, 600.0);
   } else {
-    gluPerspective(33.0, 1.0, 1.0, 600.0);
+    gluPerspective(33.0, 1.0, 10.0, 600.0);
   }
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
@@ -763,7 +763,12 @@ generateShadowVolume(void)
   } else {
     eyePos = sceneEyePos;
   }
-  svsGenerateShadowVolume(svs, renderShadowingObject, 250, maxRadius,
+  /* XXX The 2048 feedbackBufferGuessSize is large enough to
+     workaround the Octane/Impact bug where if the feedback
+     buffer is under 2048 entries, a buggy hardware feedback
+     path is used.  2048 forces the (bug free) software path.
+     This bug is fixed in IRIX 6.5. */
+  svsGenerateShadowVolume(svs, renderShadowingObject, 2048, maxRadius,
     lightPos, objectPos, eyePos);
 }
 

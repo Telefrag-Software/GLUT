@@ -5,7 +5,7 @@
    provided without guarantee or warrantee expressed or  implied. This
    program is -not- in the public domain. */
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #pragma warning (disable:4244)          /* disable bogus conversion warnings */
 #endif
 
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 #include <GL/glu.h>
@@ -151,7 +151,7 @@ txfLoadFont(char *filename)
     lastError = "not a texture font file.";
     goto error;
   }
-#define EXPECT(n) if (got != n) { lastError = "premature end of file."; goto error; }
+#define EXPECT(n) if (got != (unsigned long) n) { lastError = "premature end of file."; goto error; }
   got = fread(&format, sizeof(int), 1, file);
   EXPECT(1);
   got = fread(&txf->tex_width, sizeof(int), 1, file);

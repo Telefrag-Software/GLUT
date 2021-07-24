@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutDisplayFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutDisplayFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutDisplayFunc - sets the display callback for the current window. 
 .SH SYNTAX
@@ -56,4 +56,4 @@ glutLayerGet(GLUT_OVERLAY_DAMAGED) is also cleared.
 .SH SEE ALSO
 glutCreateMenu, glutPostRedisplay, glutOverlayDisplayFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

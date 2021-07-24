@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutExtensionSupported 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutExtensionSupported 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutExtensionSupported - helps to easily determine whether a
 given OpenGL extension is supported. 
@@ -46,4 +46,4 @@ extension family prefix (EXT).
 .SH SEE ALSO
 glutGet, glGetString
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

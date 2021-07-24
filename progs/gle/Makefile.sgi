@@ -7,6 +7,7 @@ TOP = ../..
 include $(TOP)/glutdefs
 include $(ROOT)/usr/include/make/commondefs
 
+LD_QUICKSTART_INFO=
 LN = ln -s
 MV = mv
 RM = -rm -rf
@@ -25,6 +26,7 @@ TARGETS = \
 	joincone \
 	joinoffset \
 	joinstyle \
+	martini \
 	screw \
 	taper \
 	texas \
@@ -36,7 +38,7 @@ LLDLIBS = $(GLE) $(GLUT) -lGLU -lGL -lXmu -lXext -lX11 -lm
 
 LCOPTS = -I$(TOP)/include -fullwarn
 LWOFF = ,813,852,827,826
-LDIRT = *~ *.bak *.pure
+LDIRT = *~ *.bak *.pure trackball.c trackball.h
 
 default : $(TARGETS)
 
@@ -87,5 +89,17 @@ texas:   texas.o mainjoin.o
 
 twistoid:   twistoid.o texture.o maintex.o
 	$(CCF) -o $@ twistoid.o texture.o maintex.o $(LDFLAGS)
+
+martini: martini.o trackball.o
+	$(CCF) -o $@ martini.o trackball.o $(LDFLAGS)
+
+trackball.c:
+	ln -s ../examples/trackball.c .
+
+trackball.h:
+	ln -s ../examples/trackball.h .
+
+martini.o: martini.c trackball.h
+trackball.o: trackball.h trackball.c
 
 include $(COMMONRULES)

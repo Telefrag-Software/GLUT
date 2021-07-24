@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutMouseFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutMouseFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutMouseFunc - sets the mouse callback for the current window. 
 .SH SYNTAX
@@ -42,4 +42,4 @@ callbacks.
 .SH SEE ALSO
 glutKeyboardFunc, glutMotionFunc, glutSpaceballButtonFunc, glutButtonBoxFunc, glutTabletButtonFunc, glutGetModifiers
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

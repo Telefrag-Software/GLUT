@@ -2,7 +2,7 @@
 #include <GL/glut.h>
 
 #include <math.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 /* Some <math.h> files do not define M_PI... */

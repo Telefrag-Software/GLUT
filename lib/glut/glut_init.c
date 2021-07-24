@@ -9,10 +9,10 @@
 #include <string.h>
 #include <stdio.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#endif /* !WIN32 */
+#endif
 
 /* SGI optimization introduced in IRIX 6.3 to avoid X server
    round trips for interning common X atoms. */
@@ -22,7 +22,6 @@
 #define XSGIFastInternAtom(dpy,string,fast_name,how) XInternAtom(dpy,string,how)
 #endif
 
-#include <GL/glut.h>
 #include "glutint.h"
 
 /* GLUT inter-file variables */
@@ -52,7 +51,12 @@ Atom __glutWMDeleteWindow;
 
 static Bool synchronize = False;
 
-#if defined(WIN32)
+#if defined(_WIN32)
+
+#ifdef __BORLANDC__
+#include <float.h>  /* For masking floating point exceptions. */
+#endif
+
 void
 __glutOpenWin32Connection(char* display)
 {
@@ -63,6 +67,17 @@ __glutOpenWin32Connection(char* display)
   /* Make sure we register the window only once. */
   if(classname)
     return;
+
+#ifdef __BORLANDC__
+  /* Under certain conditions (e.g. while rendering solid surfaces with
+     lighting enabled) Microsoft OpenGL libraries cause some illegal
+     operations like floating point overflow or division by zero. The
+     default behaviour of Microsoft compilers is to mask (ignore)
+     floating point exceptions, while Borland compilers do not.  The
+     following function of Borland RTL allows to mask exceptions.
+     Advice from Pier Giorgio Esposito (mc2172@mclink.it). */
+  _control87(MCW_EM,MCW_EM);
+#endif
 
   classname = "GLUT";
 
@@ -103,7 +118,7 @@ __glutOpenWin32Connection(char* display)
      the same one. */
   __glutScreen          = 0;
 }
-#else /* !WIN32 */
+#else /* !_WIN32 */
 void
 __glutOpenXConnection(char *display)
 {
@@ -128,7 +143,7 @@ __glutOpenXConnection(char *display)
   __glutWMDeleteWindow = XSGIFastInternAtom(__glutDisplay,
     "WM_DELETE_WINDOW", SGI_XA_WM_DELETE_WINDOW, False);
 }
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 void
 __glutInitTime(struct timeval *beginning)
@@ -197,9 +212,9 @@ glutInit(int *argcp, char **argv)
   /* parse arguments for standard options */
   for (i = 1; i < __glutArgc; i++) {
     if (!strcmp(__glutArgv[i], "-display")) {
-#if defined(WIN32)
+#if defined(_WIN32)
       __glutWarning("-display option invalid for win32 glut.");
-#endif /* WIN32 */
+#endif
       if (++i >= __glutArgc) {
         __glutFatalError(
           "follow -display option with X display name.");
@@ -214,18 +229,18 @@ glutInit(int *argcp, char **argv)
       geometry = __glutArgv[i];
       removeArgs(argcp, &argv[1], 2);
     } else if (!strcmp(__glutArgv[i], "-direct")) {
-#if defined(WIN32)
+#if defined(_WIN32)
       __glutWarning("-direct option invalid for win32 glut.");
-#endif /* WIN32 */
+#endif
       if (!__glutTryDirect)
         __glutFatalError(
           "cannot force both direct and indirect rendering.");
       __glutForceDirect = GL_TRUE;
       removeArgs(argcp, &argv[1], 1);
     } else if (!strcmp(__glutArgv[i], "-indirect")) {
-#if defined(WIN32)
+#if defined(_WIN32)
       __glutWarning("-indirect option invalid for win32 glut.");
-#endif /* WIN32 */
+#endif
       if (__glutForceDirect)
         __glutFatalError(
           "cannot force both direct and indirect rendering.");
@@ -238,9 +253,9 @@ glutInit(int *argcp, char **argv)
       __glutDebug = GL_TRUE;
       removeArgs(argcp, &argv[1], 1);
     } else if (!strcmp(__glutArgv[i], "-sync")) {
-#if defined(WIN32)
+#if defined(_WIN32)
       __glutWarning("-indirect option invalid for win32 glut.");
-#endif /* WIN32 */
+#endif
       synchronize = GL_TRUE;
       removeArgs(argcp, &argv[1], 1);
     } else {
@@ -249,11 +264,11 @@ glutInit(int *argcp, char **argv)
       break;
     }
   }
-#if defined(WIN32)
+#if defined(_WIN32)
   __glutOpenWin32Connection(display);
 #else
   __glutOpenXConnection(display);
-#endif /* WIN32 */
+#endif
   if (geometry) {
     int flags, x, y, width, height;
 

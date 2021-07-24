@@ -1,5 +1,5 @@
 
-/* Copyright (c) Mark J. Kilgard, 1996. */
+/* Copyright (c) Mark J. Kilgard, 1996, 1998. */
 
 #include "../../Glut.cf"
 
@@ -8,7 +8,7 @@ TARGETS = hiddenline haloed silhouette softshadow accumaa field convolve \
   envphong decal textext genmipmap imgproc mipmap_lines textrim tvertex \
   warp motionblur projtex zcomposite videoresize occlude af_depthcue \
   af_teapots multilight boundary shadowfun hello2rts rasonly sgiflag \
-  pointburst
+  pointburst redblue_stereo texwinalign
 
 SRCS = hiddenline.c haloed.c silhouette.c softshadow.c accumaa.c field.c \
   convolve.c shadowvol.c shadowmap.c projshadow.c sphere.c tess.c texture.c \
@@ -16,7 +16,8 @@ SRCS = hiddenline.c haloed.c silhouette.c softshadow.c accumaa.c field.c \
   textmap.c genmipmap.c imgproc.c mipmap_lines.c izoom.c textrim.c tvertex.c \
   warp.c motionblur.c projtex.c zcomposite.c videoresize.c occlude.c \
   addfog.c af_depthcue.c af_teapots.c multilight.c boundary.c shadowfun.c \
-  rts.c hello2rts.c rasonly.c sgiflag.c pointburst.c
+  rts.c hello2rts.c rasonly.c sgiflag.c pointburst.c redblue_stereo.c \
+  texwinalign.c
 
 AllTarget($(TARGETS))
 
@@ -45,6 +46,7 @@ SimpleGlutProgramTarget(pointburst)
 SimpleGlutProgramTarget(projshadow)
 NormalGlutProgramTarget(projtex,projtex.o texture.o)
 SimpleGlutProgramTarget(rasonly)
+SimpleGlutProgramTarget(redblue_stereo)
 SimpleGlutProgramTarget(sgiflag)
 SimpleGlutProgramTarget(shadowfun)
 SimpleGlutProgramTarget(shadowmap)
@@ -55,6 +57,7 @@ NormalGlutProgramTarget(tess,tess.o sphere.o)
 NormalGlutProgramTarget(textext,textext.o textmap.o texture.o)
 NormalGlutProgramTarget(textrim,textrim.o texture.o)
 NormalGlutProgramTarget(textile,textile.o texture.o)
+SimpleGlutProgramTarget(texwinalign)
 SimpleGlutProgramTarget(tvertex)
 NormalGlutProgramTarget(videoresize,videoresize.o sphere.o)
 SimpleGlutProgramTarget(vox)

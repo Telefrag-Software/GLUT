@@ -1,10 +1,14 @@
 
-/* Copyright (c) Mark J. Kilgard, 1994, 1997. */
+/* Copyright (c) Mark J. Kilgard, 1994, 1997, 1998. */
 /* Copyright (c) Nate Robins, 1997. */
 
- /* This program is freely distributable without licensing fees
-    and is provided without guarantee or warrantee expressed or
-    implied. This program is -not- in the public domain. */
+/* This program is freely distributable without licensing fees
+   and is provided without guarantee or warrantee expressed or
+   implied. This program is -not- in the public domain. */
+
+/* This file completely re-implements glut_menu.c and glut_menu2.c
+   for Win32.  Note that neither glut_menu.c nor glut_menu2.c are
+   compiled into Win32 GLUT. */
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,10 +16,8 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <GL/glut.h>
 #include "glutint.h"
 
-GLUTmenu *__glutCurrentMenu = NULL;
 void (*__glutMenuStatusFunc) (int, int, int);
 GLUTmenu *__glutMappedMenu;
 GLUTwindow *__glutMenuWindow;
@@ -95,9 +97,9 @@ static void
 mapMenu(GLUTmenu * menu, int x, int y)
 {
   TrackPopupMenu(menu->win, TPM_LEFTALIGN |
-		 __glutMenuButton == TPM_RIGHTBUTTON ? 
-		 TPM_RIGHTBUTTON : TPM_LEFTBUTTON,
-		 x, y, 0, __glutCurrentWindow->win, NULL);
+    __glutMenuButton == TPM_RIGHTBUTTON ? 
+    TPM_RIGHTBUTTON : TPM_LEFTBUTTON,
+    x, y, 0, __glutCurrentWindow->win, NULL);
 }
 
 void
@@ -125,13 +127,15 @@ __glutGetUniqueMenuItem(GLUTmenu * menu, UINT unique)
   i = menu->num;
   item = menu->list;
   while (item) {
-    if (item->unique == unique)
+    if (item->unique == unique) {
       return item;
+    }
     if (item->isTrigger) {
       GLUTmenuItem *subitem;
       subitem = __glutGetUniqueMenuItem(menuList[item->value], unique);
-      if (subitem)
+      if (subitem) {
         return subitem;
+      }
     }
     i--;
     item = item->next;
@@ -165,18 +169,6 @@ __glutGetMenuItem(GLUTmenu * menu, Window win, int *which)
     item = item->next;
   }
   return NULL;
-}
-
-static int
-getMenuItemIndex(GLUTmenuItem * item)
-{
-  int count = 0;
-
-  while (item) {
-    count++;
-    item = item->next;
-  }
-  return count;
 }
 
 GLUTmenu *
@@ -225,8 +217,9 @@ getUnusedMenuSlot(void)
        though the ANSI C library spec requires this. */
     menuList = (GLUTmenu **) malloc(sizeof(GLUTmenu *));
   }
-  if (!menuList)
+  if (!menuList) {
     __glutFatalError("out of memory.");
+  }
   menuList[menuListSize - 1] = NULL;
   return menuListSize - 1;
 }
@@ -245,12 +238,14 @@ glutCreateMenu(GLUTselectCB selectFunc)
   GLUTmenu *menu;
   int menuid;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   menuid = getUnusedMenuSlot();
   menu = (GLUTmenu *) malloc(sizeof(GLUTmenu));
-  if (!menu)
+  if (!menu) {
     __glutFatalError("out of memory.");
+  }
   menu->id = menuid;
   menu->num = 0;
   menu->submenus = 0;
@@ -265,15 +260,15 @@ glutCreateMenu(GLUTselectCB selectFunc)
   return menuid + 1;
 }
 
-/* CENTRY */
 void APIENTRY
 glutDestroyMenu(int menunum)
 {
   GLUTmenu *menu = __glutGetMenuByNum(menunum);
   GLUTmenuItem *item, *next;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   assert(menu->id == menunum - 1);
   DestroyMenu(menu->win);
   menuList[menunum - 1] = NULL;
@@ -318,7 +313,6 @@ glutSetMenu(int menuid)
   }
   __glutSetMenu(menu);
 }
-/* ENDCENTRY */
 
 static void
 setMenuItem(GLUTmenuItem * item, const char *label,
@@ -328,8 +322,9 @@ setMenuItem(GLUTmenuItem * item, const char *label,
 
   menu = item->menu;
   item->label = __glutStrdup(label);
-  if (!item->label)
+  if (!item->label) {
     __glutFatalError("out of memory.");
+  }
   item->isTrigger = isTrigger;
   item->len = (int) strlen(label);
   item->value = value;
@@ -341,17 +336,18 @@ setMenuItem(GLUTmenuItem * item, const char *label,
   }
 }
 
-/* CENTRY */
 void APIENTRY
 glutAddMenuEntry(const char *label, int value)
 {
   GLUTmenuItem *entry;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   entry = (GLUTmenuItem *) malloc(sizeof(GLUTmenuItem));
-  if (!entry)
+  if (!entry) {
     __glutFatalError("out of memory.");
+  }
   entry->menu = __glutCurrentMenu;
   setMenuItem(entry, label, value, FALSE);
   __glutCurrentMenu->num++;
@@ -365,16 +361,19 @@ glutAddSubMenu(const char *label, int menu)
   GLUTmenuItem *submenu;
   GLUTmenu     *popupmenu;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   submenu = (GLUTmenuItem *) malloc(sizeof(GLUTmenuItem));
-  if (!submenu)
+  if (!submenu) {
     __glutFatalError("out of memory.");
+  }
   __glutCurrentMenu->submenus++;
   submenu->menu = __glutCurrentMenu;
   popupmenu = __glutGetMenuByNum(menu);
-  if (popupmenu)
+  if (popupmenu) {
     submenu->win = popupmenu->win;
+  }
   setMenuItem(submenu, label, /* base 0 */ menu - 1, TRUE);
   __glutCurrentMenu->num++;
   submenu->next = __glutCurrentMenu->list;
@@ -387,8 +386,9 @@ glutChangeToMenuEntry(int num, const char *label, int value)
   GLUTmenuItem *item;
   int i;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   i = __glutCurrentMenu->num;
   item = __glutCurrentMenu->list;
   while (item) {
@@ -427,8 +427,9 @@ glutChangeToSubMenu(int num, const char *label, int menu)
   GLUTmenuItem *item;
   int i;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   i = __glutCurrentMenu->num;
   item = __glutCurrentMenu->list;
   while (item) {
@@ -467,8 +468,9 @@ glutRemoveMenuItem(int num)
   GLUTmenuItem *item, **prev;
   int i;
 
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   i = __glutCurrentMenu->num;
   prev = &__glutCurrentMenu->list;
   item = __glutCurrentMenu->list;
@@ -496,8 +498,13 @@ glutRemoveMenuItem(int num)
 void APIENTRY
 glutAttachMenu(int button)
 {
-  if (__glutMappedMenu)
+  if (__glutCurrentWindow == __glutGameModeWindow) {
+    __glutWarning("cannot attach menus in game mode.");
+    return;
+  }
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   if (__glutCurrentWindow->menu[button] < 1) {
     __glutCurrentWindow->buttonUses++;
   }
@@ -507,12 +514,12 @@ glutAttachMenu(int button)
 void APIENTRY
 glutDetachMenu(int button)
 {
-  if (__glutMappedMenu)
+  if (__glutMappedMenu) {
     menuModificationError();
+  }
   if (__glutCurrentWindow->menu[button] > 0) {
     __glutCurrentWindow->buttonUses--;
     __glutCurrentWindow->menu[button] = 0;
   }
 }
-/* ENDCENTRY */
 

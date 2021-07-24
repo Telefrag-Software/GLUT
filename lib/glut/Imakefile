@@ -25,13 +25,20 @@ SRCS = \
 	glut_event.c \
 	glut_ext.c \
 	glut_fullscrn.c \
+	glut_gamemode.c \
 	glut_get.c \
+	glut_glxext.c \
 	glut_hel10.c \
 	glut_hel12.c \
 	glut_hel18.c \
 	glut_init.c \
 	glut_input.c \
+	glut_joy.c \
+	glut_key.c \
+	glut_keyctrl.c \
+	glut_keyup.c \
 	glut_menu.c \
+	glut_menu2.c \
 	glut_mesa.c \
 	glut_modifier.c \
 	glut_mroman.c \
@@ -66,13 +73,20 @@ OBJS = \
 	glut_event.o \
 	glut_ext.o \
 	glut_fullscrn.o \
+	glut_gamemode.o \
 	glut_get.o \
+	glut_glxext.o \
 	glut_hel10.o \
 	glut_hel12.o \
 	glut_hel18.o \
 	glut_init.o \
 	glut_input.o \
+	glut_joy.o \
+	glut_key.o \
+	glut_keyctrl.o \
+	glut_keyup.o \
 	glut_menu.o \
+	glut_menu2.o \
 	glut_mesa.o \
 	glut_modifier.o \
 	glut_mroman.o \

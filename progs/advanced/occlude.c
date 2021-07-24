@@ -245,8 +245,10 @@ display(void)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   draw();
 
+  /* Draw all teapots. */
+  teapot1 = teapot2 = teapot3 = teapot4 = teapot5 = 1;
 #ifdef GL_EXT_histogram
-  if (occlusionDectection) {
+  if (occlusionDectection && !noOcclude) {
     GLuint count_buffer[8];
     int i;
 
@@ -289,10 +291,6 @@ display(void)
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   }
 #endif
-  if (!occlusionDectection || noOcclude) {
-    /* Draw all teapots. */
-    teapot1 = teapot2 = teapot3 = teapot4 = teapot5 = 1;
-  }
   /* If each teapot needs to be drawn (ie, not occluded when occlusion
      detection is enabled, draw it. */
   if (teapot1) {

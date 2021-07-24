@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutDestroyMenu 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutDestroyMenu 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutDestroyMenu - destroys the specified menu. 
 .SH SYNTAX
@@ -19,4 +19,4 @@ glutGetMenu will return zero.
 .SH SEE ALSO
 glutCreateMenu, glutDestroyWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

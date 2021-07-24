@@ -47,3 +47,4 @@ GLUT = $(TOP)/lib/glut$(GLUT_LIB_SUFFIX)/libglut.a
 FGLUT = $(TOP)/lib/fglut$(GLUT_LIB_SUFFIX)/libfglut.a
 MUI = $(TOP)/lib/mui$(GLUT_LIB_SUFFIX)/libmui.a
 GLE = $(TOP)/lib/gle$(GLUT_LIB_SUFFIX)/libgle.a
+GLSMAP = $(TOP)/lib/glsmap$(GLUT_LIB_SUFFIX)/libglsmap.a

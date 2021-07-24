@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include "win32_dirent.h"
 /* Have to #undef LoadMenu or else Microsoft VC++ won't allow us to
    redefine it. */

@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSolidSphere 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSolidSphere 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSolidSphere, glutWireSphere - render a solid or wireframe sphere respectively. 
 .SH SYNTAX
@@ -28,4 +28,4 @@ glutSolidCube, glutSolidCone, glutSolidTorus, glutSolidDodecahedron,
 glutSolidOctahedron, glutSolidTetrahedron, glutSolidIcosahedron,
 glutSolidTeapot
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

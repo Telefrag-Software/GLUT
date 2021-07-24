@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <GL/glut.h>
 #include "glutint.h"
 
 /* strdup is actually not a standard ANSI C or POSIX routine
@@ -22,7 +21,7 @@ __glutStrdup(const char *string)
 {
   char *copy;
 
-  copy = malloc(strlen(string) + 1);
+  copy = (char*) malloc(strlen(string) + 1);
   if (copy == NULL)
     return NULL;
   strcpy(copy, string);

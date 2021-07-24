@@ -48,7 +48,7 @@ GLfloat lightdif[4] = { 0.8, 0.8, 0.8, 1.0 };
 GLubyte texture[32][32][3];
 GLubyte sky[32][32][3];
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #define drand48() (((float) rand())/((float) RAND_MAX))
 #endif
 

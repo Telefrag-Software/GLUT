@@ -29,10 +29,17 @@ SRCS = \
 	glut_event.c \
 	glut_ext.c \
 	glut_fullscrn.c \
+	glut_gamemode.c \
 	glut_get.c \
+	glut_glxext.c \
 	glut_init.c \
 	glut_input.c \
+	glut_joy.c \
+	glut_key.c \
+	glut_keyctrl.c \
+	glut_keyup.c \
 	glut_menu.c \
+	glut_menu2.c \
 	glut_mesa.c \
 	glut_modifier.c \
 	glut_overlay.c \
@@ -84,7 +91,7 @@ default: $(TARGETS)
 
 sinclude ObjectType.mk
 
-$(SRCS) : $(HDRS)
+$(OBJS) : $(HDRS)
 
 libglut.a : $(OBJS)
 	$(RM) $@
@@ -166,9 +173,9 @@ symcheck: libglut.a
 dstr.c: glut_dstr.c
 	ln -s glut_dstr.c $@
 
-dstr: dstr.c glut_util.o glut_ext.o
+dstr: dstr.c glut_util.o glut_glxext.o
 	$(RM) $@
-	$(CC) -g -o $@ $(CFLAGS) -DTEST dstr.c glut_util.o glut_ext.o -lGLU -lGL -lXext -lX11 -lm
+	$(CC) -g -o $@ $(CFLAGS) -DTEST dstr.c glut_util.o glut_glxext.o -lGLU -lGL -lXext -lX11 -lm
 
 ./glut.h : glut.h
 ./glutint.h : glutint.h

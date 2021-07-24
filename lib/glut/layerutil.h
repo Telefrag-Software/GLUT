@@ -9,11 +9,11 @@
 
 /* Based on XLayerUtil.h: Revision: 1.3 */
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xmd.h>
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
 /* Transparent type values */
 /* None                       0 */

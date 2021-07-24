@@ -60,8 +60,8 @@ int	off;
 extern int mui_singlebuffered;
 int selectedfile = -1;
 int cd(char *s);
-void pwd();
-void ls();
+void pwd(void);
+void ls(void);
 
 extern void	settlstrings(muiObject *obj, char **s);
 void	settltop(muiObject *obj, int top);
@@ -188,47 +188,47 @@ void handletextbox(muiObject *obj, enum muiReturnValue value)
 #define THUMBHEIGHT 20
 #define ARROWSPACE 40
 
-void maketestui()
+void maketestui(void)
 {
     muiObject *l1, *l2, *l3, *b1, *b2, *b3, *b4, *t;
     int xmin, ymin, xmax, ymax;
 
     muiNewUIList(1);
     l1 = muiNewBoldLabel(10, 475, "Directory:");
-    muiAddToUIList(1, l1, 0);
+    muiAddToUIList(1, l1);
     l4 = muiNewLabel(80, 475, "./");
-    muiAddToUIList(1, l4, 0);
+    muiAddToUIList(1, l4);
     l2 = muiNewBoldLabel(10, 430, "Set directory:");
-    muiAddToUIList(1, l2, 0);
+    muiAddToUIList(1, l2);
     b1 = muiNewButton(10, 100, 390, 415);
     muiLoadButton(b1, "Up");
-    muiAddToUIList(1, b1, 1);
+    muiAddToUIList(1, b1);
     muiSetCallback(b1, handleupdir);
     b2 = muiNewButton(10, 100, 355, 380);
     muiLoadButton(b2, "Original");
-    muiAddToUIList(1, b2, 2);
+    muiAddToUIList(1, b2);
     muiSetCallback(b2, handleoriginal);
     tl = muiNewTextList(120, 80, 370, 22);
-    muiAddToUIList(1, tl, 3);
+    muiAddToUIList(1, tl);
     muiGetObjectSize(tl, &xmin, &ymin, &xmax, &ymax);
     vs = muiNewVSlider(xmax, ymin+2, ymax, 0, THUMBHEIGHT);
     muiSetVSValue(vs, 1.0);
     muiSetVSArrowDelta(vs, 10);
-    muiAddToUIList(1, vs, 4);
+    muiAddToUIList(1, vs);
     t = muiNewTextbox(120, 390, 40);
     muiSetActive(t, 1);
-    muiAddToUIList(1, t, 5);
+    muiAddToUIList(1, t);
     muiSetCallback(t, handletextbox);
     l3 = muiNewBoldLabel(40, 50, "Open File:");
-    muiAddToUIList(1, l3, 0);
+    muiAddToUIList(1, l3);
     b3 = muiNewButton(130, 230, 9, 34);
     muiLoadButton(b3, "Accept");
     muiSetCallback(b3, handleaccept);
-    muiAddToUIList(1, b3, 5);
+    muiAddToUIList(1, b3);
     b4 = muiNewButton(250, 350, 9, 34);
     muiLoadButton(b4, "Cancel");
     muiSetCallback(b4, handlecancel);
-    muiAddToUIList(1, b4, 6);
+    muiAddToUIList(1, b4);
     muiSetCallback(vs, controltltop);
     muiSetCallback(tl, handlefileselection);
     
@@ -263,7 +263,7 @@ void errormsg(char *s)
     fprintf(stderr, "%s\n", s);
 }
 
-void prname()
+void prname(void)
 {
 	directory[0] = '/';
 	if (off == 0)
@@ -281,7 +281,7 @@ int dirlevels(char *s)
     return(levels);
 }
 
-int cat()
+int cat(void)
 {
 	register i, j;
 	char *name = directory + 1;	/* I love C */
@@ -302,7 +302,7 @@ int cat()
 }
 
 /* get the current working directory (the following 3 routines are from pwd.c) */
-void pwd()
+void pwd(void)
 {
 	for(off = 0;;) {
 		if(stat(dot, &d) < 0) {
@@ -349,7 +349,7 @@ void pwd()
 	}
 }
 
-void freels()
+void freels(void)
 {
     char **p;
 
@@ -366,7 +366,7 @@ int mystrcmp(char **s1, char **s2)
     return strcmp(*s1,*s2);
 }
 
-void ls()
+void ls(void)
 {
     DIR			*dirp;
     int			i = 0;

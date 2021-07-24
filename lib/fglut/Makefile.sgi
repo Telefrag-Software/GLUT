@@ -34,7 +34,12 @@ REFSRCS = \
   glut_get.c \
   glut_init.c \
   glut_input.c \
+  glut_joy.c \
+  glut_key.c \
+  glut_keyctrl.c \
+  glut_keyup.c \
   glut_menu.c \
+  glut_menu2.c \
   glut_modifier.c \
   glut_overlay.c \
   glut_shapes.c \
@@ -95,7 +100,10 @@ glut_fullscrn.o: glut_fullscrn.fc
 glut_get.o: glut_get.fc
 glut_init.o: glut_init.fc
 glut_input.o: glut_input.fc
+glut_joy.o: glut_joy.fc
+glut_keyctrl.o: glut_keyctrl.fc
 glut_menu.o: glut_menu.fc
+glut_menu2.o: glut_menu2.fc
 glut_modifier.o: glut_modifier.fc
 glut_overlay.o: glut_overlay.fc
 glut_shapes.o: glut_shapes.fc
@@ -116,6 +124,7 @@ REMAPS = \
     '-DGLUTstrokeFont=char*' \
     '-DGLUTdisplayCB=int*' \
     '-DGLUTreshapeCB=int*' \
+    '-DGLUTjoystickCB=int*' \
     '-DGLUTkeyboardCB=int*' \
     '-DGLUTmouseCB=int*' \
     '-DGLUTmotionCB=int*' \
@@ -125,6 +134,7 @@ REMAPS = \
     '-DGLUTidleCB=int*' \
     '-DGLUTtimerCB=int*' \
     '-DGLUTmenuStateCB=int*' \
+    '-DGLUTmenuStatusCB=int*' \
     '-DGLUTselectCB=int*' \
     '-DGLUTspecialCB=int*' \
     '-DGLUTspaceMotionCB=int*' \
@@ -136,6 +146,7 @@ REMAPS = \
     '-DGLUTtabletButtonCB=int*' \
     '-DGLUTdisplayFCB=int*' \
     '-DGLUTreshapeFCB=int*' \
+    '-DGLUTjoystickFCB=int*' \
     '-DGLUTkeyboardFCB=int*' \
     '-DGLUTmouseFCB=int*' \
     '-DGLUTmotionFCB=int*' \

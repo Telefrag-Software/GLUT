@@ -7,12 +7,15 @@ TOP = ../..
 include $(TOP)/glutdefs
 include $(ROOT)/usr/include/make/commondefs
 
+LD_QUICKSTART_INFO=
+
 OPTIMIZER = -g
 
 TARGETS = test1 test2 test3 test4 test5 test6 test7 test8 test9 test10 \
 	  test11 test12 test13 test14 test15 test16 test17 test18 test19 \
-	  test20 test21 test22 test23 test24 test25 test26 test27 \
-	  bigtest cursor_test menu_test over_test shape_test timer_test
+	  test20 test21 test22 test23 test24 test25 test26 test27 test28 \
+	  bigtest cursor_test menu_test over_test shape_test timer_test \
+	  keyup_test joy_test
 
 RM = -rm -rf
 
@@ -28,8 +31,11 @@ $(TARGETS) : $(GLUT)
 
 # Do not be surprised if some of these tests fail on previous GLUT releases.
 
+# NOTE: first run of test2 can fail since time dependent, but run twice
+
 test : $(TARGETS)
 	@GLUT_TEST_ALT_DISPLAY=$$DISPLAY ./test1
+	-./test2
 	@./test2
 	@./test3
 	@./test4
@@ -55,6 +61,7 @@ test : $(TARGETS)
 	@./test25
 	@./test26
 	@./test27
+	@./test28
 
 SIFT_OUTPUT = 2>&1 | grep '^[A-Za-z]'
 
@@ -83,7 +90,8 @@ pure_test : $(TARGETS)
 	purify -windows=no test23 $(SIFT_OUTPUT) ; test23.pure $(SIFT_OUTPUT) ; /bin/rm ./test23.pure
 	purify -windows=no test24 $(SIFT_OUTPUT) ; test24.pure $(SIFT_OUTPUT) ; /bin/rm ./test24.pure
 	purify -windows=no test25 $(SIFT_OUTPUT) ; test25.pure $(SIFT_OUTPUT) ; /bin/rm ./test25.pure
-	purify -windows=no test26 $(SIFT_OUTPUT) ; test25.pure $(SIFT_OUTPUT) ; /bin/rm ./test26.pure
-	purify -windows=no test27 $(SIFT_OUTPUT) ; test25.pure $(SIFT_OUTPUT) ; /bin/rm ./test27.pure
+	purify -windows=no test26 $(SIFT_OUTPUT) ; test26.pure $(SIFT_OUTPUT) ; /bin/rm ./test26.pure
+	purify -windows=no test27 $(SIFT_OUTPUT) ; test27.pure $(SIFT_OUTPUT) ; /bin/rm ./test27.pure
+	purify -windows=no test28 $(SIFT_OUTPUT) ; test28.pure $(SIFT_OUTPUT) ; /bin/rm ./test28.pure
 
 include $(COMMONRULES)

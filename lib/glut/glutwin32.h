@@ -7,16 +7,14 @@
    and is provided without guarantee or warrantee expressed or 
    implied. This program is -not- in the public domain. */
 
-
 #include "win32_x11.h"
 #include "win32_glx.h"
 
-
-/* we have to undef some things because Microsoft likes to pollute the
+/* We have to undef some things because Microsoft likes to pollute the
    global namespace. */
 #undef TRANSPARENT
 
-/* "equivalent" cursors - eventually, the X glyphs should be
+/* Win32 "equivalent" cursors - eventually, the X glyphs should be
    converted to Win32 cursors -- then they will look the same */
 #define XC_arrow               IDC_ARROW
 #define XC_top_left_arrow      IDC_ARROW
@@ -41,17 +39,10 @@
 
 #define XA_STRING 0
 
-/* Function prototypes */
-int
-gettimeofday(struct timeval* tp, void* tzp);
-
-void*
-__glutFont(void *font);
-
-int
-__glutGetTransparentPixel(Display * dpy, XVisualInfo * vinfo);
-
-void
-__glutAdjustCoords(Window parent, int* x, int* y, int* width, int* height);
+/* Private routines from win32_util.c */
+extern int gettimeofday(struct timeval* tp, void* tzp);
+extern void *__glutFont(void *font);
+extern int __glutGetTransparentPixel(Display *dpy, XVisualInfo *vinfo);
+extern void __glutAdjustCoords(Window parent, int *x, int *y, int *width, int *height);
 
 #endif /* __glutwin32_h__ */

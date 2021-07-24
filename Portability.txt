@@ -105,5 +105,26 @@ stralloc(const char *string)
   o  IBM's AIX defines "quad" to be a 64-bit type in <sys/type.h>.
      Avoid using quad as a variable name.
 
+  o  HP's HP-UX 10.20 may have a type or otherwise define "time".
+     Avoid using time as a variable name.  XXX GLUT doesn't do this
+     well currently.
+
+  o  GLU 1.2 introduced the types GLUquadric, GLUnurbs, and
+     GLUtesselator as aliases for the older GLUquadricObj, GLUnurbsObj,
+     and GLUtesselatorObj type names.  Avoid the newer type names; use
+     the older names with the "Obj" suffix since all versions of GLU
+     support the Obj-suffixed types.  (Note: yes, the GLU API has
+     GLUtesselatorObj is spelled incorrectly - tessellator should have
+     two l's.)
+
+  o  Do not include <malloc.h> to get the standard C malloc/free
+     routines.  Instead, include <stdlib.h>.  FreeBSD and probably
+     other systems lack a <malloc.h>.
+
+  o  Linux systems prototype a function called "idle" in <unistd.h>.
+     This can result in an error in GLUT programs that name their
+     idle callback "idle" and include <unistd.h>.  Do no use a function
+     named idle if you include <unistd.h>.
+
 - Mark Kilgard
-  November 11, 1997
+  June 11, 1998

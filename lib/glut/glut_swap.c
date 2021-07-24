@@ -5,7 +5,6 @@
    and is provided without guarantee or warrantee expressed or
    implied. This program is -not- in the public domain. */
 
-#include <GL/glut.h>
 #include "glutint.h"
 
 /* CENTRY */
@@ -31,7 +30,7 @@ glutSwapBuffers(void)
   /* For the MESA_SWAP_HACK. */
   window->usedSwapBuffers = 1;
 
-  glXSwapBuffers(__glutDisplay, __glutCurrentWindow->renderWin);
+  SWAP_BUFFERS_LAYER(__glutCurrentWindow);
 
   /* I considered putting the window being swapped on the
      GLUT_FINISH_WORK work list because you could call

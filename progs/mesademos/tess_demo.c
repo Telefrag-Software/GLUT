@@ -1,3 +1,4 @@
+
 /* tess_demo.c */
 
 /* A demo of the GLU polygon tesselation functions written by Bogdan Sikorski. */
@@ -16,6 +17,7 @@
 
 #define MAX_POINTS 200
 #define MAX_CONTOURS 50
+#define HALF_WIDTH 5     /* half of the width of a grid box */
 
 int menu;
 typedef enum {
@@ -28,9 +30,18 @@ struct {
   GLint p[MAX_POINTS][2];
   GLuint point_cnt;
 } contours[MAX_CONTOURS];
-GLuint contour_cnt;
+int contour_cnt;
 GLsizei width, height;
 mode_type mode;
+
+#ifdef GLU_VERSION_1_2
+typedef struct listmem {
+   GLint *data;
+   struct listmem *next;
+} ListMem;
+
+ListMem root;
+#endif
 
 void CALLBACK
 my_error(GLenum err)
@@ -46,6 +57,24 @@ my_error(GLenum err)
     glutBitmapCharacter(GLUT_BITMAP_9_BY_15, str[i]);
 }
 
+#ifdef GLU_VERSION_1_2
+/* ARGSUSED */
+void CALLBACK
+myCombine(GLdouble coords[3], void *d[4], GLfloat w[4], void **dataOut)
+{
+   ListMem *ptr = &root;
+   while (ptr->next) ptr = ptr->next;
+   ptr->next = malloc(sizeof(ListMem));
+   ptr = ptr->next;
+   ptr->next = 0;
+   ptr->data = malloc(3 * sizeof(GLint));
+   ptr->data[0] = (GLint) coords[0];
+   ptr->data[1] = (GLint) coords[1];
+   ptr->data[2] = (GLint) coords[2];
+   *dataOut = ptr->data;
+}
+#endif
+
 void 
 set_screen_wh(GLsizei w, GLsizei h)
 {
@@ -56,18 +85,25 @@ set_screen_wh(GLsizei w, GLsizei h)
 void 
 tesse(void)
 {
-  GLUtriangulatorObj *tobj;
+  static GLUtriangulatorObj *tobj = NULL;
   GLdouble data[3];
-  GLuint i, j, point_cnt;
+  int i, j, point_cnt;
 
-  tobj = gluNewTess();
+  if (tobj == NULL) {
+    tobj = gluNewTess();
+  }
   if (tobj != NULL) {
     glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(0.7, 0.7, 0.0);
+    glColor3f(0.7, 0.5, 0.0);
     gluTessCallback(tobj, GLU_BEGIN, (void (CALLBACK*)())glBegin);
     gluTessCallback(tobj, GLU_END, (void (CALLBACK*)())glEnd);
     gluTessCallback(tobj, GLU_ERROR, (void (CALLBACK*)()) my_error);
     gluTessCallback(tobj, GLU_VERTEX, (void (CALLBACK*)()) glVertex2iv);
+#ifdef GLU_VERSION_1_2
+    root.data = 0;
+    root.next = 0;
+    gluTessCallback(tobj, GLU_TESS_COMBINE, (void (CALLBACK*)()) myCombine);
+#endif
     gluBeginPolygon(tobj);
     for (j = 0; j <= contour_cnt; j++) {
       point_cnt = contours[j].point_cnt;
@@ -82,6 +118,18 @@ tesse(void)
     gluEndPolygon(tobj);
     mode = TESSELATED;
   }
+#ifdef GLU_VERSION_1_2
+  {
+    ListMem *fptr = root.next;
+    ListMem *tmp;
+    while (fptr) {
+      tmp = fptr->next;
+      free(fptr->data);
+      free(fptr);
+      fptr = tmp;
+    }
+  }
+#endif
 }
 
 void 
@@ -139,8 +187,10 @@ middle_down(int x1, int y1)
 void 
 mouse_clicked(int button, int state, int x, int y)
 {
-  x -= x % 10;
-  y -= y % 10;
+  x += HALF_WIDTH;
+  y += HALF_WIDTH;
+  x -= x % (2*HALF_WIDTH);
+  y -= y % (2*HALF_WIDTH);
   switch (button) {
   case GLUT_LEFT_BUTTON:
     if (state == GLUT_DOWN)
@@ -156,8 +206,8 @@ mouse_clicked(int button, int state, int x, int y)
 void 
 display(void)
 {
-  GLuint i, j;
-  GLuint point_cnt;
+  GLint i, j;
+  int point_cnt;
 
   glClear(GL_COLOR_BUFFER_BIT);
   switch (mode) {
@@ -165,13 +215,14 @@ display(void)
     /* draw grid */
     glColor3f(0.6, 0.5, 0.5);
     glBegin(GL_LINES);
-    for (i = 0; i < width; i += 10)
-      for (j = 0; j < height; j += 10) {
-        glVertex2i(0, j);
-        glVertex2i(width, j);
+    for (i = 0; i < width; i += (2*HALF_WIDTH)) {
         glVertex2i(i, height);
         glVertex2i(i, 0);
-      }
+    }
+    for (j = 0; j < height; j += (2*HALF_WIDTH)) {
+        glVertex2i(0, j);
+        glVertex2i(width, j);
+    }
     glColor3f(1.0, 1.0, 0.0);
     for (i = 0; i <= contour_cnt; i++) {
       point_cnt = contours[i].point_cnt;
@@ -322,3 +373,4 @@ main(int argc, char **argv)
   glutMainLoop();
   return 0;             /* ANSI C requires main to return int. */
 }
+

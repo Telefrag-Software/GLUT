@@ -41,6 +41,7 @@ static GLfloat angle = 20;
 static TexFont *txf;
 static int usePolygonOffset = 1;
 static int animation = 1;
+static int fullscreen = 0;
 
 void
 idle(void)
@@ -59,6 +60,15 @@ visible(int vis)
   } else {
     glutIdleFunc(NULL);
   }
+}
+
+void reshape(int w, int h)
+{
+   glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   gluPerspective(60.0, (GLfloat) w/(GLfloat) h, 1.0, 20.0);
+   glMatrixMode(GL_MODELVIEW);
 }
 
 void
@@ -330,6 +340,8 @@ main(int argc, char **argv)
   for (i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "-sb")) {
       doubleBuffer = 0;
+    } else if (!strcmp(argv[i], "-fullscreen")) {
+      fullscreen = 1;
     } else {
       filename = argv[i];
     }
@@ -351,12 +363,18 @@ main(int argc, char **argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
   }
   glutInitWindowSize(300, 300);
-  glutCreateWindow("txfdemo");
+  if (fullscreen) {
+    glutGameModeString("640x480:16@60");
+    glutEnterGameMode();
+  } else {
+    glutCreateWindow("txfdemo");
+  }
   glutDisplayFunc(display);
   glutMouseFunc(mouse);
   glutMotionFunc(motion);
   glutKeyboardFunc(keyboard);
   glutVisibilityFunc(visible);
+  glutReshapeFunc(reshape);
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -377,35 +395,37 @@ main(int argc, char **argv)
 
   txfEstablishTexture(txf, 1, GL_TRUE);
 
-  minifyMenu = glutCreateMenu(minifySelect);
-  glutAddMenuEntry("Nearest", GL_NEAREST);
-  glutAddMenuEntry("Linear", GL_LINEAR);
-  glutAddMenuEntry("Nearest mipmap nearest", GL_NEAREST_MIPMAP_NEAREST);
-  glutAddMenuEntry("Linear mipmap nearest", GL_LINEAR_MIPMAP_NEAREST);
-  glutAddMenuEntry("Nearest mipmap linear", GL_NEAREST_MIPMAP_LINEAR);
-  glutAddMenuEntry("Linear mipmap linear", GL_LINEAR_MIPMAP_LINEAR);
+  if (!fullscreen) {
+    minifyMenu = glutCreateMenu(minifySelect);
+    glutAddMenuEntry("Nearest", GL_NEAREST);
+    glutAddMenuEntry("Linear", GL_LINEAR);
+    glutAddMenuEntry("Nearest mipmap nearest", GL_NEAREST_MIPMAP_NEAREST);
+    glutAddMenuEntry("Linear mipmap nearest", GL_LINEAR_MIPMAP_NEAREST);
+    glutAddMenuEntry("Nearest mipmap linear", GL_NEAREST_MIPMAP_LINEAR);
+    glutAddMenuEntry("Linear mipmap linear", GL_LINEAR_MIPMAP_LINEAR);
 
-  alphaMenu = glutCreateMenu(alphaSelect);
-  glutAddMenuEntry("Alpha testing", GL_ALPHA_TEST);
-  glutAddMenuEntry("Alpha blending", GL_BLEND);
-  glutAddMenuEntry("Both", GL_ALPHA_TEST + GL_BLEND);
-  glutAddMenuEntry("Nothing", GL_NONE);
+    alphaMenu = glutCreateMenu(alphaSelect);
+    glutAddMenuEntry("Alpha testing", GL_ALPHA_TEST);
+    glutAddMenuEntry("Alpha blending", GL_BLEND);
+    glutAddMenuEntry("Both", GL_ALPHA_TEST + GL_BLEND);
+    glutAddMenuEntry("Nothing", GL_NONE);
 
-  polygonOffsetMenu = glutCreateMenu(polygonOffsetSelect);
-  glutAddMenuEntry("Enable", 1);
-  glutAddMenuEntry("Disable", 0);
+    polygonOffsetMenu = glutCreateMenu(polygonOffsetSelect);
+    glutAddMenuEntry("Enable", 1);
+    glutAddMenuEntry("Disable", 0);
 
-  animationMenu = glutCreateMenu(animationSelect);
-  glutAddMenuEntry("Start", 1);
-  glutAddMenuEntry("Stop", 0);
+    animationMenu = glutCreateMenu(animationSelect);
+    glutAddMenuEntry("Start", 1);
+    glutAddMenuEntry("Stop", 0);
 
-  glutCreateMenu(mainSelect);
-  glutAddSubMenu("Filtering", minifyMenu);
-  glutAddSubMenu("Alpha", alphaMenu);
-  glutAddSubMenu("Polygon Offset", polygonOffsetMenu);
-  glutAddSubMenu("Animation", animationMenu);
-  glutAddMenuEntry("Quit", 666);
-  glutAttachMenu(GLUT_RIGHT_BUTTON);
+    glutCreateMenu(mainSelect);
+    glutAddSubMenu("Filtering", minifyMenu);
+    glutAddSubMenu("Alpha", alphaMenu);
+    glutAddSubMenu("Polygon Offset", polygonOffsetMenu);
+    glutAddSubMenu("Animation", animationMenu);
+    glutAddMenuEntry("Quit", 666);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+  }
 
 #if !defined(GL_EXT_polygon_offset) && !defined(GL_VERSION_1_1)
   fprintf(stderr, "Warning: polygon offset not available; artifacts will results.\n");

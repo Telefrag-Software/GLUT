@@ -38,7 +38,9 @@
  * OpenGL(TM) is a trademark of Silicon Graphics, Inc.
  */
 #include <math.h>
-#ifdef WIN32
+#ifdef _WIN32
+#include <windows.h>
+#include <winsock.h>
 #include <sys/timeb.h>
 #define gettimeofday(_x, _y)          \
 {                                     \
@@ -255,7 +257,7 @@ GLfloat tv[4][4] = {
 float pcr, pcg, pcb, pca;
 
 vector table_points[TABLERES+1][TABLERES+1];
-int tablecolors[TABLERES+1][TABLERES+1];
+GLubyte tablecolors[TABLERES+1][TABLERES+1];
 
 vector paper_points[4] = {
     {-0.8, 0.0, 0.4},
@@ -594,9 +596,9 @@ static void display(void)
 	/* We're emerging from the table */
 	c = 1.0 - (logo_pos[Y]) / -0.33;
 	pca /= 4.0;
-	glColor3ub((int)(128.0*(1.0-c)*0.5 + 255.0*pca*c),
-		   (int)(102.0*(1.0-c)*0.5 + 255.0*pca*c),
-		   (int)(179.0*(1.0-c)*0.5 + 200.0*pca*c));
+	glColor3ub((GLubyte)(128.0*(1.0-c)*0.5 + 255.0*pca*c),
+		   (GLubyte)(102.0*(1.0-c)*0.5 + 255.0*pca*c),
+		   (GLubyte)(179.0*(1.0-c)*0.5 + 200.0*pca*c));
       } else {
 	/* Still under table */
 	glColor3ub(128/2,  102/2,  179/2);
@@ -619,9 +621,9 @@ static void display(void)
       if (logo_pos[Y]<0.33) {
 	pca /= 4.0;
 	c = 1.0 - (logo_pos[Y])/0.33;
-	glColor3ub((int)(255.0*pca*c),
-		   (int)(255.0*pca*c),
-		   (int)(200.0*pca*c));
+	glColor3ub((GLubyte)(255.0*pca*c),
+		   (GLubyte)(255.0*pca*c),
+		   (GLubyte)(200.0*pca*c));
       } else {
 	glColor3ub(0, 0, 0);
       }
@@ -886,7 +888,7 @@ void draw_table(void)
       
       pcr = c * 255; pcg = c * 255; pcb = c * 200;
       pca += c;
-      glColor3ub((int)pcr,  (int)pcg,  (int)pcb);
+      glColor3ub((GLubyte)pcr,  (GLubyte)pcg,  (GLubyte)pcb);
       glVertex3fv(paper_points[i]);
     }
     glEnd();
@@ -900,7 +902,7 @@ void draw_table(void)
 
     if (current_time>TIME*1.0-5.0) {
 	c = (current_time-(TIME*1.0-5.0))/2.0;
-	glColor3ub((int)(c*255.0),  (int)(c*255.0),  (int)(c*255.0));
+	glColor3ub((GLubyte)(c*255.0),  (GLubyte)(c*255.0),  (GLubyte)(c*255.0));
     } else glColor3ub(0,  0,  0);
 
     glDisable(GL_DEPTH_TEST);

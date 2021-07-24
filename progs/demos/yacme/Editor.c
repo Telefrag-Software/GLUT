@@ -380,7 +380,7 @@ Mouse( int button, int state, int x, int y )
 				switch ( object.type )
 				{
 					case CURVE:
-						if (curType=InsertPoint( &object ) != 0)
+						if ((curType = InsertPoint( &object ) != 0))
 						{
 							curPoint = object.upoint;
 							curCmpnt = object.cmpnt;
@@ -552,7 +552,7 @@ YACME_menuFunc( int item )
 			break;
 
 		case ALPHA_ITEM:
-			DrawCurve[0] = !DrawCurve[3];
+			DrawCurve[3] = !DrawCurve[3];
 			if (DrawCurve[3])
 				glutChangeToMenuEntry( 4, "Alpha on", ALPHA_ITEM );
 			else

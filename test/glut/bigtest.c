@@ -51,7 +51,7 @@
 #define MENUDELAY  200  /* hack to fix glutMenuStateFunc bug */
 #define MAXWIN     9    /* max no. of windows */
 
-int AUTODELAY = 1500;   /* delay in demo mode  */
+unsigned int AUTODELAY = 1500;   /* delay in demo mode  */
 
 #define VERSIONLONG "Version " VERSION "/" DATE ", compiled " __DATE__ ", " __TIME__ ", file " __FILE__
 
@@ -1164,7 +1164,7 @@ reshapeWindow(int index)
 /* glutReshapeWindow(x * (index % 2? 0.8: 1.2), y * (index % 2? 
 
    1.2: 0.8)); */
-  glutReshapeWindow(x * 1.0, y * 0.8);
+  glutReshapeWindow((int) (x * 1.0), (int) (y * 0.8));
 }
 
 /* iconifyWindow - Iconify a window */
@@ -2061,7 +2061,7 @@ autoDemo(int value)
 
   restartValue = value;
 
-#define AUTODELAY2 AUTODELAY*0.66
+#define AUTODELAY2 (unsigned int) (AUTODELAY*0.66)
 
   /* fprintf(stderr, "autoDemo: value %d \n", value);  */
 

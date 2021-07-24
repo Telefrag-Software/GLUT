@@ -20,6 +20,7 @@ display(void)
   glFlush();
 }
 
+/* ARGSUSED1 */
 void
 gokey(unsigned char key, int x, int y)
 {

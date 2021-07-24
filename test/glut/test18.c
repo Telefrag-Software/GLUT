@@ -171,6 +171,12 @@ main(int argc, char **argv)
 
   main_win = glutCreateWindow("test18");
 
+  if (glutGet(GLUT_WINDOW_COLORMAP_SIZE) != 0) {
+    printf("RGBA color model windows should report zero colormap entries.\n");
+    printf("ERROR: test18\n");
+    exit(1);
+  }
+
   glutInitDisplayMode(GLUT_SINGLE | GLUT_INDEX);
   glutDisplayFunc(display);
 

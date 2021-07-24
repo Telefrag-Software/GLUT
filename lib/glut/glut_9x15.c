@@ -1,9 +1,11 @@
 
 /* GENERATED FILE -- DO NOT MODIFY */
 
+#define glutBitmap9By15 XXX
 #include "glutbitmap.h"
+#undef glutBitmap9By15
 
-#ifdef WIN32
+#ifdef _WIN32
 /* XXX Work around Microsoft OpenGL 1.1 bug where glBitmap with
    a height or width of zero does not advance the raster position
    as specified by OpenGL. (Cosmo OpenGL does not have this bug.) */
@@ -13,7 +15,7 @@ static const BitmapCharRec ch0 = {1,1,0,0,9,ch0data};
 static const BitmapCharRec ch0 = {0,0,0,0,9,0};
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 /* XXX Work around Microsoft OpenGL 1.1 bug where glBitmap with
    a height or width of zero does not advance the raster position
    as specified by OpenGL. (Cosmo OpenGL does not have this bug.) */
@@ -23,7 +25,7 @@ static const BitmapCharRec ch32 = {1,1,0,0,9,ch32data};
 static const BitmapCharRec ch32 = {0,0,0,0,9,0};
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 /* XXX Work around Microsoft OpenGL 1.1 bug where glBitmap with
    a height or width of zero does not advance the raster position
    as specified by OpenGL. (Cosmo OpenGL does not have this bug.) */
@@ -33,7 +35,7 @@ static const BitmapCharRec ch127 = {1,1,0,0,9,ch127data};
 static const BitmapCharRec ch127 = {0,0,0,0,9,0};
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 /* XXX Work around Microsoft OpenGL 1.1 bug where glBitmap with
    a height or width of zero does not advance the raster position
    as specified by OpenGL. (Cosmo OpenGL does not have this bug.) */

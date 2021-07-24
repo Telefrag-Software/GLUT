@@ -103,7 +103,8 @@ drawRects(GLenum mode)
 void 
 processHits(GLint hits, GLuint buffer[])
 {
-  unsigned int i, j;
+  int i;
+  unsigned int j;
   GLuint names, *ptr;
 
   printf("hits = %d\n", hits);
@@ -147,7 +148,7 @@ pickRects(int button, int state, int x, int y)
   (void) glRenderMode(GL_SELECT);
 
   glInitNames();
-  glPushName(-1);
+  glPushName((GLuint) ~0);
 
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();

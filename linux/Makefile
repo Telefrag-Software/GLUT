@@ -502,9 +502,9 @@ DEBUG_MALLOC =
 
 HDRS = 	glutint.h 	glutstroke.h 	layerutil.h
 
-SRCS = 	glut_8x13.c 	glut_9x15.c 	glut_bitmap.c 	glut_bwidth.c 	glut_cindex.c 	glut_cmap.c	glut_cursor.c 	glut_dials.c 	glut_dstr.c     glut_event.c 	glut_ext.c 	glut_fullscrn.c 	glut_get.c 	glut_hel10.c 	glut_hel12.c 	glut_hel18.c 	glut_init.c 	glut_input.c 	glut_menu.c 	glut_modifier.c 	glut_mroman.c 	glut_overlay.c 	glut_roman.c 	glut_shapes.c 	glut_space.c 	glut_stroke.c 	glut_swap.c	glut_swidth.c 	glut_tablet.c 	glut_teapot.c 	glut_tr10.c 	glut_tr24.c 	glut_util.c 	glut_win.c 	glut_winmisc.c 	layerutil.c glut_mesa.c glut_warp.c glut_vidresize.c
+SRCS = 	glut_8x13.c 	glut_9x15.c 	glut_bitmap.c 	glut_bwidth.c 	glut_cindex.c 	glut_cmap.c	glut_cursor.c 	glut_dials.c 	glut_dstr.c     glut_event.c 	glut_ext.c 	glut_fullscrn.c 	glut_gamemode.c	glut_get.c 	glut_glxext.c	glut_hel10.c 	glut_hel12.c 	glut_hel18.c 	glut_init.c 	glut_input.c 	glut_joy.c	glut_key.c	glut_keyctrl.c	glut_keyup.c	glut_menu.c 	glut_menu2.c	glut_modifier.c	glut_mroman.c 	glut_overlay.c 	glut_roman.c 	glut_shapes.c 	glut_space.c 	glut_stroke.c 	glut_swap.c	glut_swidth.c 	glut_tablet.c 	glut_teapot.c 	glut_tr10.c 	glut_tr24.c 	glut_util.c 	glut_win.c 	glut_winmisc.c 	layerutil.c glut_mesa.c glut_warp.c glut_vidresize.c
 
-OBJS = 	glut_8x13.o 	glut_9x15.o 	glut_bitmap.o 	glut_bwidth.o 	glut_cindex.o 	glut_cmap.o	glut_cursor.o 	glut_dials.o 	glut_dstr.o     glut_event.o 	glut_ext.o 	glut_fullscrn.o 	glut_get.o 	glut_hel10.o 	glut_hel12.o 	glut_hel18.o 	glut_init.o 	glut_input.o 	glut_menu.o 	glut_modifier.o 	glut_mroman.o 	glut_overlay.o 	glut_roman.o 	glut_shapes.o 	glut_space.o 	glut_stroke.o 	glut_swap.o	glut_swidth.o 	glut_tablet.o 	glut_teapot.o 	glut_tr10.o 	glut_tr24.o 	glut_util.o 	glut_win.o 	glut_winmisc.o 	layerutil.o glut_mesa.o glut_warp.o glut_vidresize.o
+OBJS = 	glut_8x13.o 	glut_9x15.o 	glut_bitmap.o 	glut_bwidth.o 	glut_cindex.o 	glut_cmap.o	glut_cursor.o 	glut_dials.o 	glut_dstr.o     glut_event.o 	glut_ext.o 	glut_fullscrn.o 	glut_gamemode.o	glut_get.o 	glut_glxext.o	glut_hel10.o 	glut_hel12.o 	glut_hel18.o 	glut_init.o 	glut_input.o 	glut_joy.o	glut_key.o	glut_keyctrl.o	glut_keyup.o	glut_menu.o 	glut_menu2.o	glut_modifier.o	glut_mroman.o 	glut_overlay.o 	glut_roman.o 	glut_shapes.o 	glut_space.o 	glut_stroke.o 	glut_swap.o	glut_swidth.o 	glut_tablet.o 	glut_teapot.o 	glut_tr10.o 	glut_tr24.o 	glut_util.o 	glut_win.o 	glut_winmisc.o 	layerutil.o glut_mesa.o glut_warp.o glut_vidresize.o
 
 all::
 	$(_NULLCMD_)
@@ -531,7 +531,7 @@ clean::
 all:: libglut.so
 
 libglut.so: $(OBJS)
-	gcc -shared -Wl,-soname,libglut.so.3 -o libglut.so.3.6 $(OBJS)
+	gcc -shared -Wl,-soname,libglut.so.3 -o libglut.so.3.7 $(OBJS)
 	$(_NULLCMD_)
 
 clean::

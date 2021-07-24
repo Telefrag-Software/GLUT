@@ -111,8 +111,9 @@
 #ifdef HAS_ALLOCA
 #include <alloca.h>
 #endif
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
+#pragma warning (disable:4244)          /* disable bogus conversion warnings */
 #endif
 #include <GL/gl.h>
 #include <math.h>
@@ -213,6 +214,10 @@ afDoFinalFogPass(GLint x, GLint y, GLsizei width, GLsizei height)
         fog_map[i] = 1.0 - exp(-dz * dz);
       }
       break;
+    default:;
+      /* Mesa makes GLenum an actual enumerant.  Have a default
+         case to avoid all the gcc warnings from all the other
+	 GLenum values that we are not handling. */
     }
   }
 

@@ -13,7 +13,7 @@ differently advertised devices.
 
                          February 13, 1995
 
-                             $Revision: 1.1 $
+                             $Revision: 1.2 $
 
 This document describes how Silicon Graphics Inc. (SGI) advertises its
 support for input devices through the X Input extension.  Because the X
@@ -36,7 +36,10 @@ queriable.  Effective use of the extension requires knowledge of the
 physical layout of the devices.  Diagrams are provided to show the
 actual layout.
 
-Comments and corrections should be sent to Mark Kilgard <mjk@sgi.com>
+Comments and corrections should be sent to Mark Kilgard <mjk@nvidia.com>
+(Please note that I no longer work at Silicon Graphics.  Try contacting
+Peter Daifuku <daifuku@sgi.com) if you need to contact SGI about this
+information.)
 
 SGI Dials and Buttons:
 

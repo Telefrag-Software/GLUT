@@ -878,7 +878,7 @@ menu(int selection)
   if (selection == 666) {
     exit(0);
   }
-  key(selection, 0, 0);
+  key((unsigned char) selection, 0, 0);
 }
 
 int

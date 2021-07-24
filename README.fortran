@@ -11,6 +11,12 @@ To build the GLUT Fortran API, do the following:
       libraries installed (make sure you have the right support
       installed for the "object style" you wish to build).
 
+      The following Fortran subsystems are particularly important
+      to have installed:
+
+        ftn77_dev.sw.util  -- utiles for building Fortran to C bindings
+	gl_dev.sw.fortran  -- OpenGL Fortran binding libraries
+
   3)  Run "mkmkfiles.sgi" in this directory.
 
   4)  Make sure you have built the "lib/glut" and "lib/fglut"

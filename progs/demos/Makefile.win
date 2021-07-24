@@ -1,15 +1,13 @@
 # Makefile for Win32
-
+# Copyright (c) Mark J. Kilgard, 1997, 1998.
 
 # defines
-SUBDIRS	= atlantis.dir bluepony.dir bounce.dir chess.dir geoface.dir glflare.dir gliq.dir glutmech.dir ideas.dir lorenz.dir opengl_logo.dir rollercoaster.dir smooth.dir underwater.dir walker.dir yacme.dir
+SUBDIRS	= atlantis.dir bluepony.dir bounce.dir chess.dir geoface.dir glflare.dir gliq.dir glutmech.dir ideas.dir lorenz.dir opengl_logo.dir rollercoaster.dir smooth.dir underwater.dir walker.dir yacme.dir skyfly.dir particle.dir newave.dir
 CLEAN	= $(SUBDIRS:.dir=.clean)
 CLOBBER	= $(SUBDIRS:.dir=.clobber)
 
-
 # default rule
 default	: $(SUBDIRS)
-
 
 # cleanup rules
 clean	: $(CLEAN)
@@ -38,5 +36,4 @@ $(CLOBBER)	:
 	@cd $*
 	@nmake -f Makefile.win -nologo clobber
 	@cd ..
-
 

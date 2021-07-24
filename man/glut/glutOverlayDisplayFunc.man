@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutOverlayDisplayFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutOverlayDisplayFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutOverlayDisplayFunc - sets the overlay display callback for the current window. 
 .SH SYNTAX
@@ -46,4 +46,4 @@ callback is not registered.
 .SH SEE ALSO
 glutDisplayFunc, glutPostOverlayRedisplay
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

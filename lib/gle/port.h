@@ -37,6 +37,7 @@ typedef gleDouble gleVector;
 
 #else  /* FUNKY_C */
 typedef double gleVector[3];
+typedef double glePoint[2];
 #define AVAL(arr,n,i,j)  arr[n][i][j]
 #define VVAL(arr,n,i)  arr[n][i];
 
@@ -188,7 +189,7 @@ typedef double gleVector[3];
 /* ====================================================== */
 #ifdef OPENGL_10
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include <windows.h>
 #pragma warning (disable:4244)          /* disable bogus conversion warnings */
 #endif

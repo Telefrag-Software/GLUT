@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutCreateWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutCreateWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutCreateWindow - creates a top-level window. 
 .SH SYNTAX
@@ -40,4 +40,4 @@ is only established for the first window created.
 .SH SEE ALSO
 glutCreateSubWindow, glutCreateMenu, glutDestroyWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -22,6 +22,7 @@ TARGETS = \
 	joincone \
 	joinoffset \
 	joinstyle \
+	martini \
 	screw \
 	taper \
 	texas \
@@ -44,11 +45,18 @@ NormalGleProgramTarget(horn, horn.o mainsimple.o)
 NormalGleProgramTarget(joincone, cone.o mainjoin.o)
 NormalGleProgramTarget(joinoffset, joinoffset.o mainjoin.o)
 NormalGleProgramTarget(joinstyle, cylinder.o mainjoin.o)
+NormalGleProgramTarget(martini, martini.o trackball.o)
 NormalGleProgramTarget(screw, screw.o texture.o maintex.o)
 NormalGleProgramTarget(taper, taper.o mainsimple.o)
 NormalGleProgramTarget(texas, texas.o mainjoin.o)
 SimpleGleProgramTarget(transport)
 NormalGleProgramTarget(twistoid, twistoid.o texture.o maintex.o)
 NormalGleProgramTarget(twoid, twoid.o)
+
+LinkFile(trackball.c, ../examples/trackball.c)
+LinkFile(trackball.h, ../examples/trackball.h)
+
+trackball.o: trackball.h trackball.c
+martini.o: trackball.h martini.c
 
 DependTarget()

@@ -37,12 +37,28 @@ fortranReshapeWrapper(int w, int h)
   (*__glutCurrentWindow->freshape) (&w, &h);
 }
 
+#if 0  /* XXX No IRIX joystick support for now. */
+static void
+fortranJoystickWrapper(unsigned int button, int x, int y, int z)
+{
+  (*__glutCurrentWindow->fjoystick) (&button, &x, &y, &z);
+}
+#endif
+
 static void
 fortranKeyboardWrapper(unsigned char ch, int x, int y)
 {
   int chi = ch;
 
   (*__glutCurrentWindow->fkeyboard) (&chi, &x, &y);
+}
+
+static void
+fortranKeyboardUpWrapper(unsigned char ch, int x, int y)
+{
+  int chi = ch;
+
+  (*__glutCurrentWindow->fkeyboardUp) (&chi, &x, &y);
 }
 
 static void
@@ -78,7 +94,7 @@ fortranVisibilityWrapper(int state)
 static void
 fortranTimerWrapper(int value)
 {
-  /* relies on special knowledge that __glutTimerList points to 
+  /* Relies on special knowledge that __glutTimerList points to 
      the GLUTtimer* currently being processed! */
   (*__glutTimerList->ffunc) (&value);
 }
@@ -93,6 +109,12 @@ static void
 fortranSpecialWrapper(int key, int x, int y)
 {
   (*__glutCurrentWindow->fspecial) (&key, &x, &y);
+}
+
+static void
+fortranSpecialUpWrapper(int key, int x, int y)
+{
+  (*__glutCurrentWindow->fspecialUp) (&key, &x, &y);
 }
 
 static void
@@ -139,28 +161,37 @@ fortranButtonBoxWrapper(int button, int state)
 
 #endif /* WRAPPERS_ONLY */
 
-#define glutfunc(Name,name) \
+#define glutfunc(Name,name,mixed,type) \
 void \
-glut##name##func(GLUT##name##FCB name) \
+glut##name##func(GLUT##type##FCB mixed) \
 { \
-    if(name == (GLUT##name ## FCB) glutnull_) { \
+    if(mixed == (GLUT##type## FCB) glutnull_) { \
 	glut##Name ## Func(NULL); \
     } else { \
-	glut ## Name ## Func(fortran ## Name ## Wrapper); \
-	__glutCurrentWindow->f ## name = name; \
+	glut##Name##Func(fortran##Name##Wrapper); \
+	__glutCurrentWindow->f##mixed = mixed; \
     } \
 }
 
-glutfunc(Reshape, reshape)
-glutfunc(Keyboard, keyboard)
-glutfunc(Mouse, mouse)
-glutfunc(Motion, motion)
-glutfunc(Entry, entry)
-glutfunc(Visibility, visibility)
-glutfunc(Special, special)
-glutfunc(Dials, dials)
+glutfunc(Reshape, reshape, reshape, reshape)
+glutfunc(Keyboard, keyboard, keyboard, keyboard)
+glutfunc(KeyboardUp, keyboardup, keyboardUp, keyboard)
+glutfunc(Mouse, mouse, mouse, mouse)
+glutfunc(Motion, motion, motion, motion)
+glutfunc(Entry, entry, entry, entry)
+glutfunc(Visibility, visibility, visibility, visibility)
+glutfunc(Special, special, special, special)
+glutfunc(SpecialUp, specialup, specialUp, special)
+glutfunc(Dials, dials, dials, dials)
+glutfunc(SpaceballMotion, spaceballmotion, spaceMotion, spaceMotion)
+glutfunc(SpaceballRotate, spaceballrotate, spaceRotate, spaceRotate)
+glutfunc(SpaceballButton, spaceballbutton, spaceButton, spaceButton)
+glutfunc(PassiveMotion, passivemotion, passive, passive)
+glutfunc(ButtonBox, buttonbox, buttonBox, buttonBox)
+glutfunc(TabletMotion, tabletmotion, tabletMotion, tabletMotion)
+glutfunc(TabletButton, tabletbutton, tabletButton, tabletButton)
 
-/* special callback cases */
+/* Special callback cases. */
 
 /* The display has no parameters passed so no need for wrapper. */
 void
@@ -169,100 +200,37 @@ glutdisplayfunc(GLUTdisplayFCB display)
   glutDisplayFunc((GLUTdisplayCB) display);
 }
 
-void
-glutpassivemotionfunc(GLUTpassiveFCB passive)
-{
-  if (passive == (GLUTpassiveFCB) glutnull_) {
-    glutPassiveMotionFunc(NULL);
-  } else {
-    glutPassiveMotionFunc(fortranPassiveMotionWrapper);
-    __glutCurrentWindow->fpassive = passive;
-  }
-}
-
-void
-glutspacemotionfunc(GLUTspaceMotionFCB spaceMotion)
-{
-  if (spaceMotion == (GLUTspaceMotionFCB) glutnull_) {
-    glutSpaceballMotionFunc(NULL);
-  } else {
-    glutSpaceballMotionFunc(fortranSpaceballMotionWrapper);
-    __glutCurrentWindow->fspaceMotion = spaceMotion;
-  }
-}
-
-void
-glutspacerotatefunc(GLUTspaceRotateFCB spaceRotate)
-{
-  if (spaceRotate == (GLUTspaceRotateFCB) glutnull_) {
-    glutSpaceballRotateFunc(NULL);
-  } else {
-    glutSpaceballRotateFunc(fortranSpaceballRotateWrapper);
-    __glutCurrentWindow->fspaceRotate = spaceRotate;
-  }
-}
-
-void
-glutspacebuttonfunc(GLUTspaceButtonFCB spaceButton)
-{
-  if (spaceButton == (GLUTspaceButtonFCB) glutnull_) {
-    glutSpaceballButtonFunc(NULL);
-  } else {
-    glutSpaceballButtonFunc(fortranSpaceballButtonWrapper);
-    __glutCurrentWindow->fspaceButton = spaceButton;
-  }
-}
-
-void
-glutbuttonboxfunc(GLUTbuttonBoxFCB buttonBox)
-{
-  if (buttonBox == (GLUTbuttonBoxFCB) glutnull_) {
-    glutButtonBoxFunc(NULL);
-  } else {
-    glutButtonBoxFunc(fortranButtonBoxWrapper);
-    __glutCurrentWindow->fbuttonBox = buttonBox;
-  }
-}
-
-void
-gluttabletmotionfunc(GLUTtabletMotionFCB tabletMotion)
-{
-  if (tabletMotion == (GLUTtabletMotionFCB) glutnull_) {
-    glutTabletMotionFunc(NULL);
-  } else {
-    glutTabletMotionFunc(fortranTabletMotionWrapper);
-    __glutCurrentWindow->ftabletMotion = tabletMotion;
-  }
-}
-
-void
-gluttabletbuttonfunc(GLUTtabletButtonFCB tabletButton)
-{
-  if (tabletButton == (GLUTtabletButtonFCB) glutnull_) {
-    glutTabletButtonFunc(NULL);
-  } else {
-    glutTabletButtonFunc(fortranTabletButtonWrapper);
-    __glutCurrentWindow->ftabletButton = tabletButton;
-  }
-}
-
 int
-glutcreatemenu(GLUTselectFCB selectFunc)
+glutcreatemenu(GLUTselectFCB select)
 {
   int menu;
 
   menu = glutCreateMenu(fortranSelectWrapper);
-  __glutCurrentMenu->fselect = selectFunc;
+  __glutCurrentMenu->fselect = select;
   return menu;
 }
 
 void
-gluttimerfunc(unsigned long interval, GLUTtimerFCB timerFunc, int value)
+gluttimerfunc(unsigned long interval, GLUTtimerFCB timer, int value)
 {
   glutTimerFunc((unsigned int) interval, fortranTimerWrapper, value);
-  /* relies on special __glutNewTimer variable side effect to
+  /* Relies on special __glutNewTimer variable side effect to
      establish Fortran timer func! */
-  __glutNewTimer->ffunc = timerFunc;
+  __glutNewTimer->ffunc = timer;
+}
+
+/* ARGSUSED */
+void
+glutjoystickfunc(GLUTjoystickFCB joystick, int pollInterval)
+{
+#if 0  /* XXX No IRIX joystick support for now. */
+  if(joystick == (GLUTjoystickFCB) glutnull_) {
+    glutJoystickFunc(NULL, pollInterval);
+  } else {
+    glutJoystickFunc(fortranJoystickWrapper, pollInterval);
+    __glutCurrentWindow->fjoystick = joystick;
+  }
+#endif
 }
 
 void

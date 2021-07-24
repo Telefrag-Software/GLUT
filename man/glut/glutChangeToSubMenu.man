@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutChangeToSubMenu 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutChangeToSubMenu 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutChangeToSubMenu - changes the specified menu item in the current
 menu into a sub-menu trigger. 
@@ -29,4 +29,4 @@ newly added sub-menu trigger.
 .SH SEE ALSO
 glutChangeToMenuEntry, glutAddSubMenu, glutRemoveMenuItem
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

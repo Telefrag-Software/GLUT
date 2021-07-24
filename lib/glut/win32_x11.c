@@ -1,5 +1,6 @@
 
 /* Copyright (c) Nate Robins, 1997. */
+/* portions Copyright (c) Mark Kilgard, 1998. */
 
 /* This program is freely distributable without licensing fees 
    and is provided without guarantee or warrantee expressed or 
@@ -11,22 +12,6 @@
 /* global variable that must be set for some functions to operate
    correctly. */
 HDC XHDC;
-
-Window
-XCreateWindow(Display* display, Window parent, int x, int y,
-	      unsigned int width, unsigned int height, unsigned int border,
-	      int depth, unsigned int class, Visual* visual, 
-	      unsigned long valuemask, XSetWindowAttributes* attributes)
-{
-  /* KLUDGE: make a window within the GLUT class (registered in
-     glut_init.c).  If the parent exists, make this a child window,
-     otherwise, make it top-level.  */
-
-  return CreateWindow("GLUT", "GLUT", WS_CLIPSIBLINGS | WS_CLIPCHILDREN |
-		      (parent ? WS_CHILD : WS_OVERLAPPEDWINDOW),
-		      x, y, width, height, parent, NULL,
-		      GetModuleHandle(NULL), 0);
-}
 
 XVisualInfo*
 XGetVisualInfo(Display* display, long mask, XVisualInfo* template, int* nitems)
@@ -293,22 +278,6 @@ suitability of this software for any purpose.  It is provided "as is"
 without express or implied warranty.
 */
 
-/* 
- *Returns pointer to first char ins search which is also in what, else NULL.
- */
-static char *strscan (search, what)
-char *search, *what;
-{
-	int i, len = strlen (what);
-	char c;
-
-	while ((c = *(search++)) != (int)NULL)
-		for (i = 0; i < len; i++)
-			if (c == what [i])
-				return (--search);
-	return (NULL);
-}
-
 /*
  *    XParseGeometry parses strings of the form
  *   "=<width>x<height>{+-}<xoffset>{+-}<yoffset>", where
@@ -322,9 +291,7 @@ char *search, *what;
  */
 
 static int
-ReadInteger(string, NextString)
-register char *string;
-char **NextString;
+ReadInteger(char *string, char **NextString)
 {
     register int Result = 0;
     int Sign = 1;
@@ -347,10 +314,7 @@ char **NextString;
 	return (-Result);
 }
 
-int XParseGeometry (string, x, y, width, height)
-char *string;
-int *x, *y;
-unsigned int *width, *height;    /* RETURN */
+int XParseGeometry(char *string, int *x, int *y, unsigned int *width, unsigned int *height)
 {
 	int mask = NoValue;
 	register char *strind;

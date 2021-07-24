@@ -232,6 +232,9 @@ main(int argc, char **argv)
   glutMotionFunc(motion);
   glutVisibilityFunc(vis);
 
+  /* Enable depth testing for Open Inventor. */
+  glEnable(GL_DEPTH_TEST);
+
   glutMainLoop();
   return 0;             /* ANSI C requires main to return int. */
 }

@@ -1,11 +1,11 @@
 
-/* Copyright (c) Mark J. Kilgard, 1997. */
+/* Copyright (c) Mark J. Kilgard, 1997, 1998. */
 
 /* This program is freely distributable without licensing fees and is
    provided without guarantee or warrantee expressed or implied.  This
    program is -not- in the public domain. */
 
-/* Real-time Shadowing library, Version 0.8 */
+/* Real-time Shadowing library, Version 0.96 */
 
 /* XXX This is library is not fully implemented yet, but still quite
    functional. */
@@ -20,10 +20,28 @@
    silhouettes with the GLU 1.2 tessellator is farmed out to a gang for
    tessellation threads. */
 
+/* This code will use Win32's multithreading and multiple CPUs if
+   available when compiled with the Visual C++ "/MT" option.  Just
+   like with the IRIX multiprocessor support, the generation of
+   silhouettes with the GLU 1.2 tessellator is farmed out to a gang
+   of tessellation threads. -mjk July 28, 1998. */
+
+/* Please do not naively assume that enabling the multiprocessor
+   code will make rts-based programs run any faster if you do not
+   have multiple CPUs.  Indeed, the extra thread overhead will in
+   fact likely make the program slightly slower. */
+
 #ifdef __sgi
-#define MP
+# define MP
 #endif
-#define NDEBUG
+
+#ifdef _WIN32
+# ifdef _MT  /* If Visual C++ "/MT" compiler switch specified. */
+#  define MP
+# endif
+#endif
+
+#define NDEBUG  /* No assertions for best performance. */
 
 #include <assert.h>
 #include <stdlib.h>
@@ -31,11 +49,17 @@
 #include <math.h>
 #include <stdio.h>
 #ifdef MP
-#include <unistd.h>
-#include <sys/prctl.h>
-#include <ulocks.h>
-#include <signal.h>
-#include <sys/sysmp.h>
+# ifdef __sgi
+#  include <unistd.h>
+#  include <sys/prctl.h>
+#  include <ulocks.h>
+#  include <signal.h>
+#  include <sys/sysmp.h>
+# endif
+# ifdef _WIN32
+#  include <windows.h>
+#  include <process.h>
+# endif
 #endif
 
 #include "rtshadow.h"
@@ -87,9 +111,90 @@ struct VertexHolder3D {
   GLfloat v[3];
 };
 
+#ifndef MP
+
+# define NUM_CONTEXTS 1
+# define MP_ASSERT(assertion)
+
+# define ARENA_VARIABLE(arena)
+# define SEMA_VARIABLE(sema)
+# define LOCK_VARIABLE(lock)
+# define THREAD_VARIABLE(thread)
+# define INITSEMA(arena)
+# define WAIT(sema)
+# define SIGNAL(sema)
+# define INITLOCK(arena)
+# define LOCK(lock)
+# define UNLOCK(lock)
+# define PRIVATE_MALLOC(size)        malloc(size)
+# define PRIVATE_FREE(ptr)           free(ptr)
+# define PRIVATE_REALLOC(ptr, size)  realloc(ptr, size)
+# define SHARED_MALLOC(size)         malloc(size)
+# define SHARED_FREE(ptr)            free(ptr)
+# define SHARED_REALLOC(ptr, size)   realloc(ptr, size)
+
+#else
+
+# define NUM_CONTEXTS 4
+# define MP_ASSERT(assertion)        assert(assertion)
+
+# ifdef __sgi
+
+#  define ARENA_VARIABLE(arena)      usptr_t *arena;
+#  define SEMA_VARIABLE(sema)        usema_t *sema;
+#  define LOCK_VARIABLE(lock)        ulock_t lock;
+#  define THREAD_VARIABLE(thread)    pid_t thread;
+
+#  define INITSEMA(arena, value)     usnewsema(arena, value)
+#  define WAIT(sema)                 uspsema(sema)
+#  define SIGNAL(sema)               usvsema(sema)
+#  define SAMPLE(sema)               ustestsema(sema)
+
+#  define INITLOCK(arena)            usnewlock(arena)
+#  define LOCK(lock)                 ussetlock(lock)
+#  define UNLOCK(lock)               usunsetlock(lock)
+
+#  define PRIVATE_MALLOC(size)       malloc(size)
+#  define PRIVATE_FREE(ptr)          free(ptr)
+#  define PRIVATE_REALLOC(ptr, size) realloc(ptr, size)
+
+#  define SHARED_MALLOC(size)        usmalloc(size, arena)
+#  define SHARED_FREE(ptr)           usfree(ptr, arena)
+#  define SHARED_REALLOC(ptr, size)  usrealloc(ptr, size, arena)
+
+# endif  /* __sgi */
+
+# ifdef _WIN32
+
+#  define ARENA_VARIABLE(arena)      HANDLE arena;
+#  define SEMA_VARIABLE(sema)        HANDLE sema;
+#  define LOCK_VARIABLE(lock)        HANDLE lock;
+#  define THREAD_VARIABLE(thread)    HANDLE thread;
+
+#  define INITSEMA(arena, value)     CreateSemaphore(NULL, value, NUM_CONTEXTS, NULL)
+#  define WAIT(sema)                 WaitForSingleObject(sema, INFINITE)
+#  define SIGNAL(sema)               ReleaseSemaphore(sema, 1, NULL)
+
+   /* Does Win32 have something cheaper than a mutex for locking? */
+#  define INITLOCK(arena)            CreateMutex(NULL, FALSE, NULL)
+#  define LOCK(lock)                 WaitForSingleObject(lock, INFINITE)
+#  define UNLOCK(lock)               ReleaseMutex(lock)
+
+#  define PRIVATE_MALLOC(size)       malloc(size)
+#  define PRIVATE_FREE(ptr)          free(ptr)
+#  define PRIVATE_REALLOC(ptr, size) realloc(ptr, size)
+
+#  define SHARED_MALLOC(size)        malloc(size)
+#  define SHARED_FREE(ptr)           free(ptr)
+#  define SHARED_REALLOC(ptr, size)  realloc(ptr, size)
+
+# endif  /* _WIN32 */
+
 typedef enum {
   CS_UNUSED, CS_CAPTURING, CS_QUEUED, CS_GENERATING
 } ContextState;
+
+#endif
 
 typedef struct ShadowVolumeState ShadowVolumeState;
 
@@ -104,6 +209,8 @@ typedef struct TessellationContext {
 
   GLUtesselator *tess;
 
+  /* For managing memory allocated by the GLU tessellator's
+     combine callback. */
   GLfloat *combineList;
   int combineListSize;
   int combineNext;
@@ -128,15 +235,11 @@ const float uniquePassThroughValue = 34567.0;
 
 #define SmallerOf(a,b) ((a) < (b) ? (a) : (b))
 
-#ifdef MP
-#define NUM_CONTEXTS 4
-usptr_t *arena;
-usema_t *contextAvailable;
-ulock_t accessQueue;
-usema_t *silhouetteNeedsGeneration;
-#else
-#define NUM_CONTEXTS 1
-#endif
+ARENA_VARIABLE(arena)
+SEMA_VARIABLE(contextAvailable)
+LOCK_VARIABLE(accessQueue)
+SEMA_VARIABLE(silhouetteNeedsGeneration)
+
 static TessellationContext *context[NUM_CONTEXTS];
 
 struct RTSscene {
@@ -147,9 +250,9 @@ struct RTSscene {
   void (*renderSceneFunc) (GLenum castingLight, void *sceneData, RTSscene * scene);
   void *sceneData;
 
+  SEMA_VARIABLE(silhouetteGenerationDone)
+  THREAD_VARIABLE(*workerPids)
 #ifdef MP
-  usema_t *silhouetteGenerationDone;
-  pid_t *workerPids;
   ShadowVolumeState *waitingForSVS;
 #endif
 
@@ -161,6 +264,8 @@ struct RTSscene {
 
   int lightListSize;
   RTSlight **lightList;
+
+  GLboolean stencilRenderingInvariantHack;
 };
 
 struct ShadowVolumeState {
@@ -260,47 +365,6 @@ extensionSupported(const char *extension)
   return 0;
 }
 
-#ifndef MP
-
-#define MP_ASSERT(assertion)
-
-#define INITSEMA(arena)
-#define WAIT(sema)
-#define SIGNAL(sema)
-#define SAMPLE(sema) (-666)
-#define INITLOCK(arena)
-#define LOCK(lock)
-#define UNLOCK(lock)
-#define PRIVATE_MALLOC(size) malloc(size);
-#define PRIVATE_FREE(ptr) free(ptr);
-#define PRIVATE_REALLOC(ptr, size) realloc(ptr, size);
-#define SHARED_MALLOC(size) malloc(size);
-#define SHARED_FREE(ptr) free(ptr);
-#define SHARED_REALLOC(ptr, size) realloc(ptr, size);
-
-#else
-
-#define MP_ASSERT(assertion) assert(assertion)
-
-#define INITSEMA(arena, value) usnewsema(arena, value)
-#define WAIT(sema) uspsema(sema)
-#define SIGNAL(sema) usvsema(sema)
-#define SAMPLE(sema) ustestsema(sema)
-
-#define INITLOCK(arena) usnewlock(arena)
-#define LOCK(lock) ussetlock(lock)
-#define UNLOCK(lock) usunsetlock(lock)
-
-#define PRIVATE_MALLOC(size) malloc(size);
-#define PRIVATE_FREE(ptr) free(ptr);
-#define PRIVATE_REALLOC(ptr, size) realloc(ptr, size);
-
-#define SHARED_MALLOC(size) usmalloc(size, arena);
-#define SHARED_FREE(ptr) usfree(ptr, arena);
-#define SHARED_REALLOC(ptr, size) usrealloc(ptr, size, arena);
-
-#endif
-
 static GLfloat *
 nextVertexHolder3D(TessellationContext * context)
 {
@@ -392,6 +456,24 @@ freeExcessList(TessellationContext * context)
   }
   context->excessList2D = NULL;
 }
+
+/* The GLU tessellator's combine callback is called to create a
+   new vertex when tessellation detects an intersection or wishes
+   to merge features.
+
+   The memory for the new vertex must be allocated by the GLU
+   tessellator caller.  The caller is also responsible for this
+   memory's deletion.  The combineList is an array for the memory
+   for these combined vertices.  The array is of size combineListSize.
+   combineNext decides how many vertices are in use on the combineList.
+
+   The combineList is of finite size.  When this list is exhausted,
+   individual vertex memory is allocated via malloc in a linked list.
+   This is the excessList2D linked list.  After tessellation, the
+   combineList will be expanded by how many vertices had to be
+   added to the excessList2D list.  The idea is that next time the
+   shadow volume tessellation is done, the combineList should
+   hopefully be large enough.
 
 /* ARGSUSED1 */
 static void CALLBACK
@@ -919,17 +1001,6 @@ work(void)
 }
 
 static void
-worker(void)
-{
-  signal(SIGHUP, SIG_DFL);
-  prctl(PR_TERMCHILD);
-  usadd(arena);
-  for (;;) {
-    work();
-  }
-}
-
-static void
 waitForSilhouetteGenerationDone(RTSscene * scene, ShadowVolumeState *svs)
 {
   LOCK(accessQueue);
@@ -944,12 +1015,25 @@ waitForSilhouetteGenerationDone(RTSscene * scene, ShadowVolumeState *svs)
   }
 }
 
+#ifdef __sgi
+
+static void
+worker(void)
+{
+  signal(SIGHUP, SIG_DFL);
+  prctl(PR_TERMCHILD);
+  usadd(arena);
+  for (;;) {
+    work();
+  }
+}
+
 static void
 setupArena(int numWorkers)
 {
   static int beenhere = 0;
   int i;
-  pid_t pid;
+  THREAD_VARIABLE(pid)
 
   if (beenhere) {
     return;
@@ -985,7 +1069,50 @@ setupArena(int numWorkers)
   }
 }
 
-#endif
+#endif  /* __sgi */
+
+#ifdef _WIN32
+
+static void
+worker(void *unused)
+{
+  for (;;) {
+    work();
+  }
+}
+
+static void
+setupArena(int numWorkers)
+{
+  static int beenhere = 0;
+  int i;
+  unsigned long retval;
+
+  if (beenhere) {
+    return;
+  }
+  beenhere = 1;
+
+  for (i=0; i<NUM_CONTEXTS; i++) {
+    context[i] = createTessellationContext();
+  }
+
+  contextAvailable = INITSEMA(arena, NUM_CONTEXTS);
+  accessQueue = INITLOCK(arena);
+  silhouetteNeedsGeneration = INITSEMA(arena, 0);
+
+  for (i=0; i<numWorkers; i++) {
+    retval = _beginthread(worker, 0, NULL);
+    if (retval == -1) {
+      perror("_beginthread");
+      exit(1);
+    }
+  }
+}
+
+#endif  /* _WIN32 */
+
+#endif  /* MP */
 
 RTSscene *
 rtsCreateScene(
@@ -997,10 +1124,18 @@ rtsCreateScene(
   RTSscene *scene;
 
 #ifdef MP
+# ifdef __sgi
   int numProcessors = (int) sysmp(MP_NAPROCS);
 
-printf("numProcessors = %d\n", numProcessors);
+  printf("numProcesasors = %d\n", numProcessors);
   setupArena(SmallerOf(4, numProcessors));
+# endif
+# ifdef _WIN32
+  int numProcessors = 2;
+
+  printf("numProcessors = %d\n", numProcessors);
+  setupArena(numProcessors);
+# endif
 #else
   context[0] = createTessellationContext();
 #endif
@@ -1033,6 +1168,8 @@ printf("numProcessors = %d\n", numProcessors);
 
   scene->lightListSize = 0;
   scene->lightList = NULL;
+
+  scene->stencilRenderingInvariantHack = GL_FALSE;
 
   return scene;
 }
@@ -1096,6 +1233,17 @@ rtsCreateObject(
   object->renderObject = renderObject;
   object->objectData = objectData;
   object->feedbackBufferSizeGuess = feedbackBufferSizeGuess;
+#ifdef __sgi
+  /* XXX Impact/Octane feedback bug work around.  If the feedback
+     buffer on Impact/Octane is less than 2048 entries, a buggy
+     hardware accelerated path is used.  Make sure at least 2049
+     entries for the feedback buffer; this forces Impact/Octane to use
+     the (bug free) software feedback path.  This bug is fixed in IRIX
+     6.5. */
+  if (object->feedbackBufferSizeGuess < 2048) {
+    object->feedbackBufferSizeGuess = 2048;
+  }
+#endif
 
   object->state = RTS_SHADOWING;
 
@@ -1534,6 +1682,19 @@ rtsRenderScene(
     }
   }
   glEnable(GL_LIGHTING);
+  glEnable(GL_CULL_FACE);
+  if (scene->stencilRenderingInvariantHack) {
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+  } else {
+    /* XXX Note that the non-hack case does not enable or
+       disable stencil.  The hack case enables stencil
+       testing but sets up the stencil modes so that stencil
+       testing is effectively disabled.  If you wanted
+       stencil testing on during the renderSceneFunc, you won't
+       need to have the hack enabled though! */
+  }
   scene->renderSceneFunc(GL_NONE, scene->sceneData, scene);
 
   if (mode == RTS_NO_SHADOWS) {
@@ -1570,7 +1731,6 @@ rtsRenderScene(
   assert(scene->stencilValidateNeeded == 0);
 
   glDisable(firstLight->glLight);
-  glEnable(GL_CULL_FACE);
   glEnable(GL_STENCIL_TEST);
   glDepthMask(GL_FALSE);
 
@@ -1586,6 +1746,10 @@ rtsRenderScene(
 
     fullStencilMask = 0;
 
+    glDisable(GL_LIGHTING);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glStencilFunc(GL_ALWAYS, 0, 0);
     do {
 
 #ifdef MP
@@ -1600,33 +1764,15 @@ rtsRenderScene(
         setupVertexArray(&firstLight->shadowVolumeList[obj], 3);
 #endif
       }
-      glDisable(GL_LIGHTING);
-#if 1
-      glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-#else
-      glColor3f(1, 0, 0);
-#endif
-      glStencilFunc(GL_ALWAYS, 0, 0);
-      glCullFace(GL_FRONT);
       fullStencilMask |= 1 << scene->bitList[bit];
       glStencilMask(1 << scene->bitList[bit]);
       glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
       renderShadowVolume(&firstLight->shadowVolumeList[obj],
         firstLight->lightPos);
 
-      glCullFace(GL_BACK);
-      glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-      renderShadowVolume(&firstLight->shadowVolumeList[obj],
-        firstLight->lightPos);
-
-#if 0
-      glColor3f(0, 1, 0);
-#endif
-      glDisable(GL_CULL_FACE);
       glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
       renderShadowVolumeTop(&firstLight->shadowVolumeList[obj],
         firstLight->lightPos);
-      glEnable(GL_CULL_FACE);
 
       bit++;
       do {
@@ -1636,6 +1782,7 @@ rtsRenderScene(
 
     } while (bit < numStencilBits && obj < firstLight->objectListSize);
 
+    glEnable(GL_CULL_FACE);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthFunc(GL_EQUAL);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
@@ -1655,7 +1802,13 @@ rtsRenderScene(
     glCullFace(GL_BACK);  /* XXX Needed? */
     glDepthMask(GL_TRUE);
     glDepthFunc(GL_LESS);
-    glDisable(GL_STENCIL_TEST);
+    if (scene->stencilRenderingInvariantHack) {
+      glEnable(GL_STENCIL_TEST);
+      glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
+      glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    } else {
+      glDisable(GL_STENCIL_TEST);
+    }
     if (hasVertexArray) {
 #if defined(GL_VERSION_1_1)
       glDisableClientState(GL_VERTEX_ARRAY);
@@ -1749,10 +1902,15 @@ rtsRenderScene(
 
             fullStencilMask = reservedStencilBit;
 
+            glDisable(GL_LIGHTING);
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+            glStencilFunc(GL_ALWAYS, 0, 0);
+            glDisable(GL_CULL_FACE);
             do {
 
 #ifdef MP
-              waitForSilhouetteGenerationDone(scene, &light->shadowVolumeList[obj]);
+              waitForSilhouetteGenerationDone(scene,
+	        &light->shadowVolumeList[obj]);
 #endif
 
               if (hasVertexArray) {
@@ -1763,34 +1921,15 @@ rtsRenderScene(
                 setupVertexArray(&light->shadowVolumeList[obj], 3);
 #endif
               }
-              glDisable(GL_LIGHTING);
-#if 1
-              glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-#else
-              glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-              glColor3f(1, 0, 0);
-#endif
-              glStencilFunc(GL_ALWAYS, 0, 0);
-              glCullFace(GL_FRONT);
               fullStencilMask |= 1 << scene->bitList[bit];
               glStencilMask(1 << scene->bitList[bit]);
               glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
               renderShadowVolume(&light->shadowVolumeList[obj],
                 light->lightPos);
 
-              glCullFace(GL_BACK);
-              glStencilOp(GL_KEEP, GL_KEEP, GL_INVERT);
-              renderShadowVolume(&light->shadowVolumeList[obj],
-                light->lightPos);
-
-#if 0
-              glColor3f(0, 1, 0);
-#endif
-              glDisable(GL_CULL_FACE);
               glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
               renderShadowVolumeTop(&light->shadowVolumeList[obj],
                 light->lightPos);
-              glEnable(GL_CULL_FACE);
 
               bit++;
               do {
@@ -1800,6 +1939,7 @@ rtsRenderScene(
 
             } while (bit < scene->numStencilBits && obj < light->objectListSize);
 
+            glEnable(GL_CULL_FACE);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
             glDepthFunc(GL_EQUAL);
             if (reservedStencilBit) {
@@ -1845,7 +1985,13 @@ rtsRenderScene(
   glCullFace(GL_BACK);  /* XXX needed? */
   glDepthMask(GL_TRUE);
   glDepthFunc(GL_LESS);
-  glDisable(GL_STENCIL_TEST);
+  if (scene->stencilRenderingInvariantHack) {
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+  } else {
+    glDisable(GL_STENCIL_TEST);
+  }
   glDisable(GL_BLEND);
   if (hasVertexArray) {
 #if defined(GL_VERSION_1_1)
@@ -1911,7 +2057,13 @@ gotShadowVolumeState:
      silhouette. */
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
+#if 0
   glDisable(GL_STENCIL_TEST);
+#else
+  glEnable(GL_STENCIL_TEST);
+  glStencilFunc(GL_ALWAYS, 0, 0xffffffff);
+  glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+#endif
   glDisable(GL_ALPHA_TEST);
   glDisable(GL_BLEND);
 
@@ -1944,6 +2096,12 @@ gotShadowVolumeState:
     /* Deallocate "anonymous" ShadowVolumeState's silhouette vertex array. */
     SHARED_FREE(svs->silhouette);
   }
+}
+
+void
+rtsStencilRenderingInvariantHack(RTSscene * scene, GLboolean enableHack)
+{
+  scene->stencilRenderingInvariantHack = enableHack;
 }
 
 /* XXX These free routines are not complete. */

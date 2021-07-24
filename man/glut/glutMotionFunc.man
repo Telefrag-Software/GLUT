@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutMotionFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutMotionFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutMotionFunc, glutPassiveMotionFunc - set the motion and
 passive motion callbacks respectively for the current window. 
@@ -31,4 +31,4 @@ respectively.
 .SH SEE ALSO
 glutMouseFunc, glutSpaceballMotionFunc, glutTabletMotionFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -186,10 +186,10 @@ void key(unsigned char key, int x, int y)
         exit(0);
 }
 
-
-
 const int TEXDIM = 256;
+
 /* Parse arguments, and set up interface between OpenGL and window system */
+int
 main(int argc, char *argv[])
 {
     /* material properties for objects in scene */

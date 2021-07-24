@@ -12,6 +12,10 @@
 #include <math.h>
 #include "izoom.h"
 
+#ifdef _WIN32
+#pragma warning (disable:4244)          /* disable bogus conversion warnings */
+#endif
+
 typedef struct filtinteg {
   float rad, min, max;
   float *tab;
@@ -598,7 +602,7 @@ filt_mitchell(float x)
   static int mitfirsted;
 
   if (!mitfirsted) {
-    mitchellinit(1.0 / 3.0, 1.0 / 3.0);
+    mitchellinit(1.0f / 3.0f, 1.0f / 3.0f);
     mitfirsted = 1;
   }
   if (x < -2.0)

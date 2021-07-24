@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSwapBuffers 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSwapBuffers 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSwapBuffers - swaps the buffers of the current window if double buffered. 
 .SH SYNTAX
@@ -27,4 +27,4 @@ effect.
 .SH SEE ALSO
 glutPostRedisplay, glutDisplayFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

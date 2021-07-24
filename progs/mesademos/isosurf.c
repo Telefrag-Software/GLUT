@@ -7,13 +7,23 @@
 
    Brian Paul */
 
-/* Conversion to GLUT by Mark J. Kilgard */
+/* Conversion to GLUT and OpenGL 1.1 by Mark J. Kilgard */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <GL/glut.h>
+
+#ifndef GL_VERSION_1_1
+/* OpenGL 1.1 not supported so emulate OpenGL 1.1
+   vertex arrays with the EXT_vertex_array extension. */
+#define GL_VERTEX_ARRAY GL_VERTEX_ARRAY_EXT
+#define GL_NORMAL_ARRAY GL_NORMAL_ARRAY_EXT
+#define glDrawArrays(a,b,c) glDrawArraysEXT(a,b,c)
+#define glVertexPointer(a,b,c,d) glVertexPointerEXT(a,b,c,numverts,d)
+#define glNormalPointer(a,b,c) glNormalPointerEXT(a,b,numverts,c)
+#endif
 
 GLboolean speed_test = GL_FALSE;
 GLboolean use_vertex_arrays = GL_FALSE;
@@ -58,11 +68,11 @@ read_surface(char *filename)
 static void 
 draw_surface(void)
 {
-  GLuint i;
+  int i;
 
-#ifdef GL_EXT_vertex_array
+#if defined(GL_EXT_vertex_array) || defined(GL_VERSION_1_1)
   if (use_vertex_arrays) {
-    glDrawArraysEXT(GL_TRIANGLE_STRIP, 0, numverts);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, numverts);
   } else {
 #endif
     glBegin(GL_TRIANGLE_STRIP);
@@ -71,7 +81,7 @@ draw_surface(void)
       glVertex3fv(verts[i]);
     }
     glEnd();
-#ifdef GL_EXT_vertex_array
+#if defined(GL_EXT_vertex_array) || defined(GL_VERSION_1_1)
   }
 #endif
 }
@@ -167,12 +177,12 @@ Init(void)
   glLoadIdentity();
   glTranslatef(0.0, 0.0, -6.0);
 
-#ifdef GL_EXT_vertex_array
+#if defined(GL_EXT_vertex_array) || defined(GL_VERSION_1_1)
   if (use_vertex_arrays) {
-    glVertexPointerEXT(3, GL_FLOAT, 0, numverts, verts);
-    glNormalPointerEXT(GL_FLOAT, 0, numverts, norms);
-    glEnable(GL_VERTEX_ARRAY_EXT);
-    glEnable(GL_NORMAL_ARRAY_EXT);
+    glVertexPointer(3, GL_FLOAT, 0, verts);
+    glNormalPointer(GL_FLOAT, 0, norms);
+    glEnable(GL_VERTEX_ARRAY);
+    glEnable(GL_NORMAL_ARRAY);
   }
 #endif
 }
@@ -256,6 +266,18 @@ Args(int argc, char **argv)
   return GL_TRUE;
 }
 
+int
+supportsOneDotOne(void)
+{
+  const GLubyte *version;
+  int major, minor;
+
+  version = glGetString(GL_VERSION);
+  if (sscanf(version, "%d.%d", &major, &minor) == 2)
+    return major > 1 || minor >= 1;
+  return 0;  /* OpenGL version string malformed! */
+}
+
 int 
 main(int argc, char **argv)
 {
@@ -278,6 +300,10 @@ main(int argc, char **argv)
   /* Make sure server supports the vertex array extension */
   if (glutExtensionSupported("GL_EXT_vertex_array")) {
     use_vertex_arrays = GL_FALSE;
+  }
+  if (supportsOneDotOne()) {
+    /* Always use vertex arrays if OpenGL 1.1 is supported! */
+    use_vertex_arrays = GL_TRUE;
   }
   Init();
 

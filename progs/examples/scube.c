@@ -331,7 +331,7 @@ drawCheck(int w, int h, int evenColor, int oddColor)
         square[3][2] = 0.0;
         square[3][3] = 1.0;
 
-        if (i & 1 ^ j & 1) {
+        if ((i & 1) ^ (j & 1)) {
           setColor(oddColor);
         } else {
           setColor(evenColor);

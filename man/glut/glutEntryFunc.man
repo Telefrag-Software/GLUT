@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutEntryFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutEntryFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutEntryFunc - sets the mouse enter/leave callback for the current window. 
 .SH SYNTAX
@@ -28,4 +28,4 @@ callbacks.
 .SH SEE ALSO
 glutMotionFunc, glutCreateWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

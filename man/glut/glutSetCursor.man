@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSetCursor 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSetCursor 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSetCursor - changes the cursor image of the current window. 
 .SH SYNTAX
@@ -96,4 +96,4 @@ access a full-screen cross-hair cursor if possible.
 .SH SEE ALSO
 glutCreateWindow, glutCreateSubWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

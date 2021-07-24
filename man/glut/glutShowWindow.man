@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutShowWindow 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutShowWindow 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutShowWindow, glutHideWindow, glutIconifyWindow - change the display status of the current window. 
 .SH SYNTAX
@@ -25,4 +25,4 @@ is subject to the window system's policy for displaying windows.
 .SH SEE ALSO
 glutPopWindow, glutPushWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

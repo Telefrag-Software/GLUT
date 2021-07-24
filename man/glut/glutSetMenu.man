@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSetMenu 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSetMenu 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSetMenu - sets the current menu; glutGetMenu - returns the identifier of the current menu. 
 .SH SYNTAX
@@ -20,4 +20,4 @@ current menu was destroyed, glutGetMenu returns zero.
 .SH SEE ALSO
 glutCreateMenu, glutSetWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

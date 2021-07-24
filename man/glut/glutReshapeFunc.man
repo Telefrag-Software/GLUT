@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutReshapeFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutReshapeFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutReshapeFunc - sets the reshape callback for the current window. 
 .SH SYNTAX
@@ -38,4 +38,4 @@ subwindows when their size is changed using glutReshapeWindow.
 .SH SEE ALSO
 glutDisplayFunc, glutReshapeWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

@@ -10,18 +10,17 @@
 #include <string.h>
 #include <assert.h>
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>  /* for XA_RGB_DEFAULT_MAP atom */
 #if defined (__vms)
-#include <X11/StdCmap.h>  /* for XmuLookupStandardColormap */
+#include <Xmu/StdCmap.h>  /* for XmuLookupStandardColormap */
 #else
 #include <X11/Xmu/StdCmap.h>  /* for XmuLookupStandardColormap */
 #endif
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
 
-#include <GL/glut.h>
 #include "glutint.h"
 #include "layerutil.h"
 
@@ -38,6 +37,7 @@ static int numRequiredOverlayCriteria = sizeof(requiredOverlayCriteria) / sizeof
 static int requiredOverlayCriteriaMask =
 (1 << LEVEL) | (1 << TRANSPARENT) | (1 << XSTATICGRAY) | (1 << RGBA) | (1 << CI_MODE);
 
+#if !defined(_WIN32)
 static int
 checkOverlayAcceptability(XVisualInfo * vi, unsigned int mode)
 {
@@ -91,11 +91,12 @@ checkOverlayAcceptability(XVisualInfo * vi, unsigned int mode)
 
   return 0;
 }
+#endif
 
 static XVisualInfo *
 getOverlayVisualInfoCI(unsigned int mode)
 {
-#if !defined(WIN32)
+#if !defined(_WIN32)
   XLayerVisualInfo *vi;
   XLayerVisualInfo template;
   XVisualInfo *goodVisual, *returnVisual;
@@ -153,7 +154,7 @@ getOverlayVisualInfoCI(unsigned int mode)
       XFree(vi);
     }
   }
-#endif /* !WIN32 */
+#endif /* !_WIN32 */
   return NULL;
 }
 
@@ -202,25 +203,25 @@ getOverlayVisualInfoRGB(unsigned int mode)
      Pragmatically, most of the typical things you want to do in the
      overlays can be done in color index (rubber banding, pop-up
      menus, etc.).  One solution for GLUT would be to simply
-     "advertise" what RGB triple (or possibly RGBA quadruple or
-     simply A alone) generates transparency.  The problem with this
-     approach is that it forces programmers to avoid whatever
-     arbitrary color various systems decide is transparent.  This is
-     a difficult burden to place on programmers that want to portably
-     make use of overlays.
+     "advertise" what RGB triple (or possibly RGBA quadruple or simply 
+     A alone) generates transparency.  The problem with this approach
+     is that it forces programmers to avoid whatever arbitrary color
+     various systems decide is transparent.  This is a difficult
+     burden to place on programmers that want to portably make use of
+     overlays.
 
      To actually support transparent RGBA overlays, there are really
      two reaonsable options.  ONE: Simply mandate that true black is
      the RGBA overlay transparent color (what IRIS GL did).  This is
-     nice for programmers since only one option, nice for existing
-     SGI hardware, bad for anyone (including SGI) who wants to
-     improve upon "true black" RGB transparency. 
+     nice for programmers since only one option, nice for existing SGI 
+     hardware, bad for anyone (including SGI) who wants to improve
+     upon "true black" RGB transparency. 
 
      Or TWO: Provide a set of queriable "transparency types" (like
      "true black" or "alpha == 0" or "true white" or even a queriable
      transparent color).  This is harder for programmers, OK for
-     existing SGI hardware, and it leaves open the issue of what
-     other modes are reasonable.
+     existing SGI hardware, and it leaves open the issue of what other 
+     modes are reasonable.
 
      Option TWO seems the more general approach, but since hardware
      designers will likely only implement a single mode (this is a
@@ -230,8 +231,8 @@ getOverlayVisualInfoRGB(unsigned int mode)
 
      Therefore, I defer any decision of how GLUT should support RGBA
      overlay transparency and leave support for it unimplemented.
-     Nobody has been pressing me for RGBA overlay transparency
-     (though people have requested color index overlay transparency
+     Nobody has been pressing me for RGBA overlay transparency (though 
+     people have requested color index overlay transparency
      repeatedly).  Geez, if you read this far you are either really
      bored or maybe actually  interested in this topic.  Anyway, if
      you have ideas (particularly if you plan on implementing a
@@ -240,8 +241,8 @@ getOverlayVisualInfoRGB(unsigned int mode)
 
      For the record, SGI's expiremental Framebufer Configuration
      experimental GLX extension uses option TWO.  Transparency modes
-     for "none" and "RGB" are defined (others could be defined
-     later).  What RGB value is the transparent one must be queried. 
+     for "none" and "RGB" are defined (others could be defined later). 
+     What RGB value is the transparent one must be queried. 
 
      I was hoping GLUT could have something that required less work
      from the programmer to use portably. -mjk */
@@ -263,6 +264,22 @@ getOverlayVisualInfo(unsigned int mode)
     return getOverlayVisualInfoCI(mode);
 }
 
+#if !defined(_WIN32)
+
+/* The GLUT overlay can come and go, and the overlay window has
+   a distinct X window ID.  Logically though, GLUT treats the
+   normal and overlay windows as a unified window.  In
+   particular, X input events typically go to the overlay window 
+   since it is "on top of" the normal window.  When an overlay
+   window ID is destroyed (due to glutRemoveOverlay or a call to 
+   glutEstablishOverlay when an overlay already exists), we
+   still keep track of the overlay window ID until we get back a 
+   DestroyNotify event for the overlay window. Otherwise, we
+   could lose track of X input events sent to a destroyed
+   overlay.  To avoid this, we keep the destroyed overlay window 
+   ID on a "stale window" list.  This lets us properly route X
+   input events generated on destroyed overlay windows to the
+   proper GLUT window. */
 static void
 addStaleWindow(GLUTwindow * window, Window win)
 {
@@ -277,7 +294,9 @@ addStaleWindow(GLUTwindow * window, Window win)
   __glutStaleWindowList = entry;
 }
 
-void 
+#endif
+
+void
 __glutFreeOverlay(GLUToverlay * overlay)
 {
   if (overlay->visAlloced)
@@ -292,7 +311,7 @@ __glutFreeOverlay(GLUToverlay * overlay)
 }
 
 static XVisualInfo *
-determineOverlayVisual(int *treatAsSingle, Bool * visAlloced)
+determineOverlayVisual(int *treatAsSingle, Bool * visAlloced, void **fbc)
 {
   if (__glutDisplayString) {
     XVisualInfo *vi;
@@ -302,6 +321,7 @@ determineOverlayVisual(int *treatAsSingle, Bool * visAlloced)
        glutInitDisplayString has been called to register a
        different display string.  Calling glutInitDisplayString
        means using a string instead of an integer mask determine 
+
        the visual to use. Using the function pointer variable
        __glutDetermineVisualFromString below avoids linking in
        the code for implementing glutInitDisplayString (ie,
@@ -312,11 +332,12 @@ determineOverlayVisual(int *treatAsSingle, Bool * visAlloced)
 
     /* Try three overlay layers. */
     *visAlloced = False;
+    *fbc = NULL;
     for (i = 1; i <= 3; i++) {
       requiredOverlayCriteria[0].value = i;
       vi = __glutDetermineVisualFromString(__glutDisplayString, treatAsSingle,
         requiredOverlayCriteria, numRequiredOverlayCriteria,
-	requiredOverlayCriteriaMask);
+        requiredOverlayCriteriaMask, fbc);
       if (vi) {
         return vi;
       }
@@ -324,18 +345,24 @@ determineOverlayVisual(int *treatAsSingle, Bool * visAlloced)
     return NULL;
   } else {
     *visAlloced = True;
+    *fbc = NULL;
     return __glutDetermineVisual(__glutDisplayMode,
       treatAsSingle, getOverlayVisualInfo);
   }
 }
 
 /* CENTRY */
-void APIENTRY 
+void APIENTRY
 glutEstablishOverlay(void)
 {
   GLUToverlay *overlay;
   GLUTwindow *window;
   XSetWindowAttributes wa;
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_fbconfig)
+  GLXFBConfigSGIX fbc;
+#else
+  void *fbc;
+#endif
 
   /* Register a routine to free an overlay with glut_win.c;
      this keeps glut_win.c from pulling in all of
@@ -348,7 +375,9 @@ glutEstablishOverlay(void)
   /* Allow for an existant overlay to be re-established perhaps
      if you wanted a different display mode. */
   if (window->overlay) {
+#if !defined(_WIN32)
     addStaleWindow(window, window->overlay->win);
+#endif
     __glutFreeOverlay(window->overlay);
   }
   overlay = (GLUToverlay *) malloc(sizeof(GLUToverlay));
@@ -356,17 +385,25 @@ glutEstablishOverlay(void)
     __glutFatalError("out of memory.");
 
   overlay->vis = determineOverlayVisual(&overlay->treatAsSingle,
-    &overlay->visAlloced);
+    &overlay->visAlloced, (void **) &fbc);
   if (!overlay->vis) {
     __glutFatalError("lacks overlay support.");
   }
-  overlay->ctx = glXCreateContext(__glutDisplay, overlay->vis,
-    None, __glutTryDirect);
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_fbconfig)
+  if (fbc) {
+    window->ctx = glXCreateContextWithConfigSGIX(__glutDisplay, fbc,
+      GLX_RGBA_TYPE_SGIX, None, __glutTryDirect);
+  } else
+#endif
+  {
+    overlay->ctx = glXCreateContext(__glutDisplay, overlay->vis,
+      None, __glutTryDirect);
+  }
   if (!overlay->ctx) {
     __glutFatalError(
       "failed to create overlay OpenGL rendering context.");
   }
-#if !defined(WIN32)
+#if !defined(_WIN32)
   overlay->isDirect = glXIsDirect(__glutDisplay, overlay->ctx);
   if (__glutForceDirect) {
     if (!overlay->isDirect) {
@@ -381,16 +418,16 @@ glutEstablishOverlay(void)
   wa.background_pixel = overlay->transparentPixel;
   wa.event_mask = window->eventMask & GLUT_OVERLAY_EVENT_FILTER_MASK;
   wa.border_pixel = 0;
+#if defined(_WIN32)
+  /* XXX Overlays not supported in Win32 yet. */
+#else
   overlay->win = XCreateWindow(__glutDisplay,
     window->win,
     0, 0, window->width, window->height, 0,
-#if defined(WIN32)
-    0, InputOutput, 0,
-#else
     overlay->vis->depth, InputOutput, overlay->vis->visual,
-#endif
     CWBackPixel | CWBorderPixel | CWEventMask | CWColormap,
     &wa);
+#endif
   if (window->children) {
     /* Overlay window must be lowered below any GLUT
        subwindows. */
@@ -404,7 +441,7 @@ glutEstablishOverlay(void)
   /* Make sure a reshape gets delivered. */
   window->forceReshape = True;
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
   __glutPutOnWorkList(__glutToplevelOf(window), GLUT_COLORMAP_WORK);
 #endif
 
@@ -417,7 +454,7 @@ glutEstablishOverlay(void)
   }
 }
 
-void APIENTRY 
+void APIENTRY
 glutRemoveOverlay(void)
 {
   GLUTwindow *window = __glutCurrentWindow;
@@ -430,21 +467,26 @@ glutRemoveOverlay(void)
   if (window->renderWin == overlay->win) {
     glutUseLayer(GLUT_NORMAL);
   }
+#if !defined(_WIN32)
   addStaleWindow(window, overlay->win);
+#endif
   __glutFreeOverlay(overlay);
   window->overlay = NULL;
-#if !defined(WIN32)
+#if !defined(_WIN32)
   __glutPutOnWorkList(__glutToplevelOf(window), GLUT_COLORMAP_WORK);
 #endif
 }
 
-void APIENTRY 
+void APIENTRY
 glutUseLayer(GLenum layer)
 {
   GLUTwindow *window = __glutCurrentWindow;
 
   switch (layer) {
   case GLUT_NORMAL:
+#ifdef _WIN32
+    window->renderDc = window->hdc;
+#endif
     window->renderWin = window->win;
     window->renderCtx = window->ctx;
     break;
@@ -452,6 +494,9 @@ glutUseLayer(GLenum layer)
     /* Did you crash here?  Calling glutUseLayer(GLUT_OVERLAY)
        without an overlay established is erroneous.  Fix your
        code. */
+#ifdef _WIN32
+    window->renderDc = window->overlay->hdc;
+#endif
     window->renderWin = window->overlay->win;
     window->renderCtx = window->overlay->ctx;
     break;
@@ -462,23 +507,23 @@ glutUseLayer(GLenum layer)
   __glutSetWindow(window);
 }
 
-void APIENTRY 
+void APIENTRY
 glutPostOverlayRedisplay(void)
 {
   __glutPostRedisplay(__glutCurrentWindow, GLUT_OVERLAY_REDISPLAY_WORK);
 }
 
 /* The advantage of this routine is that it saves the cost of a
-   glutSetWindow call (entailing an expensive OpenGL context switch),
-   particularly useful when multiple windows need redisplays posted at
-   the same times. */
+   glutSetWindow call (entailing an expensive OpenGL context
+   switch), particularly useful when multiple windows need
+   redisplays posted at the same times. */
 void APIENTRY
 glutPostWindowOverlayRedisplay(int win)
 {
   __glutPostRedisplay(__glutWindowList[win - 1], GLUT_OVERLAY_REDISPLAY_WORK);
 }
 
-void APIENTRY 
+void APIENTRY
 glutOverlayDisplayFunc(GLUTdisplayCB displayFunc)
 {
   if (!__glutCurrentWindow->overlay) {
@@ -488,7 +533,7 @@ glutOverlayDisplayFunc(GLUTdisplayCB displayFunc)
   __glutCurrentWindow->overlay->display = displayFunc;
 }
 
-void APIENTRY 
+void APIENTRY
 glutHideOverlay(void)
 {
   if (!__glutCurrentWindow->overlay) {
@@ -499,7 +544,7 @@ glutHideOverlay(void)
   __glutCurrentWindow->overlay->shownState = 0;
 }
 
-void APIENTRY 
+void APIENTRY
 glutShowOverlay(void)
 {
   if (!__glutCurrentWindow->overlay) {
@@ -510,7 +555,7 @@ glutShowOverlay(void)
   __glutCurrentWindow->overlay->shownState = 1;
 }
 
-int APIENTRY 
+int APIENTRY
 glutLayerGet(GLenum param)
 {
   switch (param) {
@@ -518,8 +563,9 @@ glutLayerGet(GLenum param)
     {
       XVisualInfo *vi;
       Bool dummy, visAlloced;
+      void *fbc;
 
-      vi = determineOverlayVisual(&dummy, &visAlloced);
+      vi = determineOverlayVisual(&dummy, &visAlloced, &fbc);
       if (vi) {
         if (visAlloced)
           XFree(vi);

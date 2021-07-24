@@ -258,7 +258,7 @@ menu(int value)
   if(value < 0)
     special(-value, 0, 0);
   else
-    key(value, 0, 0);
+    key((unsigned char) value, 0, 0);
 }
 
 int

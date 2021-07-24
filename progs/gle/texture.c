@@ -37,7 +37,7 @@ Texture * create_planet_texture (void) {
          int mi = i - TEXTURE_SIZE/2;
          int mj = j - TEXTURE_SIZE/2;
 
-         pixmap [3*TEXTURE_SIZE*i + 3*j] = 100*mi*mi + 40*mj*mj >> 8;
+         pixmap [3*TEXTURE_SIZE*i + 3*j] = (100*mi*mi + 40*mj*mj) >> 8;
          pixmap [3*TEXTURE_SIZE*i + 3*j + 1] = (10*mi*mi + 4*mj*mj) ;
          pixmap [3*TEXTURE_SIZE*i + 3*j + 2] = (1000*mi*mi + 400*mj*mj) >> 16 ;
 

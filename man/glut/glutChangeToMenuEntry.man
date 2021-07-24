@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutChangeToMenuEntry 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutChangeToMenuEntry 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutChangeToMenuEntry - changes the specified menu item in
 the current menu into a menu entry. 
@@ -29,4 +29,4 @@ selected.
 .SH SEE ALSO
 glutChangeToSubMenu, glutAddMenuEntry, glutRemoveMenuItem
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

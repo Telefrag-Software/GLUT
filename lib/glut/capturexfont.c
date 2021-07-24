@@ -26,7 +26,7 @@ outputChar(int num, int width, int height,
   int xoff, int yoff, int advance, int data)
 {
   if (width == 0 || height == 0) {
-    printf("#ifdef WIN32\n");
+    printf("#ifdef _WIN32\n");
     printf("/* XXX Work around Microsoft OpenGL 1.1 bug where glBitmap with\n");
     printf("   a height or width of zero does not advance the raster position\n");
     printf("   as specified by OpenGL. (Cosmo OpenGL does not have this bug.) */\n");

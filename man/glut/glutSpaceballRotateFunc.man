@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSpaceballRotateFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSpaceballRotateFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSpaceballRotateFunc - sets the Spaceball rotation callback for the current
 window. 
@@ -30,6 +30,6 @@ Passing NULL to glutSpaceballRotateFunc disables the generation
 of Spaceball rotate callbacks. When a new window is created, no
 Spaceball rotate callback is initially registered. 
 .SH SEE ALSO
-glutSpaceballMotionFunc, glutSpaceballButtonFunc, glutMotionFunc, glutTabletMotionFunc, glutDeviceGet
+glutSpaceballMotionFunc, glutSpaceballButtonFunc, glutMotionFunc, glutTabletMotionFunc, glutJoystickFunc, glutDeviceGet
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

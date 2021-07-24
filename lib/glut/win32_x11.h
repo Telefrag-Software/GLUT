@@ -7,6 +7,7 @@
    and is provided without guarantee or warrantee expressed or 
    implied. This program is -not- in the public domain. */
 
+#include <stdlib.h>
 #include <windows.h>
 
 /* Type definitions (conversions) */
@@ -153,6 +154,7 @@ typedef int Status;
 #define WithdrawnState 0	/* for windows that are not mapped */
 #define NormalState 1	/* most applications want to start this way */
 #define IconicState 3	/* application wants to start as an icon */
+#define GameModeState 4  /* Win32 GLUT only (not in Xlib!). */
 
 /* Type definitions */
 
@@ -244,22 +246,10 @@ typedef struct {
 
 /* Function prototypes. */
 
-extern Window XCreateWindow(
-  Display* display,
-  Window parent,
-  int x, int y,
-  unsigned int width, unsigned int height,
-  unsigned int border,
-  int depth,
-  unsigned int class,
-  Visual* visual, 
-  unsigned long valuemask,
-  XSetWindowAttributes* attributes);
-
 extern XVisualInfo* XGetVisualInfo(
   Display* display,
   long mask,
-  XVisualInfo* template,
+  XVisualInfo* ttemplate,  /* Avoid class with C++ keyword. */
   int*nitems);
 
 extern Colormap XCreateColormap(

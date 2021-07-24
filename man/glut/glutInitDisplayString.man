@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutInitDisplayString 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutInitDisplayString 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutInitDisplayString - sets the initial display mode via a string. 
 .SH SYNTAX
@@ -134,9 +134,25 @@ and "=1" for the RGBA color model capability.
 .TP 8
 .B rgb
 Number of bits of red, green, and blue in the RGBA color buffer and
-and zero bits of alpha color buffer precision.
+zero bits of alpha color buffer precision.
 Default is ">=1" for the red, green, and blue capabilities, and "~0" for 
 alpha capability, and "=1" for the RGBA color model capability.
+.TP 8
+.B luminance
+Number of bits of red in the RGBA and zero bits of green, blue (alpha
+not specified) of color buffer precision.
+Default is ">=1" for the red capabilitis, and "=0" for the
+green and blue capabilities, and "=1" for the RGBA color model
+capability, and, for X11, "=1" for the StaticGray ("xstaticgray")
+capability.
+
+SGI InfiniteReality (and other future machines) support a 16-bit
+luminance (single channel) display mode (an additional 16-bit alpha
+channel can also be requested).  The red channel maps to gray scale and
+green and blue channels are not available.  A 16-bit precision
+luminance display mode is often appropriate for medical imaging
+applications.  Do not expect many machines to support extended
+precision luminance display modes.
 .TP 8
 .B stencil
 Number of bits in the stencil buffer.
@@ -165,6 +181,11 @@ slow capability is to help programs avoid frame buffer configurations
 that are slower (but perhaps higher precision) for the current machine.
 Default is ">=0".  This default means that slow visuals are used in
 preference to fast visuals, but fast visuals will still be allowed.
+.TP 8
+.B win32pfd
+Only recognized on GLUT implementations for Win32, this capability
+name matches the Win32 Pixel Format Descriptor by numer.  win32pfd
+requires a compartor and numeric value.
 .TP 8
 .B xvisual
 Only recongized on GLUT implementations for the X Window System, this
@@ -226,4 +247,4 @@ to more as long as 2 bits are available).
 .SH SEE ALSO
 glutInit, glutCreateWindow, glutInitDisplayMode
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

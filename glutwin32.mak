@@ -9,10 +9,10 @@ LIBINSTALL     = \msdev\lib
 INCLUDEINSTALL = \msdev\include\GL
 
 # Win95 dll directory
-DLLINSTALL     = \windows\system
+#DLLINSTALL     = \windows\system
 
 # WinNT dll directory
-#DLLINSTALL     = \winnt\system32
+DLLINSTALL     = \winnt\system32
 
 # Microsoft OpenGL libraries
 #
@@ -39,31 +39,41 @@ MUI     = $(TOP)/lib/mui/mui.lib
 # The OpenGL Extrusion and Tubing lib
 GLE     = $(TOP)/lib/gle/gle.lib
 
+# The OpenGL Sphere Mapping lib
+GLSMAP  = $(TOP)/lib/glsmap/glsmap.lib
+
 # common definitions used by all makefiles
 CFLAGS	= $(cflags) $(cdebug) $(EXTRACFLAGS) -DWIN32 -I$(TOP)/include
 LIBS	= $(lflags) $(ldebug) $(EXTRALIBS) $(GLUT) $(GLU) $(OPENGL) $(guilibs)
-EXES	= $(SRCS:.c=.exe)
+EXES	= $(SRCS:.c=.exe) $(CPPSRCS:.cpp=.exe)
+
+!IFNDEF NODEBUG
+lcommon = /NODEFAULTLIB /INCREMENTAL:NO /DEBUG /NOLOGO
+!ENDIF
 
 # default rule
 default	: $(EXES)
 
-
 # cleanup rules
-clean	:
-	@del *.obj
-	@del *.pdb
-	@del *.ilk
-	@del *.ncb
-	@del *~
-	@del *.exp
+clean	::
+	@del /f *.obj
+	@del /f *.pdb
+	@del /f *.ilk
+	@del /f *.ncb
+	@del /f *~
+	@del /f *.exp
 
-clobber	: clean
-	@del *.exe
-	@del *.dll
-	@del *.lib
+clobber	:: clean
+	@del /f *.exe
+	@del /f *.dll
+	@del /f *.lib
+	-@del /f $(LDIRT)
 
 # inference rules
-$(EXES)	: $*.obj
+$(EXES)	: $*.obj $(DEPLIBS)
+	echo $@
         $(link) -out:$@ $** $(LIBS)
 .c.obj	: 
+	$(CC) $(CFLAGS) $<
+.cpp.obj : 
 	$(CC) $(CFLAGS) $<

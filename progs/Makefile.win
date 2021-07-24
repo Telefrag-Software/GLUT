@@ -1,8 +1,7 @@
 # Makefile for Win32
 
-
 # defines
-SUBDIRS	= advanced.dir contrib.dir demos.dir examples.dir mesademos.dir mui.dir redbook.dir texfont.dir gle.dir
+SUBDIRS	= advanced.dir contrib.dir demos.dir examples.dir mesademos.dir mui.dir redbook.dir texfont.dir gle.dir gameglut.dir bucciarelli.dir advanced97.dir spheremap.dir
 CLEAN	= $(SUBDIRS:.dir=.clean)
 CLOBBER	= $(SUBDIRS:.dir=.clobber)
 

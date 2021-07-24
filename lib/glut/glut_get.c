@@ -1,12 +1,12 @@
 
-/* Copyright (c) Mark J. Kilgard, 1994. */
+/* Copyright (c) Mark J. Kilgard, 1994, 1997, 1998. */
 
 /* This program is freely distributable without licensing fees
    and is provided without guarantee or warrantee expressed or
    implied. This program is -not- in the public domain. */
 
 #include <assert.h>
-#include <GL/glut.h>
+#include <stdlib.h>  /* SunOS 4 needs NULL defined for GETTIMEOFDAY macro. */
 #include "glutint.h"
 
 /* CENTRY */
@@ -107,13 +107,17 @@ glutGet(GLenum param)
     if (value) {
       return 0;
     } else {
-#if defined(WIN32)
+#if defined(_WIN32)
       /* KLUDGE: we always assume 256 colors in CI mode on
          Win32 */
       return 256;
-#else /* !WIN32 */
-      return __glutCurrentWindow->vis->visual->map_entries;
-#endif /* WIN32 */
+#else
+      if (__glutCurrentWindow->renderWin == __glutCurrentWindow->win) { 
+        return __glutCurrentWindow->vis->visual->map_entries;
+      } else {
+        return __glutCurrentWindow->overlay->vis->visual->map_entries;
+      }
+#endif /* _WIN32 */
     }
   case GLUT_WINDOW_PARENT:
     return __glutCurrentWindow->parent ?
@@ -161,14 +165,16 @@ glutGet(GLenum param)
     {
       XVisualInfo *vi;
       Bool dummy, visAlloced;
-#if defined(WIN32)      
-      /* our fake glXChooseVisual (which is called by
+      void *fbc;
+
+#if defined(_WIN32)      
+      /* Our fake glXChooseVisual (which is called by
          __glutDetermineVisual) needs an HDC to work with, so grab one
          from the "root" window. */
       XHDC = GetDC(GetDesktopWindow());
 #endif
-      vi = __glutDetermineWindowVisual(&dummy, &visAlloced);
-#if defined(WIN32)      
+      vi = __glutDetermineWindowVisual(&dummy, &visAlloced, &fbc);
+#if defined(_WIN32)      
       ReleaseDC(GetDesktopWindow(), XHDC);
 #endif
       if (vi) {
@@ -186,12 +192,22 @@ glutGet(GLenum param)
       GETTIMEOFDAY(&now);
       TIMEDELTA(elapsed, now, beginning);
       /* Return elapsed milliseconds. */
-#if defined(__vms)
+#if defined(__vms) && ( __VMS_VER < 70000000 )
       return (int) (elapsed.val / TICKS_PER_MILLISECOND);
 #else
       return (int) ((elapsed.tv_sec * 1000) + (elapsed.tv_usec / 1000));
 #endif
     }
+  case GLUT_WINDOW_FORMAT_ID:
+#if defined(_WIN32)
+    return GetPixelFormat(__glutCurrentWindow->hdc);
+#else
+    if (__glutCurrentWindow->renderWin == __glutCurrentWindow->win) {
+      return (int) __glutCurrentWindow->vis->visualid;
+    } else {
+      return (int) __glutCurrentWindow->overlay->vis->visualid;
+    }
+#endif
   default:
     __glutWarning("invalid glutGet parameter: %d", param);
     return -1;

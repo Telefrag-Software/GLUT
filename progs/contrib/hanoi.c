@@ -189,9 +189,9 @@ DrawPosts(void)
   glColor3fv(poleColor);
   glLineWidth(10);
   glMaterialfv(GL_FRONT, GL_DIFFUSE, poleColor);
-  DrawPost(WIDTH / 4);
-  DrawPost(2 * WIDTH / 4);
-  DrawPost(3 * WIDTH / 4);
+  DrawPost((int) WIDTH / 4);
+  DrawPost(2 * (int) WIDTH / 4);
+  DrawPost(3 * (int) WIDTH / 4);
 }
 
 void 
@@ -407,7 +407,7 @@ main(int argc, char *argv[])
     }
   }
 
-  glutInitWindowSize(WIDTH, HEIGHT);
+  glutInitWindowSize((int) WIDTH, (int) HEIGHT);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
   glutCreateWindow("Hanoi");
@@ -415,7 +415,7 @@ main(int argc, char *argv[])
   glutDisplayFunc(draw);
   glutKeyboardFunc(keyboard);
 
-  glViewport(0, 0, WIDTH, HEIGHT);
+  glViewport(0, 0, (GLsizei) WIDTH, (GLsizei) HEIGHT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0, WIDTH, 0, HEIGHT, -10000, 10000);

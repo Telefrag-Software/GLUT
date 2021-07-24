@@ -35,7 +35,7 @@
 
 #include "fracviewer.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 #define drand48() (((float) rand())/((float) RAND_MAX))
 #define srand48(x) (srand((x)))
 #endif

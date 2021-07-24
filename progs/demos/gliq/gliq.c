@@ -345,7 +345,7 @@ void mouse(int button, int state, int x, int y)
       case PLAY:
 	if (picked <= 0)
 	  break;
-	if (mid = legalmove())
+	if ((mid = legalmove()))
 	  {
 #if 0
 	    //	    printf("Erasing (%d,%d).", (mid-1)/BOARDSIZE, (mid-1)%BOARDSIZE);

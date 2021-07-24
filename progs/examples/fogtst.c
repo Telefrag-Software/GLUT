@@ -44,7 +44,6 @@
 #include <GL/glut.h>
 
 GLenum doubleBuffer;
-/* *INDENT-OFF* */
 double plane[4] = {
   1.0, 0.0, -1.0, 0.0
 };
@@ -84,11 +83,10 @@ static float back_mat_specular[] = {0.0, 0.0, 1.0, 1.0};
 static float back_mat_diffuse[] = {1.0, 0.0, 0.0, 1.0};
 static float lmodel_ambient[] = {0.0, 0.0, 0.0, 1.0};
 static float fog_color[] = {0.8, 0.8, 0.8, 1.0};
-/* *INDENT-ON* */
 
 /* ARGSUSED1 */
 static void
-Key(unsigned char key, int x, int y)
+  Key(unsigned char key, int x, int y)
 {
   switch (key) {
   case 'd':
@@ -108,7 +106,7 @@ Key(unsigned char key, int x, int y)
 
 /* ARGSUSED1 */
 static void
-SpecialKey(int key, int x, int y)
+  SpecialKey(int key, int x, int y)
 {
   switch (key) {
   case GLUT_KEY_UP:
@@ -131,7 +129,7 @@ SpecialKey(int key, int x, int y)
 }
 
 static void
-Draw(void)
+  Draw(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -155,7 +153,7 @@ Draw(void)
 }
 
 static void
-Args(int argc, char **argv)
+  Args(int argc, char **argv)
 {
   GLint i;
   doubleBuffer = GL_TRUE;
@@ -170,7 +168,7 @@ Args(int argc, char **argv)
 }
 
 int
-main(int argc, char **argv)
+  main(int argc, char **argv)
 {
   GLenum type;
 

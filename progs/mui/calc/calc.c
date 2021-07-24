@@ -533,7 +533,7 @@ void interpclick(int x)
     if (savingprog && x != Progkey && x != Runkey)
         program[proglen++] = x;
     if ((Zerokey <= x && x <= Ninekey) || x == Dotkey ||
-    	(base == 16) && (Akey <= x && x <= Fkey)) {
+    	((base == 16) && (Akey <= x && x <= Fkey))) {
         if (enablepush) push();
 	enablepush = 0;
 	if (x == Dotkey)

@@ -173,7 +173,7 @@ __glutXGetLayerVisualInfo(Display * dpy, long lvinfo_mask,
 #if 0                   /* Unused by GLUT. */
 Status
 __glutXMatchLayerVisualInfo(Display * dpy, int screen,
-  int depth, int class, int layer,
+  int depth, int visualClass, int layer,
   XLayerVisualInfo * lvinfo_return)
 {
   XLayerVisualInfo *lvinfo;
@@ -182,7 +182,11 @@ __glutXMatchLayerVisualInfo(Display * dpy, int screen,
 
   lvinfoTemplate.vinfo.screen = screen;
   lvinfoTemplate.vinfo.depth = depth;
-  lvinfoTemplate.vinfo.class = class;
+#if defined(__cplusplus) || defined(c_plusplus)
+  lvinfoTemplate.vinfo.c_class = visualClass;
+#else
+  lvinfoTemplate.vinfo.class = visualClass;
+#endif
   lvinfoTemplate.layer = layer;
   lvinfo = __glutXGetLayerVisualInfo(dpy,
     VisualScreenMask | VisualDepthMask |

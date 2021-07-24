@@ -38,7 +38,7 @@
 #include <stdio.h>		/* C header for standard I/O                 */
 #include <string.h>		/* For String compare 			     */
 #include <stdlib.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/file.h>
 #endif

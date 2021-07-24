@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutAddSubMenu 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutAddSubMenu 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutAddSubMenu - adds a sub-menu trigger to the bottom of the current menu. 
 .SH SYNTAX
@@ -24,4 +24,4 @@ be selected.
 .SH SEE ALSO
 glutAddMenuEntry, glutChangeToSubMenu, glutRemoveItem
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

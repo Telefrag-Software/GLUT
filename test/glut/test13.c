@@ -5,14 +5,15 @@
    and is provided without guarantee or warrantee expressed or 
    implied. This program is -not- in the public domain. */
 
-#include <GL/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef WIN32
+#ifdef _WIN32
+#include <windows.h>
 #define sleep(x) Sleep(1000 * x)
 #else
 #include <unistd.h>
 #endif
+#include <GL/glut.h>
 
 int window1, window2;
 int win1reshaped = 0, win2reshaped = 0;

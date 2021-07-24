@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutVisibilityFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutVisibilityFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutVisibilityFunc - sets the visibility callback for the current window. 
 .SH SYNTAX
@@ -36,4 +36,4 @@ be reported.
 .SH SEE ALSO
 glutCreateWindow, glutPopWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

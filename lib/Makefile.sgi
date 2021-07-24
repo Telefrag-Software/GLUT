@@ -1,6 +1,6 @@
 #!smake
 #
-# Copyright (c) Mark J. Kilgard, 1995.
+# Copyright (c) Mark J. Kilgard, 1995, 1998.
 #
 
 TOP = ..
@@ -17,12 +17,15 @@ SUBDIRS = \
   glut$(GLUT_LIB_SUFFIX) \
   $(FGLUT_DIR)$(GLUT_LIB_SUFFIX) \
   mui$(GLUT_LIB_SUFFIX) \
-  gle$(GLUT_LIB_SUFFIX)
+  gle$(GLUT_LIB_SUFFIX) \
+  glsmap$(GLUT_LIB_SUFFIX) \
+
 ALL_SUBDIRS = \
   glut glut.n32 glut.n64 \
   fglut fglut.n32 fglut.n64 \
   mui mui.n32 mui.n64 \
-  gle gle.n32 gle.n64
+  gle gle.n32 gle.n64 \
+  glsmap glsmap.n32 glsmap.n64 \
 
 default: $(_FORCE)
 	$(SUBDIRS_MAKERULE)

@@ -1,20 +1,19 @@
 
-/* Copyright (c) Mark J. Kilgard, 1995. */
+/* Copyright (c) Mark J. Kilgard, 1995, 1998. */
 
 /* This program is freely distributable without licensing fees 
    and is provided without guarantee or warrantee expressed or 
    implied. This program is -not- in the public domain. */
 
-#include <GL/glut.h>
 #include "glutint.h"
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xatom.h>  /* For XA_CURSOR */
 #include <X11/cursorfont.h>
 #endif
 
 typedef struct _CursorTable {
-#if defined(WIN32)
+#if defined(_WIN32)
   char* glyph;
 #else
   int glyph;
@@ -47,13 +46,17 @@ static CursorTable cursorTable[] = {
 };
 /* *INDENT-ON* */
 
+#if !defined(_WIN32)
 static Cursor blankCursor = None;
 static Cursor fullCrosshairCusor = None;
 
+/* SGI X server's support a special property called the
+   _SGI_CROSSHAIR_CURSOR that when installed as a window's
+   cursor, becomes a full screen crosshair cursor.  SGI
+   has special cursor generation hardware for this case. */
 static Cursor
 getFullCrosshairCursor(void)
 {
-#if !defined(WIN32)
   Cursor cursor;
   Atom crosshairAtom, actualType;
   int rc, actualFormat;
@@ -76,18 +79,13 @@ getFullCrosshairCursor(void)
     }
   }
   return XCreateFontCursor(__glutDisplay, XC_crosshair);
-#else
-  /* we could kludge up an XGetWindowProperty, XInterAtom and
-     XCreateFontCursor that worked for just this case, but I dunno if
-     it is worth it, hence the #ifdefs instead. */
-  return IDC_CROSS;
-#endif /* !WIN32 */
 }
 
+/* X11 forces you to create a blank cursor if you want
+   to disable the cursor. */
 static Cursor
 makeBlankCursor(void)
 {
-#if !defined(WIN32)
   static char data[1] =
   {0};
   Cursor cursor;
@@ -103,66 +101,101 @@ makeBlankCursor(void)
   XFreePixmap(__glutDisplay, blank);
 
   return cursor;
-#else
-  /* we could kludge up an XCreateBitmapFromData, XCreatePixmapCursor
-     and XFreePixmap that worked for just this case, but I dunno if it
-     is worth it, hence the #ifdefs instead. */
-  return NULL;
-#endif /* !WIN32 */
 }
+#endif /* !_WIN32 */
 
-/* CENTRY */
-void APIENTRY 
-glutSetCursor(int cursor)
+/* Win32 and X11 use this same function to accomplish
+   fairly different tasks.  X11 lets you just define the
+   cursor for a window and the window system takes care
+   of making sure that the window's cursor is installed
+   when the mouse is in the window.  Win32 requires the
+   application to handle a WM_SETCURSOR message to install
+   the right cursor when windows are entered.  Think of
+   the Win32 __glutSetCursor (called from __glutWindowProc)
+   as "install cursor".  Think of the X11 __glutSetCursor
+   (called from glutSetCursor) as "define cursor". */
+void 
+__glutSetCursor(GLUTwindow *window)
 {
+  int cursor = window->cursor;
   Cursor xcursor;
 
   if (cursor >= 0 &&
     cursor < sizeof(cursorTable) / sizeof(cursorTable[0])) {
-    if (cursorTable[cursor].cursor == None)
+    if (cursorTable[cursor].cursor == None) {
       cursorTable[cursor].cursor = XCreateFontCursor(__glutDisplay,
         cursorTable[cursor].glyph);
+    }
     xcursor = cursorTable[cursor].cursor;
   } else {
     /* Special cases. */
     switch (cursor) {
     case GLUT_CURSOR_INHERIT:
-#if defined(WIN32)
-      /* must be a parent - this bit of voodoo is brought to you by
-	 your friendly neighborhood Win32 API.  It allows the parent
-	 to override the setting of the child windows cursor (ACK!).
-	 Therefore, if this parent has children (and the cursor is in
-	 one), DON'T SET THE CURSOR.  */
-      if (__glutCurrentWindow->parent)
-        return;
-      else {
-        if (__glutCurrentWindow->win != GetFocus())
+#if defined(_WIN32)
+      while (window->parent) {
+        window = window->parent;
+        if (window->cursor != GLUT_CURSOR_INHERIT) {
+          __glutSetCursor(window);
           return;
-        xcursor = cursorTable[0].cursor;
-        if (xcursor == NULL)
-          xcursor =
-            cursorTable[0].cursor =
-            LoadCursor(NULL, cursorTable[0].glyph);
+        }
+      }
+      /* XXX Default to an arrow cursor.  Is this
+         right or should we be letting the default
+         window proc be installing some system cursor? */
+      xcursor = cursorTable[0].cursor;
+      if (xcursor == NULL) {
+        xcursor =
+          cursorTable[0].cursor =
+          LoadCursor(NULL, cursorTable[0].glyph);
       }
 #else
       xcursor = None;
 #endif
       break;
     case GLUT_CURSOR_NONE:
-      if (blankCursor == None)
+#if defined(_WIN32)
+      xcursor = NULL;
+#else
+      if (blankCursor == None) {
         blankCursor = makeBlankCursor();
+      }
       xcursor = blankCursor;
+#endif
       break;
     case GLUT_CURSOR_FULL_CROSSHAIR:
-      if (fullCrosshairCusor == None)
+#if defined(_WIN32)
+      xcursor = IDC_CROSS;
+#else
+      if (fullCrosshairCusor == None) {
         fullCrosshairCusor = getFullCrosshairCursor();
+      }
       xcursor = fullCrosshairCusor;
+#endif
       break;
     }
   }
-  __glutCurrentWindow->cursor = cursor;
   XDefineCursor(__glutDisplay,
-    __glutCurrentWindow->win, xcursor);
+    window->win, xcursor);
   XFlush(__glutDisplay);
+}
+
+/* CENTRY */
+void APIENTRY 
+glutSetCursor(int cursor)
+{
+#ifdef _WIN32
+  POINT point;
+
+  __glutCurrentWindow->cursor = cursor;
+  /* Are we in the window right now?  If so,
+     install the cursor. */
+  GetCursorPos(&point);
+  if (__glutCurrentWindow->win == WindowFromPoint(point)) {
+    __glutSetCursor(__glutCurrentWindow);
+  }
+#else
+  __glutCurrentWindow->cursor = cursor;
+  __glutSetCursor(__glutCurrentWindow);
+#endif
 }
 /* ENDCENTRY */

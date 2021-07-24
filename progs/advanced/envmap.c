@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #else
 #define drand48() (((float) rand())/((float) RAND_MAX))
@@ -641,7 +641,7 @@ motion(int x, int y)
 void
 menu(int value)
 {
-  keys(value, 0, 0);
+  keys((unsigned char) value, 0, 0);
 }
 
 #if defined(GL_VERSION_1_1)

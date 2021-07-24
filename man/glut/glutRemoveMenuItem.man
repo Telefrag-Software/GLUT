@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutRemoveMenuItem 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutRemoveMenuItem 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutRemoveMenuItem - remove the specified menu item. 
 .SH SYNTAX
@@ -20,4 +20,4 @@ the removed menu item are renumbered.
 .SH SEE ALSO
 glutAddMenuEntry, glutAddSubMenu, glutChangeToMenuEntry, glutChangeToSubMenu
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

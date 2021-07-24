@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSolidTetrahedron 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSolidTetrahedron 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSolidTetrahedron, glutWireTetrahedron - render a
 solid or wireframe tetrahedron (4-sided regular solid) respectively. 
@@ -20,4 +20,4 @@ glutSolidSphere, glutSolidCube, glutSolidCone, glutSolidTorus, glutSolidDodecahe
 glutSolidOctahedron, glutSolidIcosahedron,
 glutSolidTeapot
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

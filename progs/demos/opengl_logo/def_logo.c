@@ -8,6 +8,7 @@
  * notice and the Dutch variable names :) stay in tact.
  */
 
+#include <stdlib.h>
 #include <GL/glut.h>
 #include <math.h>
 

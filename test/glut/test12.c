@@ -5,8 +5,10 @@
    and is provided without guarantee or warrantee expressed or 
    implied. This program is -not- in the public domain. */
 
+#include <stdlib.h>
 #include <stdio.h>
-#ifdef WIN32
+#ifdef _WIN32
+#include <windows.h>
 #define sleep(x) Sleep(1000 * x)
 #else
 #include <unistd.h>
@@ -112,6 +114,8 @@ main(int argc, char **argv)
     printf("FAIL: test12\n");
     exit(1);
   }
+  printf("Window format id = 0x%x (%d)\n",
+    glutGet(GLUT_WINDOW_FORMAT_ID), glutGet(GLUT_WINDOW_FORMAT_ID));
   glutSetCursor(GLUT_CURSOR_NONE);
   val = glutGet(GLUT_WINDOW_CURSOR);
   if (val != GLUT_CURSOR_NONE) {

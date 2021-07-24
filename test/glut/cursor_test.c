@@ -68,24 +68,36 @@ char *name[] =
 int win;
 
 void
+futureSetCursor(int value)
+{
+  glutSetCursor(GLUT_CURSOR_HELP);
+}
+
+void
 menu(int value)
 {
   int cursor;
 
   if(value < 0) {
-    glutSetWindow(win);
     switch(value) {
     case -1:
+      glutSetWindow(win);
       glutWarpPointer(25, 25);
       return;
     case -2:
+      glutSetWindow(win);
       glutWarpPointer(-25, -25);
       return;
     case -3:
+      glutSetWindow(win);
       glutWarpPointer(250, 250);
       return;
     case -4:
+      glutSetWindow(win);
       glutWarpPointer(2000, 200);
+      return;
+    case -5:
+      glutTimerFunc(3000, futureSetCursor, glutGetWindow());
       return;
     }
   }
@@ -121,6 +133,7 @@ main(int argc, char **argv)
   glutAddMenuEntry("Warp to (-25,-25)", -2);
   glutAddMenuEntry("Warp to (250,250)", -3);
   glutAddMenuEntry("Warp to (2000,200)", -4);
+  glutAddMenuEntry("Set cursor in 3 secs", -5);
   glutAttachMenu(GLUT_RIGHT_BUTTON);
   glutCreateSubWindow(win, 10, 10, 90, 90);
   glutAttachMenu(GLUT_RIGHT_BUTTON);

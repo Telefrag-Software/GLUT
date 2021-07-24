@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutBitmapWidth 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutBitmapWidth 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutBitmapWidth - returns the width of a bitmap character,
 glutBitmapLength returns the length of a bitmap font string.
@@ -31,4 +31,4 @@ returned by glutBitmapWidth for each character in the string.
 .SH SEE ALSO
 glutBitmapCharacter, glutStrokeWidth
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

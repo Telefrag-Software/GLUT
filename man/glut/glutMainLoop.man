@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutMainLoop 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutMainLoop 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutMainLoop - enters the GLUT event processing loop. 
 .SH SYNTAX
@@ -17,4 +17,4 @@ been registered.
 .SH SEE ALSO
 glutInit
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

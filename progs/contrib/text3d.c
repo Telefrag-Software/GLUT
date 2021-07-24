@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 #include <GL/glut.h>

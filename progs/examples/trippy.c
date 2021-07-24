@@ -147,7 +147,7 @@ void seed_text(char *string)
     int i;
     int width = 0;
 
-    for (i = 0; i < strlen(string); i++) {
+    for (i = 0; i < (int) strlen(string); i++) {
         width += glutStrokeWidth(GLUT_STROKE_ROMAN, string[i]);
     }
 
@@ -155,7 +155,7 @@ void seed_text(char *string)
     glScalef(seedsize / 100.0, seedsize / 100.0, seedsize / 100.0);
     glTranslatef(-width / 2.0, -50.0, 0.0);
 
-    for (i = 0; i < strlen(string); i++) {
+    for (i = 0; i < (int) strlen(string); i++) {
         set_colour();
         glutStrokeCharacter(GLUT_STROKE_ROMAN, string[i]);
     }

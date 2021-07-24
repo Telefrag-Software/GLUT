@@ -5,29 +5,27 @@
    and is provided without guarantee or warrantee expressed or
    implied. This program is -not- in the public domain. */
 
+/* The Win32 GLUT file win32_menu.c completely re-implements all
+   the menuing functionality implemented.  This file is used only by
+   the X Window System version of GLUT. */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <assert.h>
 
-#if !defined(WIN32)
 #include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>  /* for XC_arrow */
-#endif /* !WIN32 */
 
-#include <GL/glut.h>
 #include "glutint.h"
 #include "layerutil.h"
 
-GLUTmenu *__glutCurrentMenu = NULL;
 void (*__glutMenuStatusFunc) (int, int, int);
-GLUTmenu *__glutMappedMenu;
-GLUTwindow *__glutMenuWindow;
 GLUTmenuItem *__glutItemSelected;
+GLUTmenu **__glutMenuList = NULL;
 
-static GLUTmenu **menuList = NULL;
 static int menuListSize = 0;
 static XFontStruct *menuFont = NULL;
 static Cursor menuCursor;
@@ -39,7 +37,6 @@ static GC blackGC, grayGC, whiteGC;
 static unsigned long menuBlack, menuWhite, menuGray;
 static unsigned long useSaveUnders;
 
-#if !defined(WIN32)
 /* A replacement for XAllocColor (originally by Brian Paul).
    This  function should never fail to allocate a color.  When
    XAllocColor fails, we return the nearest matching color.  If
@@ -56,8 +53,9 @@ noFaultXAllocColor(Display * dpy, Colormap cmap, int cmapSize,
 
   for (;;) {
     /* First try just using XAllocColor. */
-    if (XAllocColor(dpy, cmap, color))
+    if (XAllocColor(dpy, cmap, color)) {
       return;
+    }
 
     /* Retrieve color table entries. */
     /* XXX alloca canidate. */
@@ -126,7 +124,7 @@ ifSunCreator(void)
       savedDisplayString = __glutDisplayString;
       __glutDisplayMode = GLUT_RGB | GLUT_SINGLE;
       __glutDisplayString = NULL;
-      window = __glutCreateWindow(NULL, 0, 0, 1, 1);
+      window = __glutCreateWindow(NULL, 0, 0, 1, 1, 0);
     }
 
     glvendor = (char *) glGetString(GL_VENDOR);
@@ -237,8 +235,9 @@ menuVisualSetup(void)
             menuColormap, &color);
           if (!status) {
             XFreeColormap(__glutDisplay, menuColormap);
-            if (placeHolders)
+            if (placeHolders) {
               free(placeHolders);
+            }
             continue;
           }
           menuGray = color.pixel;
@@ -247,8 +246,9 @@ menuVisualSetup(void)
             menuColormap, &color);
           if (!status) {
             XFreeColormap(__glutDisplay, menuColormap);
-            if (placeHolders)
+            if (placeHolders) {
               free(placeHolders);
+            }
             continue;
           }
           menuBlack = color.pixel;
@@ -257,8 +257,9 @@ menuVisualSetup(void)
             menuColormap, &color);
           if (!status) {
             XFreeColormap(__glutDisplay, menuColormap);
-            if (placeHolders)
+            if (placeHolders) {
               free(placeHolders);
+            }
             continue;
           }
           if (placeHolders) {
@@ -316,10 +317,11 @@ menuVisualSetup(void)
   presumablyMesa = !XQueryExtension(__glutDisplay, "GLX",
     &dummy, &dummy, &dummy);
 
-  if (presumablyMesa)
+  if (presumablyMesa) {
     useSaveUnders = CWSaveUnder;
-  else
+  } else {
     useSaveUnders = 0;
+  }
 }
 
 static void
@@ -348,8 +350,9 @@ menuGraphicsContextSetup(Window win)
 {
   XGCValues gcvals;
 
-  if (blackGC != None)
+  if (blackGC != None) {
     return;
+  }
   gcvals.font = menuFont->fid;
   gcvals.foreground = menuBlack;
   blackGC = XCreateGC(__glutDisplay, win,
@@ -358,20 +361,6 @@ menuGraphicsContextSetup(Window win)
   grayGC = XCreateGC(__glutDisplay, win, GCForeground, &gcvals);
   gcvals.foreground = menuWhite;
   whiteGC = XCreateGC(__glutDisplay, win, GCForeground, &gcvals);
-}
-#endif /* !WIN32 */
-
-/* DEPRICATED, use glutMenuStatusFunc instead. */
-void APIENTRY 
-glutMenuStateFunc(GLUTmenuStateCB menuStateFunc)
-{
-  __glutMenuStatusFunc = (GLUTmenuStatusCB) menuStateFunc;
-}
-
-void APIENTRY 
-glutMenuStatusFunc(GLUTmenuStatusCB menuStatusFunc)
-{
-  __glutMenuStatusFunc = menuStatusFunc;
 }
 
 void
@@ -392,8 +381,8 @@ unmapMenu(GLUTmenu * menu)
   XUnmapWindow(__glutDisplay, menu->win);
 }
 
-void
-__glutFinishMenu(Window win, int x, int y)
+static void
+finishMenu(Window win, int x, int y)
 {
   Window dummy;
   int rc;
@@ -405,9 +394,10 @@ __glutFinishMenu(Window win, int x, int y)
      colormap.  If the window associated with the menu has an
      overlay, install that window's overlay colormap so the
      overlay isn't left using the popup menu's colormap. */
-  if (__glutMenuWindow->overlay)
+  if (__glutMenuWindow->overlay) {
     XInstallColormap(__glutDisplay,
       __glutMenuWindow->overlay->colormap->cmap);
+  }
 
   /* This XFlush is needed to to make sure the pointer is
      really ungrabbed when the application's menu callback is
@@ -532,8 +522,8 @@ mapMenu(GLUTmenu * menu, int x, int y)
   XMapWindow(__glutDisplay, menu->win);
 }
 
-void
-__glutStartMenu(GLUTmenu * menu, GLUTwindow * window,
+static void
+startMenu(GLUTmenu * menu, GLUTwindow * window,
   int x, int y, int x_win, int y_win)
 {
   int grab;
@@ -607,8 +597,8 @@ paintMenuItem(GLUTmenuItem * item, int num)
   }
 }
 
-void
-__glutPaintMenu(GLUTmenu * menu)
+static void
+paintMenu(GLUTmenu * menu)
 {
   GLUTmenuItem *item;
   int i = menu->num;
@@ -634,8 +624,8 @@ __glutPaintMenu(GLUTmenu * menu)
   }
 }
 
-GLUTmenuItem *
-__glutGetMenuItem(GLUTmenu * menu, Window win, int *which)
+static GLUTmenuItem *
+getMenuItem(GLUTmenu * menu, Window win, int *which)
 {
   GLUTmenuItem *item;
   int i;
@@ -655,7 +645,7 @@ __glutGetMenuItem(GLUTmenu * menu, Window win, int *which)
     if (item->isTrigger) {
       GLUTmenuItem *subitem;
 
-      subitem = __glutGetMenuItem(menuList[item->value],
+      subitem = __glutGetMenuItem(__glutMenuList[item->value],
         win, which);
       if (subitem) {
         menu->searched = False;
@@ -681,8 +671,8 @@ getMenuItemIndex(GLUTmenuItem * item)
   return count;
 }
 
-GLUTmenu *
-__glutGetMenu(Window win)
+static GLUTmenu *
+getMenu(Window win)
 {
   GLUTmenu *menu;
 
@@ -696,13 +686,13 @@ __glutGetMenu(Window win)
   return NULL;
 }
 
-GLUTmenu *
-__glutGetMenuByNum(int menunum)
+static GLUTmenu *
+getMenuByNum(int menunum)
 {
   if (menunum < 1 || menunum > menuListSize) {
     return NULL;
   }
-  return menuList[menunum - 1];
+  return __glutMenuList[menunum - 1];
 }
 
 static int
@@ -712,351 +702,39 @@ getUnusedMenuSlot(void)
 
   /* Look for allocated, unused slot. */
   for (i = 0; i < menuListSize; i++) {
-    if (!menuList[i]) {
+    if (!__glutMenuList[i]) {
       return i;
     }
   }
   /* Allocate a new slot. */
   menuListSize++;
-  if (menuList) {
-    menuList = (GLUTmenu **)
-      realloc(menuList, menuListSize * sizeof(GLUTmenu *));
+  if (__glutMenuList) {
+    __glutMenuList = (GLUTmenu **)
+      realloc(__glutMenuList, menuListSize * sizeof(GLUTmenu *));
   } else {
     /* XXX Some realloc's do not correctly perform a malloc
        when asked to perform a realloc on a NULL pointer,
        though the ANSI C library spec requires this. */
-    menuList = (GLUTmenu **) malloc(sizeof(GLUTmenu *));
+    __glutMenuList = (GLUTmenu **) malloc(sizeof(GLUTmenu *));
   }
-  if (!menuList)
+  if (!__glutMenuList) {
     __glutFatalError("out of memory.");
-  menuList[menuListSize - 1] = NULL;
+  }
+  __glutMenuList[menuListSize - 1] = NULL;
   return menuListSize - 1;
 }
 
-static void
-menuModificationError(void)
+void
+__glutMenuModificationError(void)
 {
   /* XXX Remove the warning after GLUT 3.0. */
   __glutWarning("The following is a new check for GLUT 3.0; update your code.");
   __glutFatalError("menu manipulation not allowed while menus in use.");
 }
 
-int APIENTRY 
-glutCreateMenu(GLUTselectCB selectFunc)
-{
-  XSetWindowAttributes wa;
-  GLUTmenu *menu;
-  int menuid;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  if (!__glutDisplay)
-    __glutOpenXConnection(NULL);
-  menuid = getUnusedMenuSlot();
-  menu = (GLUTmenu *) malloc(sizeof(GLUTmenu));
-  if (!menu)
-    __glutFatalError("out of memory.");
-  menu->id = menuid;
-  menu->num = 0;
-  menu->submenus = 0;
-  menu->managed = False;
-  menu->searched = False;
-  menu->pixwidth = 0;
-  menu->select = selectFunc;
-  menu->list = NULL;
-  menu->cascade = NULL;
-  menu->highlighted = NULL;
-  menu->anchor = NULL;
-  menuSetup();
-  wa.override_redirect = True;
-  wa.background_pixel = menuGray;
-  wa.border_pixel = menuBlack;
-  wa.colormap = menuColormap;
-  wa.event_mask = StructureNotifyMask | ExposureMask |
-    ButtonPressMask | ButtonReleaseMask |
-    EnterWindowMask | LeaveWindowMask;
-  /* Save unders really only enabled if useSaveUnders is set to
-     CWSaveUnder, ie. using Mesa 3D.  See earlier comments. */
-  wa.save_under = True;
-  menu->win = XCreateWindow(__glutDisplay, __glutRoot,
-  /* Real position determined when mapped. */
-    0, 0,
-  /* Real size will be determined when menu is manged. */
-    1, 1,
-    MENU_BORDER, menuDepth, InputOutput, menuVisual,
-    CWOverrideRedirect | CWBackPixel | CWBorderPixel |
-    CWEventMask | CWColormap | useSaveUnders,
-    &wa);
-  menuGraphicsContextSetup(menu->win);
-  menuList[menuid] = menu;
-  __glutSetMenu(menu);
-  return menuid + 1;
-}
-
-/* CENTRY */
-void APIENTRY 
-glutDestroyMenu(int menunum)
-{
-  GLUTmenu *menu = __glutGetMenuByNum(menunum);
-  GLUTmenuItem *item, *next;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  assert(menu->id == menunum - 1);
-  XDestroySubwindows(__glutDisplay, menu->win);
-  XDestroyWindow(__glutDisplay, menu->win);
-  menuList[menunum - 1] = NULL;
-  /* free all menu entries */
-  item = menu->list;
-  while (item) {
-    assert(item->menu == menu);
-    next = item->next;
-    free(item->label);
-    free(item);
-    item = next;
-  }
-  if (__glutCurrentMenu == menu) {
-    __glutCurrentMenu = NULL;
-  }
-  free(menu);
-}
-
-int APIENTRY 
-glutGetMenu(void)
-{
-  if (__glutCurrentMenu) {
-    return __glutCurrentMenu->id + 1;
-  } else {
-    return 0;
-  }
-}
-
-void APIENTRY 
-glutSetMenu(int menuid)
-{
-  GLUTmenu *menu;
-
-  if (menuid < 1 || menuid > menuListSize) {
-    __glutWarning("glutSetMenu attempted on bogus menu.");
-    return;
-  }
-  menu = menuList[menuid - 1];
-  if (!menu) {
-    __glutWarning("glutSetMenu attempted on bogus menu.");
-    return;
-  }
-  __glutSetMenu(menu);
-}
-/* ENDCENTRY */
 
 static void
-setMenuItem(GLUTmenuItem * item, const char *label,
-  int value, Bool isTrigger)
-{
-  GLUTmenu *menu;
-
-  menu = item->menu;
-  item->label = __glutStrdup(label);
-  if (!item->label)
-    __glutFatalError("out of memory.");
-  item->isTrigger = isTrigger;
-  item->len = (int) strlen(label);
-  item->value = value;
-  item->pixwidth = XTextWidth(menuFont, label, item->len) + 4;
-  if (item->pixwidth > menu->pixwidth) {
-    menu->pixwidth = item->pixwidth;
-  }
-  menu->managed = False;
-}
-
-/* CENTRY */
-void APIENTRY 
-glutAddMenuEntry(const char *label, int value)
-{
-  XSetWindowAttributes wa;
-  GLUTmenuItem *entry;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  entry = (GLUTmenuItem *) malloc(sizeof(GLUTmenuItem));
-  if (!entry)
-    __glutFatalError("out of memory.");
-  entry->menu = __glutCurrentMenu;
-  setMenuItem(entry, label, value, False);
-  wa.event_mask = EnterWindowMask | LeaveWindowMask;
-  entry->win = XCreateWindow(__glutDisplay,
-    __glutCurrentMenu->win, MENU_GAP,
-    __glutCurrentMenu->num * fontHeight + MENU_GAP,  /* x & y */
-    entry->pixwidth, fontHeight,  /* width & height */
-    0, CopyFromParent, InputOnly, CopyFromParent,
-    CWEventMask, &wa);
-  XMapWindow(__glutDisplay, entry->win);
-  __glutCurrentMenu->num++;
-  entry->next = __glutCurrentMenu->list;
-  __glutCurrentMenu->list = entry;
-}
-
-void APIENTRY 
-glutAddSubMenu(const char *label, int menu)
-{
-  XSetWindowAttributes wa;
-  GLUTmenuItem *submenu;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  submenu = (GLUTmenuItem *) malloc(sizeof(GLUTmenuItem));
-  if (!submenu)
-    __glutFatalError("out of memory.");
-  __glutCurrentMenu->submenus++;
-  submenu->menu = __glutCurrentMenu;
-  setMenuItem(submenu, label, /* base 0 */ menu - 1, True);
-  wa.event_mask = EnterWindowMask | LeaveWindowMask;
-  submenu->win = XCreateWindow(__glutDisplay,
-    __glutCurrentMenu->win, MENU_GAP,
-    __glutCurrentMenu->num * fontHeight + MENU_GAP,  /* x & y */
-    submenu->pixwidth, fontHeight,  /* width & height */
-    0, CopyFromParent, InputOnly, CopyFromParent,
-    CWEventMask, &wa);
-  XMapWindow(__glutDisplay, submenu->win);
-  __glutCurrentMenu->num++;
-  submenu->next = __glutCurrentMenu->list;
-  __glutCurrentMenu->list = submenu;
-}
-
-void APIENTRY 
-glutChangeToMenuEntry(int num, const char *label, int value)
-{
-  GLUTmenuItem *item;
-  int i;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  i = __glutCurrentMenu->num;
-  item = __glutCurrentMenu->list;
-  while (item) {
-    if (i == num) {
-      if (item->isTrigger) {
-        /* If changing a submenu trigger to a menu entry, we
-           need to account for submenus.  */
-        item->menu->submenus--;
-      }
-      free(item->label);
-      setMenuItem(item, label, value, False);
-      return;
-    }
-    i--;
-    item = item->next;
-  }
-  __glutWarning("Current menu has no %d item.", num);
-}
-
-void APIENTRY 
-glutChangeToSubMenu(int num, const char *label, int menu)
-{
-  GLUTmenuItem *item;
-  int i;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  i = __glutCurrentMenu->num;
-  item = __glutCurrentMenu->list;
-  while (item) {
-    if (i == num) {
-      if (!item->isTrigger) {
-        /* If changing a menu entry to as submenu trigger, we
-           need to account for submenus.  */
-        item->menu->submenus++;
-      }
-      free(item->label);
-      setMenuItem(item, label, /* base 0 */ menu - 1, True);
-      return;
-    }
-    i--;
-    item = item->next;
-  }
-  __glutWarning("Current menu has no %d item.", num);
-}
-
-void APIENTRY 
-glutRemoveMenuItem(int num)
-{
-  GLUTmenuItem *item, **prev, *remaining;
-  int pixwidth, i;
-
-  if (__glutMappedMenu)
-    menuModificationError();
-  i = __glutCurrentMenu->num;
-  prev = &__glutCurrentMenu->list;
-  item = __glutCurrentMenu->list;
-  /* If menu item is removed, the menu's pixwidth may need to
-     be recomputed. */
-  pixwidth = 1;
-  while (item) {
-    if (i == num) {
-      /* If this menu item's pixwidth is as wide as the menu's
-         pixwidth, removing this menu item will necessitate
-         shrinking the menu's pixwidth. */
-      if (item->pixwidth >= __glutCurrentMenu->pixwidth) {
-        /* Continue recalculating menu pixwidth, first skipping
-           the removed item. */
-        remaining = item->next;
-        while (remaining) {
-          if (remaining->pixwidth > pixwidth) {
-            pixwidth = remaining->pixwidth;
-          }
-          remaining = remaining->next;
-        }
-        __glutCurrentMenu->pixwidth = pixwidth;
-      }
-      __glutCurrentMenu->num--;
-      __glutCurrentMenu->managed = False;
-
-      /* Patch up menu's item list. */
-      *prev = item->next;
-
-      free(item->label);
-      free(item);
-      return;
-    }
-    if (item->pixwidth > pixwidth) {
-      pixwidth = item->pixwidth;
-    }
-    i--;
-    prev = &item->next;
-    item = item->next;
-  }
-  __glutWarning("Current menu has no %d item.", num);
-}
-
-void APIENTRY 
-glutAttachMenu(int button)
-{
-  if (__glutMappedMenu)
-    menuModificationError();
-  if (__glutCurrentWindow->menu[button] < 1) {
-    __glutCurrentWindow->buttonUses++;
-  }
-  __glutChangeWindowEventMask(
-    ButtonPressMask | ButtonReleaseMask, True);
-  __glutCurrentWindow->menu[button] = __glutCurrentMenu->id + 1;
-}
-
-void APIENTRY 
-glutDetachMenu(int button)
-{
-  if (__glutMappedMenu)
-    menuModificationError();
-  if (__glutCurrentWindow->menu[button] > 0) {
-    __glutCurrentWindow->buttonUses--;
-    __glutChangeWindowEventMask(ButtonPressMask | ButtonReleaseMask,
-      __glutCurrentWindow->buttonUses > 0);
-    __glutCurrentWindow->menu[button] = 0;
-  }
-}
-/* ENDCENTRY */
-
-void
-__glutMenuItemEnterOrLeave(GLUTmenuItem * item,
+menuItemEnterOrLeave(GLUTmenuItem * item,
   int num, int type)
 {
   int alreadyUp = 0;
@@ -1082,7 +760,7 @@ __glutMenuItemEnterOrLeave(GLUTmenuItem * item,
         unmapMenu(item->menu->cascade);
         item->menu->cascade = NULL;
       } else {
-        GLUTmenu *submenu = menuList[item->value];
+        GLUTmenu *submenu = __glutMenuList[item->value];
 
         if (submenu->anchor == item) {
           /* We entered the submenu trigger for the submenu
@@ -1120,7 +798,7 @@ __glutMenuItemEnterOrLeave(GLUTmenuItem * item,
   }
   if (item->isTrigger) {
     if (type == EnterNotify && !alreadyUp) {
-      GLUTmenu *submenu = menuList[item->value];
+      GLUTmenu *submenu = __glutMenuList[item->value];
 
       mapMenu(submenu,
         item->menu->x + item->menu->pixwidth +
@@ -1132,3 +810,201 @@ __glutMenuItemEnterOrLeave(GLUTmenuItem * item,
     }
   }
 }
+
+/* Installs callback functions for use by glut_event.c  The point
+   of this is so that GLUT's menu code only gets linked into
+   GLUT binaries (assuming a static library) if the GLUT menu
+   API is used. */
+static void
+installMenuCallbacks(void)
+{
+  __glutMenuItemEnterOrLeave = menuItemEnterOrLeave;
+  __glutFinishMenu = finishMenu;
+  __glutPaintMenu = paintMenu;
+  __glutStartMenu = startMenu;
+  __glutGetMenuByNum = getMenuByNum;
+  __glutGetMenu = getMenu;
+  __glutGetMenuItem = getMenuItem;
+}
+
+int APIENTRY 
+glutCreateMenu(GLUTselectCB selectFunc)
+{
+  XSetWindowAttributes wa;
+  GLUTmenu *menu;
+  int menuid;
+
+  if (__glutMappedMenu) {
+    __glutMenuModificationError();
+  }
+  if (!__glutDisplay) {
+    __glutOpenXConnection(NULL);
+  }
+
+  installMenuCallbacks();
+
+  menuid = getUnusedMenuSlot();
+  menu = (GLUTmenu *) malloc(sizeof(GLUTmenu));
+  if (!menu) {
+    __glutFatalError("out of memory.");
+  }
+  menu->id = menuid;
+  menu->num = 0;
+  menu->submenus = 0;
+  menu->managed = False;
+  menu->searched = False;
+  menu->pixwidth = 0;
+  menu->select = selectFunc;
+  menu->list = NULL;
+  menu->cascade = NULL;
+  menu->highlighted = NULL;
+  menu->anchor = NULL;
+  menuSetup();
+  wa.override_redirect = True;
+  wa.background_pixel = menuGray;
+  wa.border_pixel = menuBlack;
+  wa.colormap = menuColormap;
+  wa.event_mask = StructureNotifyMask | ExposureMask |
+    ButtonPressMask | ButtonReleaseMask |
+    EnterWindowMask | LeaveWindowMask;
+  /* Save unders really only enabled if useSaveUnders is set to
+     CWSaveUnder, ie. using Mesa 3D.  See earlier comments. */
+  wa.save_under = True;
+  menu->win = XCreateWindow(__glutDisplay, __glutRoot,
+  /* Real position determined when mapped. */
+    0, 0,
+  /* Real size will be determined when menu is manged. */
+    1, 1,
+    MENU_BORDER, menuDepth, InputOutput, menuVisual,
+    CWOverrideRedirect | CWBackPixel | CWBorderPixel |
+    CWEventMask | CWColormap | useSaveUnders,
+    &wa);
+  menuGraphicsContextSetup(menu->win);
+  __glutMenuList[menuid] = menu;
+  __glutSetMenu(menu);
+  return menuid + 1;
+}
+
+/* CENTRY */
+int APIENTRY 
+glutGetMenu(void)
+{
+  if (__glutCurrentMenu) {
+    return __glutCurrentMenu->id + 1;
+  } else {
+    return 0;
+  }
+}
+
+void APIENTRY 
+glutSetMenu(int menuid)
+{
+  GLUTmenu *menu;
+
+  if (menuid < 1 || menuid > menuListSize) {
+    __glutWarning("glutSetMenu attempted on bogus menu.");
+    return;
+  }
+  menu = __glutMenuList[menuid - 1];
+  if (!menu) {
+    __glutWarning("glutSetMenu attempted on bogus menu.");
+    return;
+  }
+  __glutSetMenu(menu);
+}
+/* ENDCENTRY */
+
+void
+__glutSetMenuItem(GLUTmenuItem * item, const char *label,
+  int value, Bool isTrigger)
+{
+  GLUTmenu *menu;
+
+  menu = item->menu;
+  item->label = __glutStrdup(label);
+  if (!item->label) {
+    __glutFatalError("out of memory.");
+  }
+  item->isTrigger = isTrigger;
+  item->len = (int) strlen(label);
+  item->value = value;
+  item->pixwidth = XTextWidth(menuFont, label, item->len) + 4;
+  if (item->pixwidth > menu->pixwidth) {
+    menu->pixwidth = item->pixwidth;
+  }
+  menu->managed = False;
+}
+
+/* CENTRY */
+void APIENTRY 
+glutAddMenuEntry(const char *label, int value)
+{
+  XSetWindowAttributes wa;
+  GLUTmenuItem *entry;
+
+  if (__glutMappedMenu) {
+    __glutMenuModificationError();
+  }
+  entry = (GLUTmenuItem *) malloc(sizeof(GLUTmenuItem));
+  if (!entry) {
+    __glutFatalError("out of memory.");
+  }
+  entry->menu = __glutCurrentMenu;
+  __glutSetMenuItem(entry, label, value, False);
+  wa.event_mask = EnterWindowMask | LeaveWindowMask;
+  entry->win = XCreateWindow(__glutDisplay,
+    __glutCurrentMenu->win, MENU_GAP,
+    __glutCurrentMenu->num * fontHeight + MENU_GAP,  /* x & y */
+    entry->pixwidth, fontHeight,  /* width & height */
+    0, CopyFromParent, InputOnly, CopyFromParent,
+    CWEventMask, &wa);
+  XMapWindow(__glutDisplay, entry->win);
+  __glutCurrentMenu->num++;
+  entry->next = __glutCurrentMenu->list;
+  __glutCurrentMenu->list = entry;
+}
+
+void APIENTRY 
+glutAddSubMenu(const char *label, int menu)
+{
+  XSetWindowAttributes wa;
+  GLUTmenuItem *submenu;
+
+  if (__glutMappedMenu) {
+    __glutMenuModificationError();
+  }
+  submenu = (GLUTmenuItem *) malloc(sizeof(GLUTmenuItem));
+  if (!submenu) {
+    __glutFatalError("out of memory.");
+  }
+  __glutCurrentMenu->submenus++;
+  submenu->menu = __glutCurrentMenu;
+  __glutSetMenuItem(submenu, label, /* base 0 */ menu - 1, True);
+  wa.event_mask = EnterWindowMask | LeaveWindowMask;
+  submenu->win = XCreateWindow(__glutDisplay,
+    __glutCurrentMenu->win, MENU_GAP,
+    __glutCurrentMenu->num * fontHeight + MENU_GAP,  /* x & y */
+    submenu->pixwidth, fontHeight,  /* width & height */
+    0, CopyFromParent, InputOnly, CopyFromParent,
+    CWEventMask, &wa);
+  XMapWindow(__glutDisplay, submenu->win);
+  __glutCurrentMenu->num++;
+  submenu->next = __glutCurrentMenu->list;
+  __glutCurrentMenu->list = submenu;
+}
+
+void APIENTRY 
+glutAttachMenu(int button)
+{
+  if (__glutMappedMenu) {
+    __glutMenuModificationError();
+  }
+  installMenuCallbacks();
+  if (__glutCurrentWindow->menu[button] < 1) {
+    __glutCurrentWindow->buttonUses++;
+  }
+  __glutChangeWindowEventMask(
+    ButtonPressMask | ButtonReleaseMask, True);
+  __glutCurrentWindow->menu[button] = __glutCurrentMenu->id + 1;
+}
+/* ENDCENTRY */

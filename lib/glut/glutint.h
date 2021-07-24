@@ -1,7 +1,7 @@
 #ifndef __glutint_h__
 #define __glutint_h__
 
-/* Copyright (c) Mark J. Kilgard, 1994, 1997. */
+/* Copyright (c) Mark J. Kilgard, 1994, 1997, 1998. */
 
 /* This program is freely distributable without licensing fees 
    and is provided without guarantee or warrantee expressed or 
@@ -11,9 +11,9 @@
 #include <sys/time.h>
 #endif
 
-#if defined(WIN32)
+#if defined(_WIN32)
 #include "glutwin32.h"
-#else /* WIN32 */
+#else
 #ifdef __sgi
 #define SUPPORT_FORTRAN
 #endif
@@ -21,21 +21,37 @@
 #include <X11/Xutil.h>
 #include <GL/glx.h>
 #endif
+
 #include <GL/glut.h>
+
+/* Non-Win32 platforms need APIENTRY defined to nothing
+   because all the GLUT routines have the APIENTRY prefix
+   to make Win32 happy. */
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
 #ifdef __vms
+#if ( __VMS_VER < 70000000 )
 struct timeval {
   __int64 val;
 };
 extern int sys$gettim(struct timeval *);
 #else
-#include <sys/types.h>
-#if !defined(WIN32)
-#include <sys/time.h>
-#endif /* !WIN32 */
+#include <time.h>
 #endif
-#if defined(__vms)
+#else
+#include <sys/types.h>
+#if !defined(_WIN32)
+#include <sys/time.h>
+#else
+#include <winsock.h>
+#endif
+#endif
+#if defined(__vms) && ( __VMS_VER < 70000000 )
 
-/* One TICK on VMS is 100 nanoseconds; 0.1 microseconds or
+/* For VMS6.2 or lower :
+   One TICK on VMS is 100 nanoseconds; 0.1 microseconds or
    0.0001 milliseconds. This means that there are 0.01
    ticks/ns, 10 ticks/us, 10,000 ticks/ms and 10,000,000
    ticks/second. */
@@ -62,7 +78,7 @@ extern int sys$gettim(struct timeval *);
                                        wants 2 args. */
 #define GETTIMEOFDAY(_x) gettimeofday(_x)
 #else
-#define GETTIMEOFDAY(_x) gettimeofday(_x, (struct timezone*) NULL)
+#define GETTIMEOFDAY(_x) gettimeofday(_x, NULL)
 #endif
 #define ADD_TIME(dest, src1, src2) { \
   if(((dest).tv_usec = \
@@ -93,6 +109,10 @@ extern int sys$gettim(struct timeval *);
   (((t2).tv_sec == (t1).tv_sec) && \
   ((t2).tv_usec >= (t1).tv_usec)))
 #endif
+
+#define IGNORE_IN_GAME_MODE() \
+  { if (__glutGameModeWindow) return; }
+
 #define GLUT_WIND_IS_RGB(x)         (((x) & GLUT_INDEX) == 0)
 #define GLUT_WIND_IS_INDEX(x)       (((x) & GLUT_INDEX) != 0)
 #define GLUT_WIND_IS_SINGLE(x)      (((x) & GLUT_DOUBLE) == 0)
@@ -119,8 +139,8 @@ extern int sys$gettim(struct timeval *);
 #define GLUT_OVERLAY_REPAIR_WORK    (1 << 12)
 
 /* Frame buffer capability macros and types. */
-#define BUFFER_SIZE             0
-#define RGBA                    1
+#define RGBA                    0
+#define BUFFER_SIZE             1
 #define DOUBLEBUFFER            2
 #define STEREO                  3
 #define AUX_BUFFERS             4
@@ -160,9 +180,10 @@ extern int sys$gettim(struct timeval *);
 
 /* Frame buffer capablities that don't have a corresponding
    FrameBufferMode entry.  These get used as mask bits. */
-#define NUM                     NUM_CAPS + 0
-#define RGBA_MODE               NUM_CAPS + 1
-#define CI_MODE                 NUM_CAPS + 2
+#define NUM                     (NUM_CAPS + 0)
+#define RGBA_MODE               (NUM_CAPS + 1)
+#define CI_MODE                 (NUM_CAPS + 2)
+#define LUMINANCE_MODE		(NUM_CAPS + 3)
 
 #define NONE			0
 #define EQ			1
@@ -181,9 +202,45 @@ typedef struct _Criterion {
 
 typedef struct _FrameBufferMode {
   XVisualInfo *vi;
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_fbconfig)
+
+  /* fbc is non-NULL when the XVisualInfo* is not OpenGL-capable
+     (ie, GLX_USE_GL is false), but the SGIX_fbconfig extension shows
+     the visual's fbconfig is OpenGL-capable.  The reason for this is typically
+     an RGBA luminance fbconfig such as 16-bit StaticGray that could
+     not be advertised as a GLX visual since StaticGray visuals are
+     required (by the GLX specification) to be color index.  The
+     SGIX_fbconfig allows StaticGray visuals to instead advertised as
+     fbconfigs that can provide RGBA luminance support. */
+
+  GLXFBConfigSGIX fbc;
+#endif
   int valid;
   int cap[NUM_CAPS];
 } FrameBufferMode;
+
+/* DisplayMode capability macros for game mode. */
+#define DM_WIDTH        0  /* "width" */
+#define DM_HEIGHT       1  /* "height" */
+#define DM_PIXEL_DEPTH  2  /* "bpp" (bits per pixel) */
+#define DM_HERTZ        3  /* "hertz" */
+#define DM_NUM          4  /* "num" */
+
+#define NUM_DM_CAPS     (DM_NUM+1)
+
+typedef struct _DisplayMode {
+#ifdef _WIN32
+  DEVMODE devmode;
+#else
+  /* XXX The X Window System does not have a standard
+     mechanism for display setting changes.  On SGI
+     systems, GLUT could use the XSGIvc (SGI X video
+     control extension).  Perhaps this can be done in
+     a future release of GLUT. */
+#endif
+  int valid;
+  int cap[NUM_DM_CAPS];
+} DisplayMode;
 
 /* GLUT  function types */
 typedef void (*GLUTdisplayCB) (void);
@@ -197,8 +254,7 @@ typedef void (*GLUTvisibilityCB) (int);
 typedef void (*GLUTwindowStatusCB) (int);
 typedef void (*GLUTidleCB) (void);
 typedef void (*GLUTtimerCB) (int);
-typedef void (*GLUTmenuStateCB) (int);  /* DEPRICATED. 
-                                                   */
+typedef void (*GLUTmenuStateCB) (int);  /* DEPRICATED. */
 typedef void (*GLUTmenuStatusCB) (int, int, int);
 typedef void (*GLUTselectCB) (int);
 typedef void (*GLUTspecialCB) (int, int, int);
@@ -209,6 +265,7 @@ typedef void (*GLUTdialsCB) (int, int);
 typedef void (*GLUTbuttonBoxCB) (int, int);
 typedef void (*GLUTtabletMotionCB) (int, int);
 typedef void (*GLUTtabletButtonCB) (int, int, int, int);
+typedef void (*GLUTjoystickCB) (unsigned int buttonMask, int x, int y, int z);
 #ifdef SUPPORT_FORTRAN
 typedef void (*GLUTdisplayFCB) (void);
 typedef void (*GLUTreshapeFCB) (int *, int *);
@@ -233,6 +290,7 @@ typedef void (*GLUTdialsFCB) (int *, int *);
 typedef void (*GLUTbuttonBoxFCB) (int *, int *);
 typedef void (*GLUTtabletMotionFCB) (int *, int *);
 typedef void (*GLUTtabletButtonFCB) (int *, int *, int *, int *);
+typedef void (*GLUTjoystickFCB) (unsigned int *buttonMask, int *x, int *y, int *z);
 #endif
 
 typedef struct _GLUTcolorcell GLUTcolorcell;
@@ -255,12 +313,12 @@ struct _GLUTcolormap {
 typedef struct _GLUTwindow GLUTwindow;
 typedef struct _GLUToverlay GLUToverlay;
 struct _GLUTwindow {
-  int num;              /* small integer window id (0-based) */
+  int num;              /* Small integer window id (0-based). */
 
   /* Window system related state. */
-#if defined(WIN32)
-  int pf;               /* pixel format */
-  HDC hdc;
+#if defined(_WIN32)
+  int pf;               /* Pixel format. */
+  HDC hdc;              /* Window's Win32 device context. */
 #endif
   Window win;           /* X window for GLUT window */
   GLXContext ctx;       /* OpenGL context GLUT glut window */
@@ -269,6 +327,9 @@ struct _GLUTwindow {
   Colormap cmap;        /* RGB colormap for window; None if CI */
   GLUTcolormap *colormap;  /* colormap; NULL if RGBA */
   GLUToverlay *overlay; /* overlay; NULL if no overlay */
+#if defined(_WIN32)
+  HDC renderDc;         /* Win32's device context for rendering. */
+#endif
   Window renderWin;     /* X window for rendering (might be
                            overlay) */
   GLXContext renderCtx; /* OpenGL context for rendering (might
@@ -291,7 +352,7 @@ struct _GLUTwindow {
   Bool treatAsSingle;   /* treat this window as single-buffered
                            (it might be "fake" though) */
   Bool forceReshape;    /* force reshape before display */
-#if !defined(WIN32)
+#if !defined(_WIN32)
   Bool isDirect;        /* if direct context (X11 only) */
 #endif
   Bool usedSwapBuffers; /* if swap buffers used last display */
@@ -303,32 +364,38 @@ struct _GLUTwindow {
   GLUTwindow *prevWorkWin;  /* link list of windows to work on */
   Bool desiredMapState; /* how to mapped window if on map work
                            list */
-  int desiredConfMask;  /* mask of desired window configuration 
-
+  Bool ignoreKeyRepeat;  /* if window ignores autorepeat */
+  int desiredConfMask;  /* mask of desired window configuration
                          */
   int desiredX;         /* desired X location */
   int desiredY;         /* desired Y location */
   int desiredWidth;     /* desired window width */
   int desiredHeight;    /* desired window height */
   int desiredStack;     /* desired window stack */
-  /* s */
-  GLUTdisplayCB display;  /* redraw  */
-  GLUTreshapeCB reshape;  /* resize  (width,height) */
-  GLUTmouseCB mouse;    /* mouse  (button,state,x,y) */
-  GLUTmotionCB motion;  /* motion  (x,y) */
-  GLUTpassiveCB passive;  /* passive motion  (x,y) */
-  GLUTentryCB entry;    /* window entry/exit  (state) */
-  GLUTkeyboardCB keyboard;  /* keyboard  (ASCII,x,y) */
-  GLUTwindowStatusCB windowStatus;  /* visibility  */
-  GLUTvisibilityCB visibility;  /* visibility  */
-  GLUTspecialCB special;  /* special key  */
-  GLUTbuttonBoxCB buttonBox;  /* button box  */
-  GLUTdialsCB dials;    /* dials  */
-  GLUTspaceMotionCB spaceMotion;  /* Spaceball motion  */
-  GLUTspaceRotateCB spaceRotate;  /* Spaceball rotate  */
-  GLUTspaceButtonCB spaceButton;  /* Spaceball button  */
-  GLUTtabletMotionCB tabletMotion;  /* tablet motion  */
-  GLUTtabletButtonCB tabletButton;  /* tablet button  */
+  /* Per-window callbacks. */
+  GLUTdisplayCB display;  /* redraw */
+  GLUTreshapeCB reshape;  /* resize (width,height) */
+  GLUTmouseCB mouse;    /* mouse (button,state,x,y) */
+  GLUTmotionCB motion;  /* motion (x,y) */
+  GLUTpassiveCB passive;  /* passive motion (x,y) */
+  GLUTentryCB entry;    /* window entry/exit (state) */
+  GLUTkeyboardCB keyboard;  /* keyboard (ASCII,x,y) */
+  GLUTkeyboardCB keyboardUp;  /* keyboard up (ASCII,x,y) */
+  GLUTwindowStatusCB windowStatus;  /* window status */
+  GLUTvisibilityCB visibility;  /* visibility */
+  GLUTspecialCB special;  /* special key */
+  GLUTspecialCB specialUp;  /* special up key */
+  GLUTbuttonBoxCB buttonBox;  /* button box */
+  GLUTdialsCB dials;    /* dials */
+  GLUTspaceMotionCB spaceMotion;  /* Spaceball motion */
+  GLUTspaceRotateCB spaceRotate;  /* Spaceball rotate */
+  GLUTspaceButtonCB spaceButton;  /* Spaceball button */
+  GLUTtabletMotionCB tabletMotion;  /* tablet motion */
+  GLUTtabletButtonCB tabletButton;  /* tablet button */
+#ifdef _WIN32
+  GLUTjoystickCB joystick;  /* joystick */
+  int joyPollInterval; /* joystick polling interval */
+#endif
 #ifdef SUPPORT_FORTRAN
   /* Special Fortran display  unneeded since no
      parameters! */
@@ -338,30 +405,33 @@ struct _GLUTwindow {
   GLUTpassiveFCB fpassive;  /* Fortran passive  */
   GLUTentryFCB fentry;  /* Fortran entry  */
   GLUTkeyboardFCB fkeyboard;  /* Fortran keyboard  */
+  GLUTkeyboardFCB fkeyboardUp;  /* Fortran keyboard up */
   GLUTwindowStatusFCB fwindowStatus;  /* Fortran visibility
                                           */
   GLUTvisibilityFCB fvisibility;  /* Fortran visibility
                                       */
-  GLUTspecialFCB fspecial;  /* special key  */
-  GLUTbuttonBoxFCB fbuttonBox;  /* button box  */
-  GLUTdialsFCB fdials;  /* dials  */
+  GLUTspecialFCB fspecial;  /* special key */
+  GLUTspecialFCB fspecialUp;  /* special key up */
+  GLUTbuttonBoxFCB fbuttonBox;  /* button box */
+  GLUTdialsFCB fdials;  /* dials */
   GLUTspaceMotionFCB fspaceMotion;  /* Spaceball motion
                                         */
   GLUTspaceRotateFCB fspaceRotate;  /* Spaceball rotate
                                         */
   GLUTspaceButtonFCB fspaceButton;  /* Spaceball button
                                         */
-  GLUTtabletMotionFCB ftabletMotion;  /* tablet motion  
-
+  GLUTtabletMotionFCB ftabletMotion;  /* tablet motion
                                        */
-  GLUTtabletButtonFCB ftabletButton;  /* tablet button  
-
+  GLUTtabletButtonFCB ftabletButton;  /* tablet button
                                        */
+#ifdef _WIN32
+  GLUTjoystickFCB fjoystick;  /* joystick */
+#endif
 #endif
 };
 
 struct _GLUToverlay {
-#if defined(WIN32)
+#if defined(_WIN32)
   int pf;
   HDC hdc;
 #endif
@@ -373,7 +443,7 @@ struct _GLUToverlay {
   GLUTcolormap *colormap;  /* colormap; NULL if RGBA */
   int shownState;       /* if overlay window mapped */
   Bool treatAsSingle;   /* treat as single-buffered */
-#if !defined(WIN32)
+#if !defined(_WIN32)
   Bool isDirect;        /* if direct context */
 #endif
   int transparentPixel; /* transparent pixel value */
@@ -417,7 +487,7 @@ struct _GLUTmenu {
   GLUTselectCB select;  /*  function of menu */
   GLUTmenuItem *list;   /* list of menu entries */
   int num;              /* number of entries */
-#if !defined(WIN32)
+#if !defined(_WIN32)
   Bool managed;         /* are the InputOnly windows size
                            validated? */
   Bool searched;	/* help detect menu loops */
@@ -445,7 +515,7 @@ struct _GLUTmenuItem {
   int value;            /* value to return for selecting this
                            entry; doubles as submenu id
                            (0-base) if submenu trigger */
-#if defined(WIN32)
+#if defined(_WIN32)
   UINT unique;          /* unique menu item id (Win32 only) */
 #endif
   char *label;          /* __glutStrdup'ed label string */
@@ -487,12 +557,71 @@ typedef struct {
   long input_mode;
 } MotifWmHints;
 
+/* Make current and buffer swap macros. */
+#ifdef _WIN32
+#define MAKE_CURRENT_LAYER(window)                                    \
+  {                                                                   \
+    HGLRC currentContext = wglGetCurrentContext();                    \
+    HDC currentDc = wglGetCurrentDC();                                \
+                                                                      \
+    if (currentContext != window->renderCtx                           \
+      || currentDc != window->renderDc) {                             \
+      wglMakeCurrent(window->renderDc, window->renderCtx);            \
+    }                                                                 \
+  }
+#define MAKE_CURRENT_WINDOW(window)                                   \
+  {                                                                   \
+    HGLRC currentContext = wglGetCurrentContext();                    \
+    HDC currentDc = wglGetCurrentDC();                                \
+                                                                      \
+    if (currentContext != window->ctx || currentDc != window->hdc) {  \
+      wglMakeCurrent(window->hdc, window->ctx);                       \
+    }                                                                 \
+  }
+#define MAKE_CURRENT_OVERLAY(overlay) \
+  wglMakeCurrent(overlay->hdc, overlay->ctx)
+#define UNMAKE_CURRENT() \
+  wglMakeCurrent(NULL, NULL)
+#define SWAP_BUFFERS_WINDOW(window) \
+  SwapBuffers(window->hdc)
+#define SWAP_BUFFERS_LAYER(window) \
+  SwapBuffers(window->renderDc)
+#else
+#define MAKE_CURRENT_LAYER(window) \
+  glXMakeCurrent(__glutDisplay, window->renderWin, window->renderCtx)
+#define MAKE_CURRENT_WINDOW(window) \
+  glXMakeCurrent(__glutDisplay, window->win, window->ctx)
+#define MAKE_CURRENT_OVERLAY(overlay) \
+  glXMakeCurrent(__glutDisplay, overlay->win, overlay->ctx)
+#define UNMAKE_CURRENT() \
+  glXMakeCurrent(__glutDisplay, None, NULL)
+#define SWAP_BUFFERS_WINDOW(window) \
+  glXSwapBuffers(__glutDisplay, window->win)
+#define SWAP_BUFFERS_LAYER(window) \
+  glXSwapBuffers(__glutDisplay, window->renderWin)
+#endif
+
 /* private variables from glut_event.c */
 extern GLUTwindow *__glutWindowWorkList;
 extern int __glutWindowDamaged;
 #ifdef SUPPORT_FORTRAN
 extern GLUTtimer *__glutTimerList;
 extern GLUTtimer *__glutNewTimer;
+#endif
+extern GLUTmenu *__glutMappedMenu;
+
+extern void (*__glutUpdateInputDeviceMaskFunc) (GLUTwindow *);
+#if !defined(_WIN32)
+extern void (*__glutMenuItemEnterOrLeave)(GLUTmenuItem * item,
+  int num, int type);
+extern void (*__glutFinishMenu)(Window win, int x, int y);
+extern void (*__glutPaintMenu)(GLUTmenu * menu);
+extern void (*__glutStartMenu)(GLUTmenu * menu,
+  GLUTwindow * window, int x, int y, int x_win, int y_win);
+extern GLUTmenu * (*__glutGetMenuByNum)(int menunum);
+extern GLUTmenuItem * (*__glutGetMenuItem)(GLUTmenu * menu,
+  Window win, int *which);
+extern GLUTmenu * (*__glutGetMenu)(Window win);
 #endif
 
 /* private variables from glut_init.c */
@@ -501,7 +630,7 @@ extern Display *__glutDisplay;
 extern unsigned int __glutDisplayMode;
 extern char *__glutDisplayString;
 extern XVisualInfo *(*__glutDetermineVisualFromString) (char *string, Bool * treatAsSingle,
-  Criterion * requiredCriteria, int nRequired, int requiredMask);
+  Criterion * requiredCriteria, int nRequired, int requiredMask, void **fbc);
 extern GLboolean __glutDebug;
 extern GLboolean __glutForceDirect;
 extern GLboolean __glutIconic;
@@ -523,22 +652,28 @@ extern Atom __glutMotifHints;
 extern unsigned int __glutModifierMask;
 
 /* private variables from glut_menu.c */
-extern GLUTmenu *__glutCurrentMenu;
 extern GLUTmenuItem *__glutItemSelected;
-extern GLUTmenu *__glutMappedMenu;
-extern GLUTwindow *__glutMenuWindow;
+extern GLUTmenu **__glutMenuList;
 extern void (*__glutMenuStatusFunc) (int, int, int);
+extern void __glutMenuModificationError(void);
+extern void __glutSetMenuItem(GLUTmenuItem * item,
+  const char *label, int value, Bool isTrigger);
 
 /* private variables from glut_win.c */
 extern GLUTwindow **__glutWindowList;
 extern GLUTwindow *__glutCurrentWindow;
+extern GLUTwindow *__glutMenuWindow;
+extern GLUTmenu *__glutCurrentMenu;
 extern int __glutWindowListSize;
 extern void (*__glutFreeOverlayFunc) (GLUToverlay *);
 extern XVisualInfo *__glutDetermineWindowVisual(Bool * treatAsSingle,
-  Bool * visAlloced);
+  Bool * visAlloced, void **fbc);
 
 /* private variables from glut_mesa.c */
 extern int __glutMesaSwapHackSupport;
+
+/* private variables from glut_gamemode.c */
+extern GLUTwindow *__glutGameModeWindow;
 
 /* private routines from glut_cindex.c */
 extern GLUTcolormap * __glutAssociateNewColormap(XVisualInfo * vis);
@@ -549,39 +684,40 @@ extern void __glutSetupColormap(
   XVisualInfo * vi,
   GLUTcolormap ** colormap,
   Colormap * cmap);
-#if !defined(WIN32)
+#if !defined(_WIN32)
 extern void __glutEstablishColormapsProperty(
   GLUTwindow * window);
 extern GLUTwindow *__glutToplevelOf(GLUTwindow * window);
 #endif
 
+/* private routines from glut_cursor.c */
+extern void __glutSetCursor(GLUTwindow *window);
+
 /* private routines from glut_event.c */
-extern void (*__glutUpdateInputDeviceMaskFunc) (GLUTwindow *);
 extern void __glutPutOnWorkList(GLUTwindow * window,
   int work_mask);
 extern void __glutRegisterEventParser(GLUTeventParser * parser);
 extern void __glutPostRedisplay(GLUTwindow * window, int layerMask);
 
 /* private routines from glut_init.c */
-#if !defined(WIN32)
+#if !defined(_WIN32)
 extern void __glutOpenXConnection(char *display);
 #else
 extern void __glutOpenWin32Connection(char *display);
 #endif
 extern void __glutInitTime(struct timeval *beginning);
 
-/* private routines for glut_menu.c */
+/* private routines for glut_menu.c (or win32_menu.c) */
+#if defined(_WIN32)
 extern GLUTmenu *__glutGetMenu(Window win);
 extern GLUTmenu *__glutGetMenuByNum(int menunum);
 extern GLUTmenuItem *__glutGetMenuItem(GLUTmenu * menu,
   Window win, int *which);
-extern void __glutFinishMenu(Window win, int x, int y);
-extern void __glutMenuItemEnterOrLeave(GLUTmenuItem * item,
-  int num, int type);
-extern void __glutPaintMenu(GLUTmenu * menu);
-extern void __glutSetMenu(GLUTmenu * menu);
 extern void __glutStartMenu(GLUTmenu * menu,
   GLUTwindow * window, int x, int y, int x_win, int y_win);
+extern void __glutFinishMenu(Window win, int x, int y);
+#endif
+extern void __glutSetMenu(GLUTmenu * menu);
 
 /* private routines from glut_util.c */
 extern char * __glutStrdup(const char *string);
@@ -603,13 +739,15 @@ extern void __glutReshapeFunc(GLUTreshapeCB reshapeFunc,
 extern void  __glutDefaultReshape(int, int);
 extern GLUTwindow *__glutCreateWindow(
   GLUTwindow * parent,
-  int x, int y, int width, int height);
+  int x, int y, int width, int height, int gamemode);
 extern void __glutDestroyWindow(
   GLUTwindow * window,
   GLUTwindow * initialWindow);
 
-/* private routines from glut_ext.c */
+#if !defined(_WIN32)
+/* private routines from glut_glxext.c */
 extern int __glutIsSupportedByGLX(char *);
+#endif
 
 /* private routines from glut_input.c */
 extern void  __glutUpdateInputDeviceMask(GLUTwindow * window);
@@ -617,10 +755,13 @@ extern void  __glutUpdateInputDeviceMask(GLUTwindow * window);
 /* private routines from glut_mesa.c */
 extern void __glutDetermineMesaSwapHackSupport(void);
 
-#if defined(WIN32)
-/* private routines from glut_win32.c */
+/* private routines from glut_gameglut.c */
+extern void __glutCloseDownGameMode(void);
+
+#if defined(_WIN32)
+/* private routines from win32_*.c */
 extern LONG WINAPI __glutWindowProc(HWND win, UINT msg, WPARAM w, LPARAM l);
 extern HDC XHDC;
-#endif /* WIN32 */
+#endif
 
 #endif /* __glutint_h__ */

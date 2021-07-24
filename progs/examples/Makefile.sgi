@@ -7,6 +7,7 @@ TOP = ../..
 include $(TOP)/glutdefs
 include $(ROOT)/usr/include/make/commondefs
 
+LD_QUICKSTART_INFO=
 LN = ln -s
 MV = mv
 RM = -rm -rf
@@ -20,7 +21,7 @@ TARGETS = sphere scene movelight glutplane \
 	surfgrid molehill zoomdino fontdemo splatlogo oversphere \
 	fontdemo evaltest sb2db screendoor simple cube reflectdino \
 	rendereps dinoshade halomagic trippy mjksift circlefit \
-	editgrid
+	editgrid dinodraw resolution
 
 LLDLIBS = $(GLUT) -lGLU -lGL -lXmu -lXi -lXext -lX11 -lm
 
@@ -53,6 +54,10 @@ logo.o : logo.c.Z
 	zcat logo.c.Z > logo.c
 	$(CCF) -c logo.c
 	$(RM) logo.c
+
+dinodraw : dinodraw.o trackball.o
+	$(RM) $@
+	$(CCF) -o $@ dinodraw.o trackball.o $(LDFLAGS)
 
 dinospin : dinospin.o trackball.o
 	$(RM) $@

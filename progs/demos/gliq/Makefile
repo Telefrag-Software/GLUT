@@ -8,10 +8,16 @@ SRCS = gliq.c
 !include "$(TOP)/glutwin32.mak"
 
 trackball.c:
+	@del trackball.c
 	copy ..\..\examples\trackball.c trackball.c
 
 trackball.h:
+	@del trackball.h
 	copy ..\..\examples\trackball.h trackball.h
+
+clobber::
+	@del trackball.c
+	@del trackball.h
 
 # dependencies
 gliq.exe	: tb.obj trackball.obj game.obj score.obj pick.obj board.obj

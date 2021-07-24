@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutTimerFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutTimerFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutTimerFunc - registers a timer callback to be triggered in a
 specified number of milliseconds. 
@@ -34,4 +34,4 @@ callback based on its value parameter when it is triggered.
 .SH SEE ALSO
 glutIdleFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

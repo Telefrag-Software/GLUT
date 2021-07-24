@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutCopyColormap 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutCopyColormap 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutCopyColormap - copies the logical colormap for the layer in use
 from a specified window to the current window. 
@@ -44,4 +44,4 @@ likely to share the same colormap:
 .SH SEE ALSO
 glutSetColor, glutGetColor, glutCreateWindow
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

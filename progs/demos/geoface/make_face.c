@@ -42,7 +42,7 @@
 #include <stdio.h>          /* C header for standard I/O                     */
 #include <string.h>         /* For String compare                            */
 #include <stdlib.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/types.h>
 #include <sys/file.h>
 #endif
@@ -131,6 +131,7 @@ HEAD *create_face ( char *f1, char *f2 )
   h->npolygons		= 0 ;
   h->npindices		= 0 ;
   h->npolylinenodes	= 0 ;
+  h->nmuscles		= 0 ;
 
   read_polygon_indices ( f1, h ) ;
   read_polygon_line    ( f2, h ) ;
@@ -445,9 +446,9 @@ data_struct ( HEAD *face )
 	fprintf (stderr,"tx1: %f ty1: %f tz1: %f\n", tx2,ty2,tz2) ;
 	fprintf (stderr,"tx1: %f ty1: %f tz1: %f\n", tx3,ty3,tz3) ;
 #endif	
-	if ( x1 == tx1 && y1 == ty1 && z1 == tz1 ||
-	     x1 == tx2 && y1 == ty2 && z1 == tz2 ||
-	     x1 == tx3 && y1 == ty3 && z1 == tz3) {
+	if ( (x1 == tx1 && y1 == ty1 && z1 == tz1) ||
+	     (x1 == tx2 && y1 == ty2 && z1 == tz2) ||
+	     (x1 == tx3 && y1 == ty3 && z1 == tz3)) {
 	  cptr = j ;
 #if DATA_STRUCT_DEBUG
 	  fprintf (stderr,"found a vertex match on polygon: %d and %d\n", i,j);
@@ -481,9 +482,9 @@ data_struct ( HEAD *face )
 	ty3 = face->polygon[j]->vertex[2]->xyz[1] ;
 	tz3 = face->polygon[j]->vertex[2]->xyz[2] ;
 
-	if ( x2 == tx1 && y2 == ty1 && z2 == tz1 ||
-	     x2 == tx2 && y2 == ty2 && z2 == tz2 ||
-	     x2 == tx3 && y2 == ty3 && z2 == tz3) {
+	if ( (x2 == tx1 && y2 == ty1 && z2 == tz1) ||
+	     (x2 == tx2 && y2 == ty2 && z2 == tz2) ||
+	     (x2 == tx3 && y2 == ty3 && z2 == tz3)) {
 	  cptr = j ;
 
 	  n = face->polygon[i]->vertex[1]->np ;

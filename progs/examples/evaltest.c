@@ -315,6 +315,10 @@ RenderEval(void)
         glEvalMesh2(GL_LINE, 0, 20, 0, 20);
       }
       break;
+    default:;
+      /* Mesa makes GLenum be a C "enum" and gcc will warn if
+         all the cases of an enum are not tested in a switch
+	 statement.  Add default case to supress the error. */
     }
     break;
   }
@@ -398,7 +402,7 @@ Menu(int value)
 {
   /* Menu items have key values assigned to them.  Just pass
      this value to the key routine. */
-  Key(value, 0, 0);
+  Key((unsigned char) value, 0, 0);
 }
 
 /* ARGSUSED1 */

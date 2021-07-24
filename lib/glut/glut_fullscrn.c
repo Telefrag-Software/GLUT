@@ -1,14 +1,16 @@
 
-/* Copyright (c) Mark J. Kilgard, 1995. */
+/* Copyright (c) Mark J. Kilgard, 1995, 1998. */
 
 /* This program is freely distributable without licensing fees 
    and is provided without guarantee or warrantee expressed or 
    implied. This program is -not- in the public domain. */
 
-#if !defined(WIN32)
+#include <assert.h>
+
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#endif /* WIN32 */
+#endif
 
 /* SGI optimization introduced in IRIX 6.3 to avoid X server
    round trips for interning common X atoms. */
@@ -24,7 +26,9 @@
 void APIENTRY 
 glutFullScreen(void)
 {
-#if !defined(WIN32)
+  assert(!__glutCurrentWindow->parent);
+  IGNORE_IN_GAME_MODE();
+#if !defined(_WIN32)
   if (__glutMotifHints == None) {
     __glutMotifHints = XSGIFastInternAtom(__glutDisplay, "_MOTIF_WM_HINTS",
       SGI_XA__MOTIF_WM_HINTS, 0);
@@ -33,11 +37,13 @@ glutFullScreen(void)
     }
   }
 #endif
+
   __glutCurrentWindow->desiredX = 0;
   __glutCurrentWindow->desiredY = 0;
   __glutCurrentWindow->desiredWidth = __glutScreenWidth;
   __glutCurrentWindow->desiredHeight = __glutScreenHeight;
   __glutCurrentWindow->desiredConfMask |= CWX | CWY | CWWidth | CWHeight;
+
   __glutPutOnWorkList(__glutCurrentWindow,
     GLUT_CONFIGURE_WORK | GLUT_FULL_SCREEN_WORK);
 }

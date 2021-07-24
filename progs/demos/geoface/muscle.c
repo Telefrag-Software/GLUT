@@ -36,6 +36,11 @@
 #include <stdio.h>
 #include "head.h"
 
+#ifdef _WIN32
+#pragma warning (disable:4244)	/* Disable bogus conversion warnings. */
+#pragma warning (disable:4305)  /* VC++ 5.0 version of above warning. */
+#endif
+
 /* Some <math.h> files do not define M_PI... */
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -54,7 +59,7 @@
 
 float VecLen ( float *v )
 {
-  return ( sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]) ) ;
+  return (float) sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
 
 /* ======================================================================== */

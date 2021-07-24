@@ -7,9 +7,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <unistd.h>
 #else
+#include <process.h>  /* for getpid */
 #define random rand
 #define srandom srand
 #endif

@@ -9,22 +9,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #endif
 
-#include <GL/glut.h>
 #include "glutint.h"
 
 GLUTwindow *__glutCurrentWindow = NULL;
 GLUTwindow **__glutWindowList = NULL;
 int __glutWindowListSize = 0;
+#if !defined(_WIN32)
 GLUTstale *__glutStaleWindowList = NULL;
+#endif
+GLUTwindow *__glutMenuWindow = NULL;
 
 void (*__glutFreeOverlayFunc) (GLUToverlay *);
 XVisualInfo *(*__glutDetermineVisualFromString) (char *string, Bool * treatAsSingle,
-  Criterion * requiredCriteria, int nRequired, int requiredMask) = NULL;
+  Criterion * requiredCriteria, int nRequired, int requiredMask, void** fbc) = NULL;
 
 static Criterion requiredWindowCriteria[] =
 {
@@ -54,6 +56,8 @@ cleanWindowWorkList(GLUTwindow * window)
   }
 }
 
+#if !defined(_WIN32)
+
 static void
 cleanStaleWindowList(GLUTwindow * window)
 {
@@ -75,12 +79,13 @@ cleanStaleWindowList(GLUTwindow * window)
   }
 }
 
+#endif
+
 static GLUTwindow *__glutWindowCache = NULL;
 
 GLUTwindow *
 __glutGetWindow(Window win)
 {
-  GLUTstale *entry;
   int i;
 
   /* Does win belong to the last window ID looked up? */
@@ -105,12 +110,18 @@ __glutGetWindow(Window win)
       }
     }
   }
-  /* Scan through destroyed overlay window IDs for which no
-     DestroyNotify has yet been received. */
-  for (entry = __glutStaleWindowList; entry; entry = entry->next) {
-    if (entry->win == win)
-      return entry->window;
+#if !defined(_WIN32)
+  {
+    GLUTstale *entry;
+
+    /* Scan through destroyed overlay window IDs for which no
+       DestroyNotify has yet been received. */
+    for (entry = __glutStaleWindowList; entry; entry = entry->next) {
+      if (entry->win == win)
+        return entry->window;
+    }
   }
+#endif
   return NULL;
 }
 
@@ -139,10 +150,9 @@ __glutSetWindow(GLUTwindow * window)
      too. */
   __glutCurrentWindow = window;
 
-  glXMakeCurrent(__glutDisplay, __glutCurrentWindow->renderWin,
-    __glutCurrentWindow->renderCtx);
+  MAKE_CURRENT_LAYER(__glutCurrentWindow);
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
   /* We should be careful to force a finish between each
      iteration through the GLUT main loop if indirect OpenGL 
      contexts are in use; indirect contexts tend to have  much
@@ -157,8 +167,9 @@ __glutSetWindow(GLUTwindow * window)
      for any OpenGL errors every iteration through the GLUT
      main loop.  To accomplish this, we post the
      GLUT_DEBUG_WORK to be done on this window. */
-  if (__glutDebug)
+  if (__glutDebug) {
     __glutPutOnWorkList(__glutCurrentWindow, GLUT_DEBUG_WORK);
+  }
 }
 
 /* CENTRY */
@@ -400,23 +411,21 @@ __glutDefaultReshape(int width, int height)
 
   /* Adjust the viewport of the window (and overlay if one
      exists). */
-  glXMakeCurrent(__glutDisplay, __glutCurrentWindow->win,
-    __glutCurrentWindow->ctx);
+  MAKE_CURRENT_WINDOW(__glutCurrentWindow);
   glViewport(0, 0, (GLsizei) width, (GLsizei) height);
   overlay = __glutCurrentWindow->overlay;
   if (overlay) {
-    glXMakeCurrent(__glutDisplay, overlay->win, overlay->ctx);
+    MAKE_CURRENT_OVERLAY(overlay);
     glViewport(0, 0, (GLsizei) width, (GLsizei) height);
   }
   /* Make sure we are current to the current layer (application
      should be able to count on the current layer not changing
      unless the application explicitly calls glutUseLayer). */
-  glXMakeCurrent(__glutDisplay, __glutCurrentWindow->renderWin,
-    __glutCurrentWindow->renderCtx);
+  MAKE_CURRENT_LAYER(__glutCurrentWindow);
 }
 
 XVisualInfo *
-__glutDetermineWindowVisual(Bool * treatAsSingle, Bool * visAlloced)
+__glutDetermineWindowVisual(Bool * treatAsSingle, Bool * visAlloced, void **fbc)
 {
   if (__glutDisplayString) {
 
@@ -432,42 +441,58 @@ __glutDetermineWindowVisual(Bool * treatAsSingle, Bool * visAlloced)
 
     assert(__glutDetermineVisualFromString);
     *visAlloced = False;
+    *fbc = NULL;
     return __glutDetermineVisualFromString(__glutDisplayString, treatAsSingle,
-      requiredWindowCriteria, numRequiredWindowCriteria, requiredWindowCriteriaMask);
+      requiredWindowCriteria, numRequiredWindowCriteria, requiredWindowCriteriaMask, fbc);
   } else {
     *visAlloced = True;
+    *fbc = NULL;
     return __glutDetermineVisual(__glutDisplayMode,
       treatAsSingle, __glutGetVisualInfo);
   }
 }
 
+/* ARGSUSED5 */  /* Only Win32 uses gameMode parameter. */
 GLUTwindow *
 __glutCreateWindow(GLUTwindow * parent,
-  int x, int y, int width, int height)
+  int x, int y, int width, int height, int gameMode)
 {
   GLUTwindow *window;
   XSetWindowAttributes wa;
   unsigned long attribMask;
   int winnum;
   int i;
-
-#if defined(WIN32)
-  WNDCLASS wc;
-  if (!GetClassInfo(GetModuleHandle(NULL), "GLUT", &wc))
-    __glutOpenWin32Connection(NULL);
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_fbconfig)
+  GLXFBConfigSGIX fbc;
 #else
-  if (!__glutDisplay)
-    __glutOpenXConnection(NULL);
+  void *fbc;
 #endif
+
+#if defined(_WIN32)
+  WNDCLASS wc;
+  int style;
+
+  if (!GetClassInfo(GetModuleHandle(NULL), "GLUT", &wc)) {
+    __glutOpenWin32Connection(NULL);
+  }
+#else
+  if (!__glutDisplay) {
+    __glutOpenXConnection(NULL);
+  }
+#endif
+  if (__glutGameModeWindow) {
+    __glutFatalError("cannot create windows in game mode.");
+  }
   winnum = getUnusedWindowSlot();
   window = (GLUTwindow *) malloc(sizeof(GLUTwindow));
-  if (!window)
+  if (!window) {
     __glutFatalError("out of memory.");
+  }
   window->num = winnum;
 
-#if !defined(WIN32)
+#if !defined(_WIN32)
   window->vis = __glutDetermineWindowVisual(&window->treatAsSingle,
-    &window->visAlloced);
+    &window->visAlloced, (void**) &fbc);
   if (!window->vis) {
     __glutFatalError(
       "visual with necessary capabilities not found.");
@@ -495,32 +520,49 @@ __glutCreateWindow(GLUTwindow * parent,
   window->width = width;
   window->height = height;
   window->forceReshape = True;
+  window->ignoreKeyRepeat = False;
 
-#if defined(WIN32)
-  __glutAdjustCoords(parent ? parent->win : NULL, &x, &y, &width, &height);
-  window->win = XCreateWindow(__glutDisplay,
-    parent == NULL ? __glutRoot : parent->win,
-    x, y, width, height, 0,
-    0, InputOutput, 0,
-    attribMask, &wa);
+#if defined(_WIN32)
+  __glutAdjustCoords(parent ? parent->win : NULL,
+    &x, &y, &width, &height);
+  if (parent) {
+    style = WS_CHILD;
+  } else {
+    if (gameMode) {
+      /* Game mode window should be a WS_POPUP window to
+         ensure that the taskbar is hidden by it.  A standard
+         WS_OVERLAPPEDWINDOW does not hide the task bar. */
+      style = WS_POPUP | WS_MAXIMIZE;
+    } else {
+      /* A standard toplevel window with borders and such. */
+      style = WS_OVERLAPPEDWINDOW;
+    }
+  }
+  window->win = CreateWindow("GLUT", "GLUT",
+    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | style,
+    x, y, width, height, parent ? parent->win : __glutRoot,
+    NULL, GetModuleHandle(NULL), 0);
   window->hdc = GetDC(window->win);
   /* Must set the XHDC for fake glXChooseVisual & fake
      glXCreateContext & fake XAllocColorCells. */
   XHDC = window->hdc;
   window->vis = __glutDetermineWindowVisual(&window->treatAsSingle,
-    &window->visAlloced);
+    &window->visAlloced, &fbc);
   if (!window->vis) {
     __glutFatalError(
-      "visual with necessary capabilities not found.");
+      "pixel format with necessary capabilities not found.");
   }
   if (!SetPixelFormat(window->hdc,
       ChoosePixelFormat(window->hdc, window->vis),
-      window->vis))
-    __glutFatalError("SetPixelFormat() failed in glutCreateWindow().");
+      window->vis)) {
+    __glutFatalError("SetPixelFormat failed during window create.");
+  }
   __glutSetupColormap(window->vis, &window->colormap, &window->cmap);
   /* Make sure subwindows get a windowStatus callback. */
-  if (parent)
+  if (parent) {
     PostMessage(parent->win, WM_ACTIVATE, 0, 0);
+  }
+  window->renderDc = window->hdc;
 #else
   window->win = XCreateWindow(__glutDisplay,
     parent == NULL ? __glutRoot : parent->win,
@@ -529,14 +571,22 @@ __glutCreateWindow(GLUTwindow * parent,
     attribMask, &wa);
 #endif
   window->renderWin = window->win;
-  window->ctx = glXCreateContext(__glutDisplay, window->vis,
-    None, __glutTryDirect);
+#if defined(GLX_VERSION_1_1) && defined(GLX_SGIX_fbconfig)
+  if (fbc) {
+    window->ctx = glXCreateContextWithConfigSGIX(__glutDisplay, fbc,
+      GLX_RGBA_TYPE_SGIX, None, __glutTryDirect);
+  } else
+#endif
+  {
+    window->ctx = glXCreateContext(__glutDisplay, window->vis,
+      None, __glutTryDirect);
+  }
   if (!window->ctx) {
     __glutFatalError(
       "failed to create OpenGL rendering context.");
   }
   window->renderCtx = window->ctx;
-#if !defined(WIN32)
+#if !defined(_WIN32)
   window->isDirect = glXIsDirect(__glutDisplay, window->ctx);
   if (__glutForceDirect) {
     if (!window->isDirect)
@@ -557,11 +607,14 @@ __glutCreateWindow(GLUTwindow * parent,
   window->reshape = __glutDefaultReshape;
   window->mouse = NULL;
   window->motion = NULL;
-  window->windowStatus = NULL;
-  window->visibility = NULL;
   window->passive = NULL;
   window->entry = NULL;
+  window->keyboard = NULL;
+  window->keyboardUp = NULL;
+  window->windowStatus = NULL;
+  window->visibility = NULL;
   window->special = NULL;
+  window->specialUp = NULL;
   window->buttonBox = NULL;
   window->dials = NULL;
   window->spaceMotion = NULL;
@@ -569,25 +622,51 @@ __glutCreateWindow(GLUTwindow * parent,
   window->spaceButton = NULL;
   window->tabletMotion = NULL;
   window->tabletButton = NULL;
+#ifdef _WIN32
+  window->joystick = NULL;
+  window->joyPollInterval = 0;
+#endif
   window->tabletPos[0] = -1;
   window->tabletPos[1] = -1;
-  window->keyboard = NULL;
   window->shownState = 0;
   window->visState = -1;  /* not VisibilityUnobscured,
                              VisibilityPartiallyObscured, or
                              VisibilityFullyObscured */
   window->entryState = -1;  /* not EnterNotify or LeaveNotify */
-  window->workMask = GLUT_MAP_WORK;
-  window->desiredMapState = NormalState;
+
   window->desiredConfMask = 0;
   window->buttonUses = 0;
   window->cursor = GLUT_CURSOR_INHERIT;
+
+  /* Setup window to be mapped when glutMainLoop starts. */
+  window->workMask = GLUT_MAP_WORK;
+#ifdef _WIN32
+  if (gameMode) {
+    /* When mapping a game mode window, just show
+       the window.  We have already created the game
+       mode window with a maximize flag at creation
+       time.  Doing a ShowWindow(window->win, SW_SHOWNORMAL)
+       would be wrong for a game mode window since it
+       would unmaximize the window. */
+    window->desiredMapState = GameModeState;
+  } else {
+    window->desiredMapState = NormalState;
+  }
+#else
+  window->desiredMapState = NormalState;
+#endif
   window->prevWorkWin = __glutWindowWorkList;
   __glutWindowWorkList = window;
+
+  /* Initially, no menus attached. */
   for (i = 0; i < GLUT_MAX_MENUS; i++) {
     window->menu[i] = 0;
   }
+
+  /* Add this new window to the window list. */
   __glutWindowList[winnum] = window;
+
+  /* Make the new window the current window. */
   __glutSetWindow(window);
 
   __glutDetermineMesaSwapHackSupport();
@@ -612,25 +691,30 @@ glutCreateWindow(const char *title)
 {
   static int firstWindow = 1;
   GLUTwindow *window;
-#if !defined(WIN32)
+#if !defined(_WIN32)
   XWMHints *wmHints;
 #endif
   Window win;
   XTextProperty textprop;
 
+  if (__glutGameModeWindow) {
+    __glutFatalError("cannot create windows in game mode.");
+  }
   window = __glutCreateWindow(NULL,
     __glutSizeHints.x, __glutSizeHints.y,
-    __glutInitWidth, __glutInitHeight);
+    __glutInitWidth, __glutInitHeight,
+    /* not game mode */ 0);
   win = window->win;
   /* Setup ICCCM properties. */
   textprop.value = (unsigned char *) title;
   textprop.encoding = XA_STRING;
   textprop.format = 8;
   textprop.nitems = strlen(title);
-#if defined(WIN32)
+#if defined(_WIN32)
   SetWindowText(win, title);
-  if (__glutIconic)
-    ShowWindow(win, SW_MINIMIZE);
+  if (__glutIconic) {
+    window->desiredMapState = IconicState;
+  }
 #else
   wmHints = XAllocWMHints();
   wmHints->initial_state =
@@ -654,8 +738,8 @@ glutCreateSubWindow(int win, int x, int y, int width, int height)
   GLUTwindow *window;
 
   window = __glutCreateWindow(__glutWindowList[win - 1],
-    x, y, width, height);
-#if !defined(WIN32)
+    x, y, width, height, /* not game mode */ 0);
+#if !defined(_WIN32)
   {
     GLUTwindow *toplevel;
 
@@ -699,7 +783,7 @@ __glutDestroyWindow(GLUTwindow * window,
   }
   /* Unbind if bound to this window. */
   if (window == __glutCurrentWindow) {
-    glXMakeCurrent(__glutDisplay, None, NULL);
+    UNMAKE_CURRENT();
     __glutCurrentWindow = NULL;
   }
   /* Begin tearing down window itself. */
@@ -718,7 +802,9 @@ __glutDestroyWindow(GLUTwindow * window,
 
   /* Cleanup data structures that might contain window. */
   cleanWindowWorkList(window);
+#if !defined(_WIN32)
   cleanStaleWindowList(window);
+#endif
   /* Remove window from the "get window cache" if it is there. */
   if (__glutWindowCache == window)
     __glutWindowCache = NULL;
@@ -727,6 +813,13 @@ __glutDestroyWindow(GLUTwindow * window,
     /* Only free XVisualInfo* gotten from glXChooseVisual. */
     XFree(window->vis);
   }
+
+  if (window == __glutGameModeWindow) {
+    /* Destroying the game mode window should implicitly
+       have GLUT leave game mode. */
+    __glutCloseDownGameMode();
+  }
+
   free(window);
 }
 
@@ -739,7 +832,7 @@ glutDestroyWindow(int win)
   if (__glutMappedMenu && __glutMenuWindow == window) {
     __glutFatalUsage("destroying menu window not allowed while menus in use");
   }
-#if !defined(WIN32)
+#if !defined(_WIN32)
   /* If not a toplevel window... */
   if (window->parent) {
     /* Destroying subwindows may change colormap requirements;
@@ -781,22 +874,6 @@ glutDisplayFunc(GLUTdisplayCB displayFunc)
   if (!displayFunc)
     __glutFatalError("NULL display callback not allowed in GLUT 3.0; update your code.");
   __glutCurrentWindow->display = displayFunc;
-}
-
-void APIENTRY
-glutKeyboardFunc(GLUTkeyboardCB keyboardFunc)
-{
-  __glutChangeWindowEventMask(KeyPressMask,
-    keyboardFunc != NULL || __glutCurrentWindow->special != NULL);
-  __glutCurrentWindow->keyboard = keyboardFunc;
-}
-
-void APIENTRY
-glutSpecialFunc(GLUTspecialCB specialFunc)
-{
-  __glutChangeWindowEventMask(KeyPressMask,
-    specialFunc != NULL || __glutCurrentWindow->keyboard != NULL);
-  __glutCurrentWindow->special = specialFunc;
 }
 
 void APIENTRY

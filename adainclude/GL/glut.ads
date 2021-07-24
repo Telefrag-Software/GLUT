@@ -165,37 +165,37 @@ package Glut is
    --  Stroke font constants (use these in GLUT program).
    --  Bitmap font opaque addresses (use constants instead in source code).
 
-   glutBitmap9By15 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmap9By15 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, glutBitmap9By15, "glutBitmap9By15", "glutBitmap9By15");
 
-   glutBitmap8By13 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmap8By13 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, glutBitmap8By13, "glutBitmap8By13", "glutBitmap8By13");
 
-   glutBitmapTimesRoman10 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmapTimesRoman10 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, 
                   glutBitmapTimesRoman10, 
                   "glutBitmapTimesRoman10", 
                   "glutBitmapTimesRoman10");
 
-   glutBitmapTimesRoman24 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmapTimesRoman24 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, 
                   glutBitmapTimesRoman24, 
                   "glutBitmapTimesRoman24", 
                   "glutBitmapTimesRoman24");
 
-   glutBitmapHelvetica10 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmapHelvetica10 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, 
                   glutBitmapHelvetica10, 
                   "glutBitmapHelvetica10", 
                   "glutBitmapHelvetica10");
 
-   glutBitmapHelvetica12 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmapHelvetica12 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, 
                   glutBitmapHelvetica12, 
                   "glutBitmapHelvetica12", 
                   "glutBitmapHelvetica12");
 
-   glutBitmapHelvetica18 : Interfaces.C.Extensions.Void_Ptr;
+   glutBitmapHelvetica18 : aliased Interfaces.C.Extensions.Void_Ptr;
    pragma Import (C, 
                   glutBitmapHelvetica18, 
                   "glutBitmapHelvetica18", 
@@ -339,6 +339,12 @@ package Glut is
                   "glutInitDisplayMode", 
                   "glutInitDisplayMode");
 
+   procedure glutInitDisplayString (string : Interfaces.C.Strings.Chars_Ptr);
+   pragma Import (C, 
+                  glutInitDisplayString, 
+                  "glutInitDisplayString", 
+                  "glutInitDisplayString");
+
    procedure glutInitWindowPosition (x : Integer; y : Integer);
    pragma Import (C, 
                   glutInitWindowPosition, 
@@ -383,6 +389,12 @@ package Glut is
                   glutPostRedisplay, 
                   "glutPostRedisplay", 
                   "glutPostRedisplay");
+
+   procedure glutPostWindowRedisplay (win : Integer);
+   pragma Import (C, 
+                  glutPostWindowRedisplay, 
+                  "glutPostWindowRedisplay", 
+                  "glutPostWindowRedisplay");
 
    procedure glutSwapBuffers;
    pragma Import (C, glutSwapBuffers, "glutSwapBuffers", "glutSwapBuffers");
@@ -467,6 +479,12 @@ package Glut is
                   glutPostOverlayRedisplay, 
                   "glutPostOverlayRedisplay", 
                   "glutPostOverlayRedisplay");
+
+   procedure glutPostWindowOverlayRedisplay (win : Integer);
+   pragma Import (C, 
+                  glutPostWindowOverlayRedisplay, 
+                  "glutPostWindowOverlayRedisplay", 
+                  "glutPostWindowOverlayRedisplay");
 
    procedure glutShowOverlay;
    pragma Import (C, glutShowOverlay, "glutShowOverlay", "glutShowOverlay");
@@ -737,7 +755,7 @@ package Glut is
 
    --  GLUT font sub-API
 
-   procedure glutBitmapCharacter (font      : Interfaces.C.Extensions.Void_Ptr;
+   procedure glutBitmapCharacter (font      : access Interfaces.C.Extensions.Void_Ptr;
                                   character : Integer);
    pragma Import (C, 
                   glutBitmapCharacter, 
@@ -761,6 +779,16 @@ package Glut is
       (font      : access Interfaces.C.Extensions.Void_Ptr;
        character : Integer) return Integer;
    pragma Import (C, glutStrokeWidth, "glutStrokeWidth", "glutStrokeWidth");
+
+   function glutStrokeLength
+      (font      : access Interfaces.C.Extensions.Void_Ptr;
+       string    : Interfaces.C.Strings.Chars_Ptr) return Integer;
+   pragma Import (C, glutStrokeLength, "glutStrokeLength", "glutStrokeLength");
+
+   function glutBitmapLength
+      (font      : access Interfaces.C.Extensions.Void_Ptr;
+       string    : Interfaces.C.Strings.Chars_Ptr) return Integer;
+   pragma Import (C, glutBitmapLength, "glutBitmapLength", "glutBitmapLength");
 
    --  GLUT pre-built models sub-API
 

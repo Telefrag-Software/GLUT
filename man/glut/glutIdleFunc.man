@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutIdleFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutIdleFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutIdleFunc - sets the global idle callback. 
 .SH SYNTAX
@@ -70,4 +70,4 @@ window first becomes visible on the screen.
 .SH SEE ALSO
 glutTimerFunc, glutVisibilityFunc
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

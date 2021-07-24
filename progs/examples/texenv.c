@@ -46,6 +46,8 @@
 #include <string.h>
 #include <GL/glut.h>
 
+#undef max
+#undef min
 #define max(a,b)	((a) >= (b) ? (a) : (b))
 #define min(a,b)	((a) <= (b) ? (a) : (b))
 /* *INDENT-OFF* */
@@ -401,10 +403,17 @@ loadTexture(int width, int height, struct formatInfo *format)
     p = texImage + i * rowSize;
     for (j = 0; j < width; ++j) {
       if (luminanceSize > 0) {
-        /* 
-           ** +-----+-----+ ** |     |     | ** |  W  | LG  |
-           ** |     |     | ** +-----+-----+ ** |     |     |
-           ** | DG  |  B  | ** |     |     | ** +-----+-----+ */
+        /** 
+         ** +-----+-----+
+	 ** |     |     |
+	 ** |  W  | LG  |
+	 ** |     |     |
+	 ** +-----+-----+
+	 ** |     |     |
+	 ** | DG  |  B  |
+	 ** |     |     |
+	 ** +-----+-----+
+	 **/
         if (i > height / 2) {
           if (j < width / 2) {
             p[0] = 0xff;
@@ -421,10 +430,17 @@ loadTexture(int width, int height, struct formatInfo *format)
         p += elementSize;
       }
       if (rgbSize > 0) {
-        /* 
-           ** +-----+-----+ ** |     |     | ** |  R  |  G  |
-           ** |     |     | ** +-----+-----+ ** |     |     |
-           ** |  Y  |  B  | ** |     |     | ** +-----+-----+ */
+        /**
+         ** +-----+-----+
+	 ** |     |     |
+	 ** |  R  |  G  |
+         ** |     |     |
+	 ** +-----+-----+
+	 ** |     |     |
+         ** |  Y  |  B  |
+	 ** |     |     |
+	 ** +-----+-----+
+	 **/
         if (i > height / 2) {
           if (j < width / 2) {
             p[0] = 0xff;
@@ -449,10 +465,17 @@ loadTexture(int width, int height, struct formatInfo *format)
         p += 3 * elementSize;
       }
       if (alphaSize > 0) {
-        /* 
-           ** +-----------+ ** |     W     | ** |  +-----+  |
-           ** |  |     |  | ** |  |  B  |  | ** |  |     |  |
-           ** |  +-----+  | ** |           | ** +-----------+ */
+        /**
+         ** +-----------+
+	 ** |     W     |
+	 ** |  +-----+  |
+         ** |  |     |  |
+	 ** |  |  B  |  |
+	 ** |  |     |  |
+         ** |  +-----+  |
+	 ** |           |
+	 ** +-----------+
+	 **/
         int i2 = i - height / 2;
         int j2 = j - width / 2;
         int h8 = height / 8;

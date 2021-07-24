@@ -65,7 +65,7 @@ Jeff R. Allen  |     Senior CS major    |    Support your local
    provided it is not sold or redistibuted in any way for profit. This
    is copyrighted material, and is NOT in the Public Domain.
 
-   $Id: worms.c,v 1.2 1995/02/17 03:29:59 jallen Exp $
+   $Id: //sw/apps/OpenGL/glut/progs/contrib/worms.c#6$
 
  */
 
@@ -76,7 +76,7 @@ Jeff R. Allen  |     Senior CS major    |    Support your local
 #include <string.h>
 #include <GL/glut.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #define drand48() (((float) rand())/((float) RAND_MAX))
 #define srand48(x) (srand((x)))
 #endif

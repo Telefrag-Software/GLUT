@@ -124,13 +124,13 @@ void drawScene (void)
  */
 void processHits (GLint hits, GLuint buffer[])
 {
-   unsigned int i, j;
-   GLuint names, *ptr;
+   int i, j, names;
+   GLuint *ptr;
 
    printf ("hits = %d\n", hits);
    ptr = (GLuint *) buffer;
    for (i = 0; i < hits; i++) {	/*  for each hit  */
-      names = *ptr;
+      names = (int) *ptr;
       printf (" number of names for hit = %d\n", names); ptr++;
       printf("  z1 is %g;", (float) *ptr/0x7fffffff); ptr++;
       printf(" z2 is %g\n", (float) *ptr/0x7fffffff); ptr++;

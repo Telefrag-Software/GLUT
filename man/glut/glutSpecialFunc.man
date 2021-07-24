@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSpecialFunc 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSpecialFunc 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSpecialFunc - sets the special keyboard callback for the current window. 
 .SH SYNTAX
@@ -96,6 +96,7 @@ Inset directional key.
 Note that the escape, backspace, and delete keys are generated as an ASCII
 character. 
 .SH SEE ALSO
+glutSpecialUpFunc,
 glutKeyboardFunc, glutMouseFunc, glutSpaceballButtonFunc, glutButtonBoxFunc, glutTabletButtonFunc, glutGetModifiers
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

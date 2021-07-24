@@ -1,7 +1,7 @@
 .\"
 .\" Copyright (c) Mark J. Kilgard, 1996.
 .\"
-.TH glutSolidTorus 3GLUT "3.6" "GLUT" "GLUT"
+.TH glutSolidTorus 3GLUT "3.7" "GLUT" "GLUT"
 .SH NAME
 glutSolidTorus, glutWireTorus - render a solid or wireframe
 torus (doughnut) respectively. 
@@ -33,4 +33,4 @@ glutSolidSphere, glutSolidCube, glutSolidCone, glutSolidDodecahedron,
 glutSolidOctahedron, glutSolidTetrahedron, glutSolidIcosahedron,
 glutSolidTeapot
 .SH AUTHOR
-Mark J. Kilgard (mjk@sgi.com)
+Mark J. Kilgard (mjk@nvidia.com)

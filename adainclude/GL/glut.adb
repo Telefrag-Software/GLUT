@@ -21,6 +21,14 @@ package body Glut is
       return Result;
    end glutCreateWindow;
 
+   procedure glutInitDisplayString (name : String) is
+      c_name : Interfaces.C.Strings.Chars_Ptr :=
+         Interfaces.C.Strings.New_String (name);
+   begin
+      glutInitDisplayString  (c_name);
+      Interfaces.C.Strings.Free  (c_name);
+   end glutInitDisplayString;
+
    procedure glutSetWindowTitle (title : String) is
       c_title : Interfaces.C.Strings.Chars_Ptr :=
          Interfaces.C.Strings.New_String (title);
@@ -36,6 +44,28 @@ package body Glut is
       glutSetIconTitle  (c_title);
       Interfaces.C.Strings.Free  (c_title);
    end glutSetIconTitle;
+
+   function glutBitmapLength (font : access Interfaces.C.Extensions.Void_Ptr;
+     str : String) return Integer is
+      Result : Integer;
+      c_str : Interfaces.C.Strings.Chars_Ptr :=
+         Interfaces.C.Strings.New_String (str);
+   begin
+      Result := glutBitmapLength  (font, c_str);
+      Interfaces.C.Strings.Free  (c_str);
+      return Result;
+   end glutBitmapLength;
+
+   function glutStrokeLength (font : access Interfaces.C.Extensions.Void_Ptr;
+     str : String) return Integer is
+      Result : Integer;
+      c_str : Interfaces.C.Strings.Chars_Ptr :=
+         Interfaces.C.Strings.New_String (str);
+   begin
+      Result := glutStrokeLength  (font, c_str);
+      Interfaces.C.Strings.Free  (c_str);
+      return Result;
+   end glutStrokeLength;
 
    procedure glutAddMenuEntry (label : String; value : Integer) is
       c_label : Interfaces.C.Strings.Chars_Ptr :=
